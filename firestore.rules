@@ -1,0 +1,440 @@
+rules_version = '2';
+
+// Stockmok Firestore Security Rules.
+//
+// Authority: docs/database-final/DB_05_FINAL_DATABASE_SECURITY_AND_TENANT_MATRIX.md.
+// Supporting: DB-02 (field sets), FIREBASE_PATH_CONTRACT (the path registry).
+//
+// Two rules govern every line below.
+//
+//   1. PATH CONSTANCY (DB-05 §1). A rule only ever get()s or exists()s
+//      organizations/{orgId}/members/{request.auth.uid}, where orgId comes from the
+//      matched path. No rule reads a path derived from resource.data.
+//      DATA_DERIVED_RULE_READS = 0.
+//
+//   2. THESE RULES ARE NOT COMMAND AUTHORIZATION (DB-05 §7). The Admin SDK bypasses
+//      this file completely, so every trusted command re-verifies auth, ACTIVE
+//      membership, role, tenant, input and state in its own body. This file protects
+//      the direct client SDK surface only.
+//
+// Client delete is denied on every path, without exception (INV-21, SEC-019).
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // Role registry — DB-05 §0.2, verbatim.
+    // T-SEC-17 asserts these lists equal the backend permission table
+    // (functions/src/guards/roles.ts) and DB-05 §0.2, per role.
+    // ─────────────────────────────────────────────────────────────────────────
+
+    function ROLE_ADMINS() {
+      return ['OWNER', 'ADMIN'];
+    }
+
+    function ROLE_INVENTORY_WRITERS() {
+      return ['OWNER', 'ADMIN', 'INVENTORY_MANAGER'];
+    }
+
+    function ROLE_PARTNER_WRITERS() {
+      return ['OWNER', 'ADMIN', 'PROCUREMENT_MANAGER'];
+    }
+
+    function ROLE_PO_WRITERS() {
+      return ['OWNER', 'ADMIN', 'PROCUREMENT_MANAGER'];
+    }
+
+    function ROLE_RECEIVERS() {
+      return ['OWNER', 'ADMIN', 'INVENTORY_MANAGER', 'PROCUREMENT_MANAGER', 'STOREKEEPER'];
+    }
+
+    function ROLE_TRANSFER_WRITERS() {
+      return ['OWNER', 'ADMIN', 'INVENTORY_MANAGER'];
+    }
+
+    function ROLE_NOT_VIEWER() {
+      return ['OWNER', 'ADMIN', 'INVENTORY_MANAGER', 'PROCUREMENT_MANAGER', 'STOREKEEPER', 'ANALYST'];
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // Principals
+    // ─────────────────────────────────────────────────────────────────────────
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isSelf(uid) {
+      return isSignedIn() && request.auth.uid == uid;
+    }
+
+    // The one constant path any rule is permitted to read.
+    function memberPath(orgId) {
+      return /databases/$(database)/documents/organizations/$(orgId)/members/$(request.auth.uid);
+    }
+
+    function memberExists(orgId) {
+      return isSignedIn() && exists(memberPath(orgId));
+    }
+
+    function memberData(orgId) {
+      return get(memberPath(orgId)).data;
+    }
+
+    // SUSP (suspended or removed) is denied everywhere, at both layers.
+    function isActiveMember(orgId) {
+      return memberExists(orgId) && memberData(orgId).status == 'ACTIVE';
+    }
+
+    function hasRole(orgId, roles) {
+      return isActiveMember(orgId) && memberData(orgId).role in roles;
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // Write predicates
+    // ─────────────────────────────────────────────────────────────────────────
+
+    // DB-05 §4.0.1 / §4.9 — the nine bounded client-listed collections.
+    // "Denies any query without a limit or with a limit greater than N."
+    function boundedList() {
+      return request.query.limit <= 100;
+    }
+
+    function changedKeys() {
+      return request.resource.data.diff(resource.data).affectedKeys();
+    }
+
+    function onlyChanged(fields) {
+      return changedKeys().hasOnly(fields);
+    }
+
+    function neverChanged(fields) {
+      return !changedKeys().hasAny(fields);
+    }
+
+    function keysWithin(allowed) {
+      return request.resource.data.keys().hasOnly(allowed);
+    }
+
+    function keysInclude(required) {
+      return request.resource.data.keys().hasAll(required);
+    }
+
+    // DB-05 §4.1 — the exact private-purchase-order draft predicates.
+    function isNewPrivateDraft() {
+      return request.resource.data.supplierKind == 'PRIVATE'
+        && request.resource.data.status == 'DRAFT'
+        && request.resource.data.isProjection == false;
+    }
+
+    function isEditableDraft() {
+      return resource.data.supplierKind == 'PRIVATE'
+        && resource.data.status == 'DRAFT'
+        && request.resource.data.supplierKind == 'PRIVATE'
+        && request.resource.data.status == 'DRAFT';
+    }
+
+    function draftFieldsOnly() {
+      return onlyChanged([
+        'counterpartyName',
+        'privateSupplierId',
+        'expectedDate',
+        'notes',
+        'totalMinor',
+        'updatedAt'
+      ]);
+    }
+
+    // orgId and poId both come from the matched path, so this stays constant-path.
+    function parentPurchaseOrder(orgId, poId) {
+      return /databases/$(database)/documents/organizations/$(orgId)/purchaseOrders/$(poId);
+    }
+
+    function parentIsEditableDraft(orgId, poId) {
+      return exists(parentPurchaseOrder(orgId, poId))
+        && get(parentPurchaseOrder(orgId, poId)).data.supplierKind == 'PRIVATE'
+        && get(parentPurchaseOrder(orgId, poId)).data.status == 'DRAFT';
+    }
+
+    // ═════════════════════════════════════════════════════════════════════════
+    // ZONE 1 — PUBLIC (DB-05 §2)
+    // ═════════════════════════════════════════════════════════════════════════
+
+    // get public / list denied is the whole anti-enumeration control (T-SEC-20).
+    match /organizationDirectory/{handle} {
+      allow get: if true;
+      allow list: if false;
+      allow write: if false;
+    }
+
+    // Release C — declared and inert so no agent reintroduces it (DB-02 §1.2).
+    match /storefrontCatalog/{handle} {
+      allow read, write: if false;
+
+      match /{document=**} {
+        allow read, write: if false;
+      }
+    }
+
+    // ═════════════════════════════════════════════════════════════════════════
+    // ZONE 2 — USER-PRIVATE (DB-05 §3)
+    // ═════════════════════════════════════════════════════════════════════════
+
+    match /users/{uid} {
+      allow get: if isSelf(uid);
+      allow list: if false;
+
+      // email and status are backend-written and are absent from a client create.
+      allow create: if isSelf(uid)
+        && keysWithin(['uid', 'displayName', 'photoUrl', 'createdAt', 'lastSeenAt'])
+        && keysInclude(['uid', 'displayName', 'createdAt'])
+        && request.resource.data.uid == uid;
+
+      allow update: if isSelf(uid) && onlyChanged(['displayName', 'photoUrl', 'lastSeenAt']);
+      allow delete: if false;
+
+      // A3 · F-H-10 — the ninth bounded path.
+      match /memberships/{orgId} {
+        allow get: if isSelf(uid);
+        allow list: if isSelf(uid) && boundedList();
+        allow write: if false;
+      }
+
+      // Self may flip `read` and nothing else. create/delete denied to everyone,
+      // so a user cannot fabricate their own notification (T-SEC-23).
+      match /notifications/{notificationId} {
+        allow get: if isSelf(uid);
+        allow list: if isSelf(uid);
+        allow create: if false;
+        allow update: if isSelf(uid) && onlyChanged(['read']);
+        allow delete: if false;
+      }
+    }
+
+    // ═════════════════════════════════════════════════════════════════════════
+    // ZONE 3 — ORGANIZATION-PRIVATE (DB-05 §4)
+    //
+    // Every principal outside the organization — PUB, AUTH, CONN, SUSP — is
+    // denied at every path below by isActiveMember() plus the catch-all.
+    // CONN has no rule-level privilege anywhere.
+    // ═════════════════════════════════════════════════════════════════════════
+
+    match /organizations/{orgId} {
+      allow get: if isActiveMember(orgId);
+      allow list: if false;
+      allow write: if false;
+
+      match /settings/{settingsId} {
+        allow get: if isActiveMember(orgId);
+        allow list: if false;
+        allow write: if false;
+      }
+
+      // BACKEND_ONLY — no client access at all.
+      match /counters/{counterId} {
+        allow read, write: if false;
+      }
+
+      match /commandReceipts/{operationId} {
+        allow read, write: if false;
+      }
+
+      match /productSkuIndex/{skuNormalized} {
+        allow read, write: if false;
+      }
+
+      // get: self or ADMINS · list: ADMINS (T-SEC-31).
+      match /members/{memberUid} {
+        allow get: if (isSelf(memberUid) && isActiveMember(orgId)) || hasRole(orgId, ROLE_ADMINS());
+        allow list: if hasRole(orgId, ROLE_ADMINS());
+        allow write: if false;
+      }
+
+      match /invitations/{invitationId} {
+        allow get, list: if hasRole(orgId, ROLE_ADMINS());
+        allow write: if false;
+      }
+
+      // SAFE_DIRECT_CLIENT_WRITE 3/6. `status` is command-only (DB-CR-012):
+      // archive is C-35a, restore is C-35b.
+      match /categories/{categoryId} {
+        allow get: if isActiveMember(orgId);
+        allow list: if isActiveMember(orgId) && boundedList();
+
+        allow create: if hasRole(orgId, ROLE_INVENTORY_WRITERS())
+          && keysWithin([
+            'categoryId', 'name', 'description', 'status',
+            'createdAt', 'createdBy', 'updatedAt', 'updatedBy'
+          ])
+          && request.resource.data.status == 'ACTIVE';
+
+        allow update: if hasRole(orgId, ROLE_INVENTORY_WRITERS())
+          && keysWithin([
+            'categoryId', 'name', 'description', 'status',
+            'createdAt', 'createdBy', 'updatedAt', 'updatedBy'
+          ])
+          && neverChanged(['status']);
+
+        allow delete: if false;
+      }
+
+      // SAFE_DIRECT_CLIENT_WRITE 4/6. `status` is immutable to clients in BOTH
+      // directions (A3 · DB-CR-033): archive is C-12, restore is C-37.
+      // There is no `isDefault` field (DB-CR-013) — the key allowlist denies it.
+      match /warehouses/{warehouseId} {
+        allow get: if isActiveMember(orgId);
+        allow list: if isActiveMember(orgId) && boundedList();
+
+        allow create: if hasRole(orgId, ROLE_INVENTORY_WRITERS())
+          && keysWithin([
+            'warehouseId', 'name', 'code', 'type', 'status', 'address',
+            'createdAt', 'createdBy', 'updatedAt', 'updatedBy'
+          ])
+          && request.resource.data.status == 'ACTIVE';
+
+        allow update: if hasRole(orgId, ROLE_INVENTORY_WRITERS())
+          && keysWithin([
+            'warehouseId', 'name', 'code', 'type', 'status', 'address',
+            'createdAt', 'createdBy', 'updatedAt', 'updatedBy'
+          ])
+          && neverChanged(['status']);
+
+        allow delete: if false;
+      }
+
+      match /products/{productId} {
+        allow get, list: if isActiveMember(orgId);
+        allow write: if false;
+      }
+
+      match /stockBalances/{balanceId} {
+        allow get, list: if isActiveMember(orgId);
+        allow write: if false;
+      }
+
+      match /productStockSummaries/{productId} {
+        allow get, list: if isActiveMember(orgId);
+        allow write: if false;
+      }
+
+      // The ledger. Immutable, and denied to VIEWER entirely (T-SEC-26).
+      match /stockMovements/{movementId} {
+        allow get: if hasRole(orgId, ROLE_NOT_VIEWER());
+        allow list: if hasRole(orgId, ROLE_NOT_VIEWER()) && boundedList();
+        allow write: if false;
+      }
+
+      // SAFE_DIRECT_CLIENT_WRITE 5/6, field-restricted.
+      // `status` (T-SEC-40 · ATTACK-16) and `ordersPlacedCount` (T-SEC-36) are
+      // backend-write-only: a guard the client evaluates is not a guard.
+      match /privatePartners/{partnerId} {
+        allow get: if hasRole(orgId, ROLE_PARTNER_WRITERS());
+        allow list: if hasRole(orgId, ROLE_PARTNER_WRITERS()) && boundedList();
+
+        allow create: if hasRole(orgId, ROLE_PARTNER_WRITERS())
+          && keysWithin([
+            'partnerId', 'partnerTypes', 'name', 'contactPerson', 'email', 'phone',
+            'address', 'notes', 'status', 'ordersPlacedCount',
+            'createdAt', 'createdBy', 'updatedAt', 'updatedBy'
+          ])
+          && request.resource.data.status == 'ACTIVE'
+          && request.resource.data.ordersPlacedCount == 0;
+
+        allow update: if hasRole(orgId, ROLE_PARTNER_WRITERS())
+          && keysWithin([
+            'partnerId', 'partnerTypes', 'name', 'contactPerson', 'email', 'phone',
+            'address', 'notes', 'status', 'ordersPlacedCount',
+            'createdAt', 'createdBy', 'updatedAt', 'updatedBy'
+          ])
+          && neverChanged(['status', 'ordersPlacedCount']);
+
+        allow delete: if false;
+      }
+
+      // SAFE_DIRECT_CLIENT_WRITE 6/6 — only while PRIVATE and DRAFT.
+      match /purchaseOrders/{poId} {
+        allow get, list: if hasRole(orgId, ROLE_NOT_VIEWER());
+
+        allow create: if hasRole(orgId, ROLE_PO_WRITERS()) && isNewPrivateDraft();
+        allow update: if hasRole(orgId, ROLE_PO_WRITERS())
+          && isEditableDraft()
+          && draftFieldsOnly();
+        allow delete: if false;
+
+        match /items/{itemId} {
+          allow get: if hasRole(orgId, ROLE_NOT_VIEWER());
+          allow list: if hasRole(orgId, ROLE_NOT_VIEWER()) && boundedList();
+          allow create, update: if hasRole(orgId, ROLE_PO_WRITERS())
+            && parentIsEditableDraft(orgId, poId);
+          allow delete: if false;
+        }
+
+        match /history/{historyId} {
+          allow get: if hasRole(orgId, ROLE_NOT_VIEWER());
+          allow list: if hasRole(orgId, ROLE_NOT_VIEWER()) && boundedList();
+          allow write: if false;
+        }
+      }
+
+      // Own-org PARTNER_WRITERS only (T-SEC-30). A connected buyer reads this
+      // exclusively through partnerCatalog.list / lookupBySku, each of which
+      // verifies an ACTIVE connection server-side (T-SEC-38).
+      match /partnerCatalog/{catalogItemId} {
+        allow get: if hasRole(orgId, ROLE_PARTNER_WRITERS());
+        allow list: if hasRole(orgId, ROLE_PARTNER_WRITERS()) && boundedList();
+        allow write: if false;
+      }
+
+      match /productMappings/{mappingId} {
+        allow get: if hasRole(orgId, ROLE_PARTNER_WRITERS());
+        allow list: if hasRole(orgId, ROLE_PARTNER_WRITERS()) && boundedList();
+        allow write: if false;
+      }
+
+      // The tenant projection of the zone-4 canonical connection.
+      match /connections/{connectionId} {
+        allow get, list: if hasRole(orgId, ROLE_PARTNER_WRITERS());
+        allow write: if false;
+      }
+
+      // Owner/Admin read only. create, update and delete are denied to every
+      // client including the Owner — immutability is structural.
+      match /auditLogs/{auditId} {
+        allow get, list: if hasRole(orgId, ROLE_ADMINS());
+        allow write: if false;
+      }
+    }
+
+    // ═════════════════════════════════════════════════════════════════════════
+    // ZONE 4 — CROSS-TENANT CANONICAL (DB-05 §5)
+    //
+    // Denied for EVERY principal, including the Owner of a participating
+    // organization. Each party reads its own zone-3 projection instead, so a
+    // third organization sees nothing (T-SEC-12).
+    // ═════════════════════════════════════════════════════════════════════════
+
+    match /handleReservations/{handle} {
+      allow read, write: if false;
+    }
+
+    match /connections/{connectionId} {
+      allow read, write: if false;
+    }
+
+    match /connectedPurchaseOrders/{poId} {
+      allow read, write: if false;
+
+      match /{document=**} {
+        allow read, write: if false;
+      }
+    }
+
+    // ═════════════════════════════════════════════════════════════════════════
+    // CATCH-ALL (DB-05 §6) — an invented path is denied (T-SEC-18).
+    // ═════════════════════════════════════════════════════════════════════════
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
