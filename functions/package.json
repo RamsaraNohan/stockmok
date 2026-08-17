@@ -1,0 +1,21 @@
+{
+  "name": "@stockmok/functions",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "lib/index.js",
+  "engines": {
+    "node": "22"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@stockmok/shared": "0.1.0",
+    "firebase-admin": "^14.1.0",
+    "firebase-functions": "^7.2.5"
+  },
+  "devDependencies": {
+    "typescript": "5.9.3"
+  }
+}

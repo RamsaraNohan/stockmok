@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics><meta name="design_doc_mode" content="canvas"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"><style>body{margin:0;background:#e8ecf1;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;color:#0f172a}a{color:#1d4ed8}a:hover{color:#1e40af}.dv-turn{padding:40px 44px 32px;border-bottom:1px solid rgba(15,23,42,.08);scroll-margin-top:16px}.dv-thd{display:flex;align-items:baseline;gap:10px;margin:0 0 20px}.dv-tid{font:600 10px ui-monospace,Menlo,monospace;padding:3px 7px;background:#0f172a;color:#fff;border-radius:4px;text-decoration:none}.dv-tname{font:600 13px/1.2 Inter,system-ui,sans-serif}.dv-opts{display:flex;flex-wrap:wrap;gap:36px;align-items:flex-start}.dv-opt{flex:none;display:flex;flex-direction:column;gap:9px;scroll-margin-top:16px;max-width:1320px}.dv-oid{font:600 10.5px ui-monospace,Menlo,monospace;padding:3px 7px;background:rgba(15,23,42,.08);color:#0f172a;border-radius:5px;text-decoration:none}.dv-olabel{display:flex;align-items:baseline;gap:8px;font:400 11px/1.3 Inter,system-ui,sans-serif;color:rgba(15,23,42,.55)}.dv-card{max-width:100%;background:#fff;border:1px solid rgba(15,23,42,.12);border-radius:12px;box-shadow:0 1px 3px rgb(15 23 42 / .07);overflow:hidden}.dv-opt:target .dv-oid{background:#1d4ed8;color:#fff}.dv-cap{margin:0;max-width:1320px;font:400 12px/17px Inter,system-ui,sans-serif;color:#475569}.eyb{font:700 12px/16px Inter,sans-serif;letter-spacing:.1em;text-transform:uppercase;color:#64748b;padding-bottom:10px;border-bottom:1px solid #cbd5e1}.tnum{font-variant-numeric:tabular-nums}.g6r{display:grid;align-items:center;min-height:36px;padding:6px 16px;border-top:1px solid #f1f5f9;font:500 14px Inter,sans-serif}.g6h{display:grid;align-items:center;height:36px;padding:0 16px;background:#f1f5f9;font:600 12px Inter,sans-serif;color:#475569}.sect{font:700 12px/16px Inter,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#64748b;padding:12px 20px 4px}.nav{height:36px;display:flex;align-items:center;gap:10px;padding:0 12px;margin:2px 8px;border-radius:6px;font:500 14px/20px Inter,sans-serif;color:#334155}.dot{width:6px;height:6px;border-radius:9999px;background:#cbd5e1;flex:none}.kpi{border:1px solid #cbd5e1;border-radius:8px;background:#fff;padding:14px 16px 16px}.kpil{font:500 13px/19px Inter,sans-serif;color:#475569}.kpiv{font:700 26px/34px Inter,sans-serif;letter-spacing:-.01em;font-variant-numeric:tabular-nums;margin-top:2px}.kpim{font:500 12px/17px Inter,sans-serif;color:#64748b;margin-top:4px}.btnp{box-sizing:border-box;height:40px;display:inline-flex;align-items:center;padding:0 16px;border-radius:6px;font:600 14px Inter,sans-serif;background:#1d4ed8;color:#fff}.btns{box-sizing:border-box;height:40px;display:inline-flex;align-items:center;padding:0 16px;border-radius:6px;font:600 14px Inter,sans-serif;border:1px solid #64748b;background:#fff;color:#0f172a}.pill{display:inline-flex;padding:2px 9px;border-radius:9999px;font:600 12px/18px Inter,sans-serif}.fld{box-sizing:border-box;height:40px;border:1px solid #64748b;border-radius:6px;display:flex;align-items:center;justify-content:space-between;padding:0 12px;font:400 14px Inter,sans-serif;background:#fff}.lbl{display:block;font:600 13px/19px Inter,sans-serif;margin-bottom:5px}.hint{font:400 12px/17px Inter,sans-serif;color:#64748b;margin-top:5px}.pg{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-top:1px solid #e2e8f0;font:500 13px Inter,sans-serif;color:#475569}.pgb{min-width:32px;height:32px;display:inline-flex;align-items:center;justify-content:center;border:1px solid #cbd5e1;border-radius:6px;font:600 13px Inter,sans-serif;background:#fff;padding:0 8px}.mk{width:22px;height:22px;flex:none}.card{background:#fff;border:1px solid #cbd5e1;border-radius:8px}.mono{font-family:ui-monospace,Menlo,monospace}.stg{display:flex;align-items:center;gap:9px;padding:9px 13px;border-radius:8px;border:1px solid #e2e8f0;background:#fff;font:600 13px Inter,sans-serif;color:#64748b}.stgn{width:20px;height:20px;border-radius:9999px;background:#e2e8f0;color:#475569;font:700 12px/20px Inter,sans-serif;text-align:center;flex:none}.wt{font:600 11px/16px ui-monospace,Menlo,monospace;padding:3px 8px;border-radius:5px;background:#0f172a;color:#fff;letter-spacing:.02em}.ph{background:#fff;border:1px solid #cbd5e1;border-radius:22px;overflow:hidden;display:flex;flex-direction:column;flex:none}.sb{height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 22px;font:600 14px Inter,sans-serif}</style></helmet>
+
+<section class="dv-turn" id="t11">
+<div class="dv-thd"><a class="dv-tid" href="#t11">11</a><span class="dv-tname">Gate 11 — Responsive reconciliation · 390 / 768 / 1280 / 1920 · nine frozen transformations applied to the whole system</span></div>
+<div class="dv-opts">
+
+<div class="dv-opt" id="11a" data-screen-label="G11 transformation contract">
+<div class="dv-olabel"><a class="dv-oid" href="#11a">11a</a>The four widths, and the nine transformations every screen inherits</div>
+<div class="dv-card" style="width:1320px">
+  <div style="padding:22px 24px">
+    <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border:1px solid #cbd5e1;border-radius:8px;overflow:hidden">
+      <div style="padding:13px 15px;border-right:1px solid #e2e8f0;background:#f8fafc"><div style="display:flex;align-items:center;gap:8px"><span class="wt">390</span><span style="font:600 13px Inter,sans-serif">Phone</span></div><div style="font:400 12px/17px Inter,sans-serif;color:#475569;margin-top:5px">One column. Bottom tab bar, no sidebar. Records instead of tables. Sheets instead of dialogs. Everything touchable at 44 px or more.</div></div>
+      <div style="padding:13px 15px;border-right:1px solid #e2e8f0;background:#f8fafc"><div style="display:flex;align-items:center;gap:8px"><span class="wt">768</span><span style="font:600 13px Inter,sans-serif">Tablet</span></div><div style="font:400 12px/17px Inter,sans-serif;color:#475569;margin-top:5px">One column of content with a drawer sidebar. Tables keep their identity columns and drop the rest into a second line. Dialogs stay dialogs at 92 % width.</div></div>
+      <div style="padding:13px 15px;border-right:1px solid #e2e8f0;background:#f8fafc"><div style="display:flex;align-items:center;gap:8px"><span class="wt">1280</span><span style="font:600 13px Inter,sans-serif">Laptop</span></div><div style="font:400 12px/17px Inter,sans-serif;color:#475569;margin-top:5px">The reference width. 256 px sidebar, 1024 px of content, full tables at 36 px rows, side panels where a screen has two parties.</div></div>
+      <div style="padding:13px 15px;background:#f8fafc"><div style="display:flex;align-items:center;gap:8px"><span class="wt">1920</span><span style="font:600 13px Inter,sans-serif">Desktop</span></div><div style="font:400 12px/17px Inter,sans-serif;color:#475569;margin-top:5px">Content stops at 1440 px and centres. Nothing stretches, no column is added, no font grows — the extra 480 px is margin, deliberately.</div></div>
+    </div>
+    <div class="card" style="margin-top:16px;overflow:hidden">
+      <div style="padding:11px 16px;background:#f8fafc;border-bottom:1px solid #e2e8f0;font:600 13px Inter,sans-serif">Nine transformations, frozen once and applied everywhere — no screen is reconciled on its own terms</div>
+      <div class="g6h" style="grid-template-columns:150px minmax(0,1fr) minmax(0,1fr) minmax(0,1fr) 160px;column-gap:14px;height:40px"><span>Element class</span><span>1920 / 1280</span><span>768</span><span>390</span><span>Drawn on</span></div>
+      <div class="g6r" style="grid-template-columns:150px minmax(0,1fr) minmax(0,1fr) minmax(0,1fr) 160px;column-gap:14px;border-top-color:#e2e8f0;min-height:52px;align-items:flex-start;padding:11px 16px"><span style="font-weight:600">Shell and navigation</span><span style="color:#475569">64 px header · 256 px pinned sidebar · 16 role-filtered destinations</span><span style="color:#475569">Header keeps monogram, name and bell; sidebar becomes a drawer behind one 44 px control</span><span style="color:#475569">Four-item bottom tab bar for the reader's most-used destinations; everything else in More</span><span><a href="#11b">11b</a> <a href="#11c">11c</a></span></div>
+      <div class="g6r" style="grid-template-columns:150px minmax(0,1fr) minmax(0,1fr) minmax(0,1fr) 160px;column-gap:14px;min-height:52px;align-items:flex-start;padding:11px 16px"><span style="font-weight:600">Operational tables</span><span style="color:#475569">Full table, 36 px rows, 14 px text, numerals right-aligned, 25 rows per page</span><span style="color:#475569">Identity plus the two decisive numbers; the rest folds under the name as a second line</span><span style="color:#475569">One record card per row: name, SKU, balance, status pill, one action</span><span><a href="#11d">11d</a></span></div>
+      <div class="g6r" style="grid-template-columns:150px minmax(0,1fr) minmax(0,1fr) minmax(0,1fr) 160px;column-gap:14px;min-height:52px;align-items:flex-start;padding:11px 16px"><span style="font-weight:600">Forms</span><span style="color:#475569">Two columns, 40 px fields, labels above, help under the field</span><span style="color:#475569">Two columns for short pairs, one for anything with help text</span><span style="color:#475569">One column, 48 px fields, 16 px input text, sticky action bar at the bottom</span><span><a href="#11e">11e</a></span></div>
+      <div class="g6r" style="grid-template-columns:150px minmax(0,1fr) minmax(0,1fr) minmax(0,1fr) 160px;column-gap:14px;min-height:52px;align-items:flex-start;padding:11px 16px"><span style="font-weight:600">Detail layouts</span><span style="color:#475569">Main column plus a 430 px context panel</span><span style="color:#475569">Panel moves below the main column, in the same order</span><span style="color:#475569">Panel becomes collapsed sections under the record; the figures stay above the fold</span><span><a href="#11e">11e</a></span></div>
+      <div class="g6r" style="grid-template-columns:150px minmax(0,1fr) minmax(0,1fr) minmax(0,1fr) 160px;column-gap:14px;min-height:52px;align-items:flex-start;padding:11px 16px"><span style="font-weight:600">Dialogs</span><span style="color:#475569">Centred, 480–560 px, focus trapped, one at a time</span><span style="color:#475569">Centred at 92 % width, 560 px maximum</span><span style="color:#475569">Bottom sheet, full width, 48 px actions pinned to the base, never scrolled out of reach</span><span><a href="#11f">11f</a></span></div>
+      <div class="g6r" style="grid-template-columns:150px minmax(0,1fr) minmax(0,1fr) minmax(0,1fr) 160px;column-gap:14px;min-height:52px;align-items:flex-start;padding:11px 16px"><span style="font-weight:600">Connected two-party structures</span><span style="color:#475569">Your side and their side as adjacent panels, with the boundary drawn between them</span><span style="color:#475569">Stacked, yours first, theirs second, with the boundary as a full-width rule and a heading</span><span style="color:#475569">Yours only, with what the partner learns as one explicit card the reader can open</span><span><a href="#11g">11g</a></span></div>
+      <div class="g6r" style="grid-template-columns:150px minmax(0,1fr) minmax(0,1fr) minmax(0,1fr) 160px;column-gap:14px;min-height:52px;align-items:flex-start;padding:11px 16px"><span style="font-weight:600">Timelines and ledgers</span><span style="color:#475569">Three columns: marker, event, actor and time</span><span style="color:#475569">Two columns; actor and time move under the event text</span><span style="color:#475569">One column; the marker becomes a left rule, and the balance after each entry stays right-aligned</span><span><a href="#11g">11g</a></span></div>
+      <div class="g6r" style="grid-template-columns:150px minmax(0,1fr) minmax(0,1fr) minmax(0,1fr) 160px;column-gap:14px;min-height:52px;align-items:flex-start;padding:11px 16px"><span style="font-weight:600">Reports and charts</span><span style="color:#475569">Chart beside its table, filters in one row</span><span style="color:#475569">Chart above its table, filters wrap to two rows</span><span style="color:#475569">Table only, with the chart's text summary in its place; filters in a sheet</span><span><a href="#11g">11g</a></span></div>
+      <div class="g6r" style="grid-template-columns:150px minmax(0,1fr) minmax(0,1fr) minmax(0,1fr) 160px;column-gap:14px;min-height:52px;align-items:flex-start;padding:11px 16px;background:#f8fafc"><span style="font-weight:600">State screens</span><span style="color:#475569">56 px icon, one sentence, one action, centred in the content area</span><span style="color:#475569">Identical, centred in the narrower column</span><span style="color:#475569">Identical, with the action at full width and 48 px tall</span><span><a href="#11h">11h</a></span></div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:14px">
+      <div class="card" style="padding:13px 15px"><div style="font:600 13px/19px Inter,sans-serif">Reconciled, not redesigned</div><div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:3px">Every 390 px screen already drawn in Gates 5 to 10 was checked against this table rather than re-drawn. Where it already obeyed, it stands as evidence; the four boards that follow add only the flows that had no small-screen frame yet.</div></div>
+      <div class="card" style="padding:13px 15px"><div style="font:600 13px/19px Inter,sans-serif">The phone is not a cut-down desktop</div><div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:3px">At 390 px a screen keeps every figure a decision needs and loses the ones that only support browsing. Receiving loses nothing at all, which is why it is the width the whole system was tested against first.</div></div>
+      <div class="card" style="padding:13px 15px"><div style="font:600 13px/19px Inter,sans-serif">Nothing important is truncated</div><div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:3px">Product names, business names and quantities wrap rather than clip at every width. The only ellipsis in the system is on the invitation link, which is a token nobody reads by eye.</div></div>
+    </div>
+  </div>
+</div>
+<p class="dv-cap"><strong>One contract, nine rows, four columns.</strong> Because the transformations are frozen at the element-class level, a screen built later inherits its small-screen behaviour instead of inventing it — and a reviewer can check any screen against this single table rather than against nine separate precedents.</p>
+</div>
+
+<div class="dv-opt" id="11b" data-screen-label="G11 shell 1920 and 1280">
+<div class="dv-olabel"><a class="dv-oid" href="#11b">11b</a>Shell at 1920 and 1280 — the sidebar is identical; only the margin changes</div>
+<div class="dv-card" style="width:1320px">
+  <div style="background:#f8fafc;padding:20px 24px 24px">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:9px"><span class="wt">1920</span><span style="font:500 12px Inter,sans-serif;color:#475569">shown at 68.75 % · content stops at 1440 px and centres, leaving 240 px of quiet on each side</span></div>
+    <div style="width:1272px;height:385px;overflow:hidden;border:1px solid #cbd5e1;border-radius:10px;background:#fff">
+      <div style="width:1850px;transform:scale(.6875);transform-origin:top left">
+        <div style="height:64px;border-bottom:1px solid #cbd5e1;display:flex;align-items:center;justify-content:space-between;padding:0 28px;background:#fff">
+          <div style="display:flex;align-items:center;gap:16px"><svg class="mk" viewBox="0 0 24 24" fill="#1d4ed8"><g stroke="none"><rect x="3.2" y="2" width="17.6" height="4.4" rx="1.2"></rect><rect x="3.2" y="9.8" width="17.6" height="4.4" rx="1.2"></rect><rect x="3.2" y="17.6" width="17.6" height="4.4" rx="1.2"></rect></g></svg><span style="font:700 17px Inter,sans-serif;letter-spacing:-.01em">Stockmok</span><div style="display:flex;align-items:center;gap:10px;padding-left:16px;border-left:1px solid #e2e8f0"><span style="width:32px;height:32px;border-radius:8px;background:#1d4ed8;color:#fff;font:700 12px Inter,sans-serif;display:inline-flex;align-items:center;justify-content:center">GO</span><span style="font:600 15px Inter,sans-serif">Grand Ocean Hotel</span><span class="pill" style="background:#eff6ff;color:#1e40af">Owner</span></div></div>
+          <div style="display:flex;align-items:center;gap:14px"><span style="position:relative;width:40px;height:40px;border-radius:8px;background:#f1f5f9;display:inline-flex;align-items:center;justify-content:center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="2" stroke-linecap="round"><path d="M18 9a6 6 0 1 0-12 0c0 5-2 6-2 6h16s-2-1-2-6"></path><path d="M10.5 20a2 2 0 0 0 3 0"></path></svg><span class="tnum" style="position:absolute;top:-3px;right:-3px;min-width:19px;height:19px;border-radius:9999px;background:#b91c1c;color:#fff;font:700 11px/19px Inter,sans-serif;text-align:center;padding:0 4px;box-sizing:border-box">3</span></span><span style="width:34px;height:34px;border-radius:9999px;background:#0f172a;color:#fff;font:700 12px Inter,sans-serif;display:inline-flex;align-items:center;justify-content:center">NF</span></div>
+        </div>
+        <div style="display:grid;grid-template-columns:256px minmax(0,1fr);min-height:496px">
+          <div style="border-right:1px solid #e2e8f0;padding:10px 0;background:#fff">
+            <div class="sect">Main</div><div class="nav" style="background:#eff6ff;color:#1e40af;font-weight:600">Dashboard</div>
+            <div class="sect">Inventory</div><div class="nav">Products</div><div class="nav">Categories</div><div class="nav">Store Rooms</div><div class="nav">Stock Movements</div>
+            <div class="sect">Procurement</div><div class="nav">Purchase Orders</div><div class="nav">Receiving</div><div class="nav">Suppliers</div><div class="nav">Buyers</div>
+            <div class="sect">Network</div><div class="nav">Connected Businesses</div><div class="nav">Partner Catalog</div><div class="nav">Product Mappings</div>
+            <div class="sect">More</div><div class="nav">Reports</div><div class="nav">Notifications</div><div class="nav">Team</div><div class="nav">Settings</div>
+          </div>
+          <div style="background:#f8fafc;padding:26px 0">
+            <div style="width:1440px;max-width:100%;margin:0 auto;padding:0 32px;box-sizing:border-box">
+              <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:20px"><div><div style="font:700 28px/36px Inter,sans-serif;letter-spacing:-.02em">Dashboard</div><div style="font:400 14px/21px Inter,sans-serif;color:#475569">Grand Ocean Hotel · 13 August 2026, 09:12</div></div><span class="btnp">Adjust stock</span></div>
+              <div style="display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:14px;margin-top:18px">
+                <div class="kpi"><div class="kpil">Inventory value</div><div class="kpiv" style="font-size:22px;line-height:30px">LKR 691,700.00</div><div class="kpim">At today's unit costs</div></div>
+                <div class="kpi"><div class="kpil">Active products</div><div class="kpiv" style="font-size:22px;line-height:30px">12</div><div class="kpim">In 4 categories</div></div>
+                <div class="kpi" style="border-color:#fbbf24"><div class="kpil">Low stock</div><div class="kpiv" style="font-size:22px;line-height:30px;color:#854d0e">3</div><div class="kpim">Below minimum</div></div>
+                <div class="kpi" style="border-color:#fca5a5"><div class="kpil">Out of stock</div><div class="kpiv" style="font-size:22px;line-height:30px;color:#991b1b">1</div><div class="kpim">Cooking Oil</div></div>
+                <div class="kpi"><div class="kpil">Open purchase orders</div><div class="kpiv" style="font-size:22px;line-height:30px">0</div><div class="kpim">LKR 0.00 committed</div></div>
+              </div>
+              <div style="display:grid;grid-template-columns:minmax(0,1fr) 430px;gap:14px;margin-top:16px">
+                <div class="card" style="height:150px;padding:14px 16px"><div style="font:600 15px/22px Inter,sans-serif">Needs attention · 4 products</div><div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:3px">Cooking Oil 0.000 L · Wheat Flour 60.000 KG · Butter Block 8.000 KG · Fish Fillet 10.000 KG</div></div>
+                <div class="card" style="height:150px;padding:14px 16px"><div style="font:600 15px/22px Inter,sans-serif">Where the stock sits</div><div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:3px">Cold Room LKR 398,900.00 · Main Store LKR 292,800.00</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;margin:18px 0 9px"><span class="wt">1280</span><span style="font:500 12px Inter,sans-serif;color:#475569">drawn at true size · the reference width every table density was set against</span></div>
+    <div style="width:1272px;height:392px;overflow:hidden;border:1px solid #cbd5e1;border-radius:10px;background:#fff">
+      <div style="width:1280px;transform:scale(.99375);transform-origin:top left">
+        <div style="height:64px;border-bottom:1px solid #cbd5e1;display:flex;align-items:center;justify-content:space-between;padding:0 20px;background:#fff">
+          <div style="display:flex;align-items:center;gap:14px"><svg class="mk" viewBox="0 0 24 24" fill="#1d4ed8"><g stroke="none"><rect x="3.2" y="2" width="17.6" height="4.4" rx="1.2"></rect><rect x="3.2" y="9.8" width="17.6" height="4.4" rx="1.2"></rect><rect x="3.2" y="17.6" width="17.6" height="4.4" rx="1.2"></rect></g></svg><div style="display:flex;align-items:center;gap:10px;padding-left:14px;border-left:1px solid #e2e8f0"><span style="width:32px;height:32px;border-radius:8px;background:#1d4ed8;color:#fff;font:700 12px Inter,sans-serif;display:inline-flex;align-items:center;justify-content:center">GO</span><span style="font:600 15px Inter,sans-serif">Grand Ocean Hotel</span><span class="pill" style="background:#eff6ff;color:#1e40af">Owner</span></div></div>
+          <div style="display:flex;align-items:center;gap:12px"><span style="position:relative;width:40px;height:40px;border-radius:8px;background:#f1f5f9;display:inline-flex;align-items:center;justify-content:center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="2" stroke-linecap="round"><path d="M18 9a6 6 0 1 0-12 0c0 5-2 6-2 6h16s-2-1-2-6"></path><path d="M10.5 20a2 2 0 0 0 3 0"></path></svg><span class="tnum" style="position:absolute;top:-3px;right:-3px;min-width:19px;height:19px;border-radius:9999px;background:#b91c1c;color:#fff;font:700 11px/19px Inter,sans-serif;text-align:center;padding:0 4px;box-sizing:border-box">3</span></span><span style="width:34px;height:34px;border-radius:9999px;background:#0f172a;color:#fff;font:700 12px Inter,sans-serif;display:inline-flex;align-items:center;justify-content:center">NF</span></div>
+        </div>
+        <div style="display:grid;grid-template-columns:256px minmax(0,1fr);min-height:330px">
+          <div style="border-right:1px solid #e2e8f0;padding:8px 0;background:#fff">
+            <div class="sect">Main</div><div class="nav" style="background:#eff6ff;color:#1e40af;font-weight:600">Dashboard</div>
+            <div class="sect">Inventory</div><div class="nav">Products</div><div class="nav">Categories</div><div class="nav">Store Rooms</div><div class="nav">Stock Movements</div>
+            <div class="sect">Procurement</div><div class="nav">Purchase Orders</div><div class="nav">Receiving</div><div class="nav">Suppliers</div><div class="nav">Buyers</div>
+          </div>
+          <div style="background:#f8fafc;padding:20px 24px">
+            <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:20px"><div><div style="font:700 26px/34px Inter,sans-serif;letter-spacing:-.02em">Dashboard</div><div style="font:400 14px/21px Inter,sans-serif;color:#475569">Grand Ocean Hotel · 13 August 2026, 09:12</div></div><span class="btnp">Adjust stock</span></div>
+            <div style="display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin-top:16px">
+              <div class="kpi" style="padding:12px 13px 14px"><div class="kpil" style="font-size:12px">Inventory value</div><div class="kpiv" style="font-size:18px;line-height:26px">691,700.00</div><div class="kpim">LKR, at cost</div></div>
+              <div class="kpi" style="padding:12px 13px 14px"><div class="kpil" style="font-size:12px">Active products</div><div class="kpiv" style="font-size:18px;line-height:26px">12</div><div class="kpim">4 categories</div></div>
+              <div class="kpi" style="padding:12px 13px 14px;border-color:#fbbf24"><div class="kpil" style="font-size:12px">Low stock</div><div class="kpiv" style="font-size:18px;line-height:26px;color:#854d0e">3</div><div class="kpim">Below minimum</div></div>
+              <div class="kpi" style="padding:12px 13px 14px;border-color:#fca5a5"><div class="kpil" style="font-size:12px">Out of stock</div><div class="kpiv" style="font-size:18px;line-height:26px;color:#991b1b">1</div><div class="kpim">Cooking Oil</div></div>
+              <div class="kpi" style="padding:12px 13px 14px"><div class="kpil" style="font-size:12px">Open orders</div><div class="kpiv" style="font-size:18px;line-height:26px">0</div><div class="kpim">LKR 0.00</div></div>
+            </div>
+            <div class="card" style="margin-top:14px;overflow:hidden">
+              <div style="padding:11px 16px;border-bottom:1px solid #e2e8f0;font:600 15px/22px Inter,sans-serif">Needs attention</div>
+              <div class="g6h" style="grid-template-columns:minmax(0,1fr) 110px 110px 130px;column-gap:12px"><span>Product</span><span style="text-align:right">On hand</span><span style="text-align:right">Minimum</span><span style="text-align:right">Status</span></div>
+              <div class="g6r" style="grid-template-columns:minmax(0,1fr) 110px 110px 130px;column-gap:12px;border-top-color:#e2e8f0"><span>Cooking Oil <span class="mono" style="font-size:12px;color:#64748b">DRY-004</span></span><span class="tnum" style="text-align:right">0.000 L</span><span class="tnum" style="text-align:right;color:#475569">40.000 L</span><span style="text-align:right"><span class="pill" style="background:#fee2e2;color:#991b1b">Out of stock</span></span></div>
+              <div class="g6r" style="grid-template-columns:minmax(0,1fr) 110px 110px 130px;column-gap:12px"><span>Wheat Flour <span class="mono" style="font-size:12px;color:#64748b">DRY-002</span></span><span class="tnum" style="text-align:right">60.000 KG</span><span class="tnum" style="text-align:right;color:#475569">80.000 KG</span><span style="text-align:right"><span class="pill" style="background:#fef3c7;color:#854d0e">Low stock</span></span></div>
+              <div class="g6r" style="grid-template-columns:minmax(0,1fr) 110px 110px 130px;column-gap:12px"><span>Butter Block <span class="mono" style="font-size:12px;color:#64748b">DAIR-002</span></span><span class="tnum" style="text-align:right">8.000 KG</span><span class="tnum" style="text-align:right;color:#475569">10.000 KG</span><span style="text-align:right"><span class="pill" style="background:#fef3c7;color:#854d0e">Low stock</span></span></div>
+              <div class="g6r" style="grid-template-columns:minmax(0,1fr) 110px 110px 130px;column-gap:12px"><span>Fish Fillet <span class="mono" style="font-size:12px;color:#64748b">MEAT-003</span></span><span class="tnum" style="text-align:right">10.000 KG</span><span class="tnum" style="text-align:right;color:#475569">12.000 KG</span><span style="text-align:right"><span class="pill" style="background:#fef3c7;color:#854d0e">Low stock</span></span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:14px">
+      <div class="card" style="padding:13px 15px"><div style="font:600 13px/19px Inter,sans-serif">1920 adds margin, not content</div><div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:3px">A sixth KPI, a wider table or a larger type scale would all be inventions of the extra room. The five KPI concepts are the five the data can justify, at every width.</div></div>
+      <div class="card" style="padding:13px 15px"><div style="font:600 13px/19px Inter,sans-serif">The sidebar never changes shape</div><div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:3px">256 px, the same sixteen destinations in the same order, the same section labels. What varies between roles is which items exist; what varies between widths is only whether it is pinned or in a drawer.</div></div>
+      <div class="card" style="padding:13px 15px"><div style="font:600 13px/19px Inter,sans-serif">Where the 1280 numbers come from</div><div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:3px">1280 − 256 sidebar − 48 padding = 976 px of table. Five KPI cards at 12 px gaps fit at 176 px each, which is why the value reads 691,700.00 with the currency moved to the sub-line rather than truncating.</div></div>
+    </div>
+  </div>
+</div>
+<p class="dv-cap"><strong>The reference width is 1280, and 1920 is the same design with quieter edges.</strong> Drawing them together makes the restraint visible: the only difference a reviewer can find is the centred 1440 px content column and the KPI cards' extra breathing room.</p>
+</div>
+
+<div class="dv-opt" id="11c" data-screen-label="G11 shell 768 and 390">
+<div class="dv-olabel"><a class="dv-oid" href="#11c">11c</a>Shell at 768 and 390 — one control opens the drawer, four tabs replace it</div>
+<div class="dv-card" style="width:1320px">
+  <div style="background:#f8fafc;padding:20px 24px 24px;display:flex;gap:26px;align-items:flex-start;flex-wrap:wrap">
+    <div style="flex:none">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:9px"><span class="wt">768</span><span style="font:500 12px Inter,sans-serif;color:#475569">true size · drawer closed</span></div>
+      <div style="width:768px;height:600px;background:#fff;border:1px solid #cbd5e1;border-radius:12px;overflow:hidden;display:flex;flex-direction:column">
+        <div style="height:64px;border-bottom:1px solid #cbd5e1;display:flex;align-items:center;justify-content:space-between;padding:0 16px;background:#fff;flex:none">
+          <div style="display:flex;align-items:center;gap:12px">
+            <span style="width:44px;height:44px;border-radius:8px;border:1px solid #cbd5e1;display:inline-flex;align-items:center;justify-content:center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0f172a" stroke-width="2.2" stroke-linecap="round"><path d="M4 7h16"></path><path d="M4 12h16"></path><path d="M4 17h16"></path></svg></span>
+            <span style="width:32px;height:32px;border-radius:8px;background:#1d4ed8;color:#fff;font:700 12px Inter,sans-serif;display:inline-flex;align-items:center;justify-content:center">GO</span>
+            <div><div style="font:600 15px/20px Inter,sans-serif">Grand Ocean Hotel</div><div style="font:500 12px/16px Inter,sans-serif;color:#64748b">Owner</div></div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px"><span style="position:relative;width:44px;height:44px;border-radius:8px;background:#f1f5f9;display:inline-flex;align-items:center;justify-content:center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="2" stroke-linecap="round"><path d="M18 9a6 6 0 1 0-12 0c0 5-2 6-2 6h16s-2-1-2-6"></path><path d="M10.5 20a2 2 0 0 0 3 0"></path></svg><span class="tnum" style="position:absolute;top:-2px;right:-2px;min-width:19px;height:19px;border-radius:9999px;background:#b91c1c;color:#fff;font:700 11px/19px Inter,sans-serif;text-align:center;padding:0 4px;box-sizing:border-box">3</span></span><span style="width:38px;height:38px;border-radius:9999px;background:#0f172a;color:#fff;font:700 12px Inter,sans-serif;display:inline-flex;align-items:center;justify-content:center">NF</span></div>
+        </div>
+        <div style="flex:1;background:#f8fafc;padding:18px 16px;overflow:hidden">
+          <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:14px"><div><div style="font:700 24px/32px Inter,sans-serif;letter-spacing:-.02em">Dashboard</div><div style="font:400 13px/19px Inter,sans-serif;color:#475569">13 August 2026, 09:12</div></div><span class="btnp" style="height:44px">Adjust stock</span></div>
+          <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:16px">
+            <div class="kpi"><div class="kpil">Inventory value</div><div class="kpiv" style="font-size:22px;line-height:30px">LKR 691,700.00</div><div class="kpim">At today's unit costs</div></div>
+            <div class="kpi"><div class="kpil">Active products</div><div class="kpiv" style="font-size:22px;line-height:30px">12</div><div class="kpim">In 4 categories</div></div>
+            <div class="kpi" style="border-color:#fbbf24"><div class="kpil">Low stock</div><div class="kpiv" style="font-size:22px;line-height:30px;color:#854d0e">3</div><div class="kpim">Wheat Flour, Butter Block, Fish Fillet</div></div>
+            <div class="kpi" style="border-color:#fca5a5"><div class="kpil">Out of stock</div><div class="kpiv" style="font-size:22px;line-height:30px;color:#991b1b">1</div><div class="kpim">Cooking Oil · no order open</div></div>
+          </div>
+          <div class="card" style="margin-top:12px;overflow:hidden">
+            <div style="padding:11px 14px;border-bottom:1px solid #e2e8f0;font:600 15px/22px Inter,sans-serif">Needs attention</div>
+            <div class="g6h" style="grid-template-columns:minmax(0,1fr) 122px 130px;column-gap:12px"><span>Product</span><span style="text-align:right">On hand / minimum</span><span style="text-align:right">Status</span></div>
+            <div class="g6r" style="grid-template-columns:minmax(0,1fr) 122px 130px;column-gap:12px;border-top-color:#e2e8f0;min-height:48px;align-items:flex-start;padding:8px 16px"><span>Cooking Oil<div class="mono" style="font:500 12px/17px ui-monospace,Menlo,monospace;color:#64748b">DRY-004 · Main Store</div></span><span class="tnum" style="text-align:right">0.000 L<div style="font:400 12px/17px Inter,sans-serif;color:#64748b">of 40.000 L</div></span><span style="text-align:right"><span class="pill" style="background:#fee2e2;color:#991b1b">Out of stock</span></span></div>
+            <div class="g6r" style="grid-template-columns:minmax(0,1fr) 122px 130px;column-gap:12px;min-height:48px;align-items:flex-start;padding:8px 16px"><span>Wheat Flour<div class="mono" style="font:500 12px/17px ui-monospace,Menlo,monospace;color:#64748b">DRY-002 · Main Store</div></span><span class="tnum" style="text-align:right">60.000 KG<div style="font:400 12px/17px Inter,sans-serif;color:#64748b">of 80.000 KG</div></span><span style="text-align:right"><span class="pill" style="background:#fef3c7;color:#854d0e">Low stock</span></span></div>
+            <div class="g6r" style="grid-template-columns:minmax(0,1fr) 122px 130px;column-gap:12px;min-height:48px;align-items:flex-start;padding:8px 16px"><span>Butter Block<div class="mono" style="font:500 12px/17px ui-monospace,Menlo,monospace;color:#64748b">DAIR-002 · Cold Room</div></span><span class="tnum" style="text-align:right">8.000 KG<div style="font:400 12px/17px Inter,sans-serif;color:#64748b">of 10.000 KG</div></span><span style="text-align:right"><span class="pill" style="background:#fef3c7;color:#854d0e">Low stock</span></span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="flex:none">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:9px"><span class="wt">768</span><span style="font:500 12px Inter,sans-serif;color:#475569">drawer open</span></div>
+      <div style="width:390px;height:600px;background:#fff;border:1px solid #cbd5e1;border-radius:12px;overflow:hidden;position:relative">
+        <div style="position:absolute;inset:0;background:rgb(15 23 42 / .45)"></div>
+        <div style="position:absolute;top:0;bottom:0;left:0;width:288px;background:#fff;border-right:1px solid #cbd5e1;display:flex;flex-direction:column">
+          <div style="height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;border-bottom:1px solid #e2e8f0"><div style="display:flex;align-items:center;gap:10px"><span style="width:32px;height:32px;border-radius:8px;background:#1d4ed8;color:#fff;font:700 12px Inter,sans-serif;display:inline-flex;align-items:center;justify-content:center">GO</span><span style="font:600 14px Inter,sans-serif">Grand Ocean Hotel</span></div><span style="width:44px;height:44px;display:inline-flex;align-items:center;justify-content:center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0f172a" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12"></path><path d="M18 6 6 18"></path></svg></span></div>
+          <div style="flex:1;overflow:hidden;padding:6px 0">
+            <div class="sect" style="padding:10px 16px 4px">Main</div><div class="nav" style="height:44px;background:#eff6ff;color:#1e40af;font-weight:600">Dashboard</div>
+            <div class="sect" style="padding:10px 16px 4px">Inventory</div><div class="nav" style="height:44px">Products</div><div class="nav" style="height:44px">Categories</div><div class="nav" style="height:44px">Store Rooms</div><div class="nav" style="height:44px">Stock Movements</div>
+            <div class="sect" style="padding:10px 16px 4px">Procurement</div><div class="nav" style="height:44px">Purchase Orders</div><div class="nav" style="height:44px">Receiving</div>
+          </div>
+          <div style="border-top:1px solid #e2e8f0;padding:10px 14px;display:flex;align-items:center;gap:10px;height:64px;box-sizing:border-box"><span style="width:36px;height:36px;border-radius:9999px;background:#0f172a;color:#fff;font:700 12px Inter,sans-serif;display:inline-flex;align-items:center;justify-content:center">NF</span><div><div style="font:600 14px/19px Inter,sans-serif">Nohan Fernando</div><div style="font:500 12px/16px Inter,sans-serif;color:#64748b">Owner</div></div></div>
+        </div>
+      </div>
+      <div class="card" style="width:390px;margin-top:12px;padding:13px 15px;box-sizing:border-box"><div style="font:600 13px/19px Inter,sans-serif">The drawer is the sidebar, not a menu</div><div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:3px">Same order, same labels, same role filtering — only the row height grows from 36 to 44 px. The workspace identity stays at the top and the signed-in person at the bottom, so a multi-workspace user can never mistake which business they are in.</div></div>
+    </div>
+    <div style="flex:none">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:9px"><span class="wt">390</span><span style="font:500 12px Inter,sans-serif;color:#475569">tab bar · the four a Storekeeper actually uses</span></div>
+      <div class="ph" style="width:390px;height:600px">
+        <div class="sb"><span class="tnum">09:12</span><span style="display:flex;align-items:center;gap:5px"><svg width="17" height="11" viewBox="0 0 17 11" fill="#0f172a"><rect x="0" y="7" width="3" height="4" rx="1"></rect><rect x="4.6" y="5" width="3" height="6" rx="1"></rect><rect x="9.2" y="2.6" width="3" height="8.4" rx="1"></rect><rect x="13.8" y="0" width="3" height="11" rx="1"></rect></svg><svg width="24" height="12" viewBox="0 0 24 12" fill="none"><rect x="0.5" y="0.5" width="19" height="11" rx="3" stroke="#0f172a" opacity=".4"></rect><rect x="2" y="2" width="14" height="8" rx="1.6" fill="#0f172a"></rect><path d="M21.5 4v4a2.2 2.2 0 0 0 0-4" fill="#0f172a" opacity=".4"></path></svg></span></div>
+        <div style="height:56px;border-bottom:1px solid #e2e8f0;display:flex;align-items:center;justify-content:space-between;padding:0 12px;flex:none">
+          <div style="display:flex;align-items:center;gap:10px"><span style="width:44px;height:44px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;border:1px solid #cbd5e1"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0f172a" stroke-width="2.2" stroke-linecap="round"><path d="M4 7h16"></path><path d="M4 12h16"></path><path d="M4 17h16"></path></svg></span><span style="width:30px;height:30px;border-radius:7px;background:#1d4ed8;color:#fff;font:700 11px Inter,sans-serif;display:inline-flex;align-items:center;justify-content:center">GO</span><span style="font:600 14px Inter,sans-serif">Grand Ocean</span></div>
+          <span style="position:relative;width:44px;height:44px;display:inline-flex;align-items:center;justify-content:center"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="2" stroke-linecap="round"><path d="M18 9a6 6 0 1 0-12 0c0 5-2 6-2 6h16s-2-1-2-6"></path><path d="M10.5 20a2 2 0 0 0 3 0"></path></svg><span class="tnum" style="position:absolute;top:2px;right:2px;min-width:17px;height:17px;border-radius:9999px;background:#b91c1c;color:#fff;font:700 10px/17px Inter,sans-serif;text-align:center;padding:0 3px;box-sizing:border-box">3</span></span>
+        </div>
+        <div style="flex:1;background:#f8fafc;padding:14px;overflow:hidden">
+          <div style="font:700 22px/30px Inter,sans-serif;letter-spacing:-.02em">Dashboard</div>
+          <div style="font:400 14px/20px Inter,sans-serif;color:#64748b">13 August 2026, 09:12</div>
+          <div style="display:flex;flex-direction:column;gap:10px;margin-top:14px">
+            <div class="card" style="padding:14px"><div class="kpil" style="font-size:14px">Inventory value</div><div class="kpiv" style="font-size:26px;line-height:34px">LKR 691,700.00</div><div class="kpim" style="font-size:13px">12 active products in 4 categories</div></div>
+            <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px">
+              <div class="card" style="padding:12px;border-color:#fbbf24"><div class="kpil" style="font-size:13px">Low stock</div><div class="kpiv" style="font-size:24px;line-height:32px;color:#854d0e">3</div></div>
+              <div class="card" style="padding:12px;border-color:#fca5a5"><div class="kpil" style="font-size:13px">Out of stock</div><div class="kpiv" style="font-size:24px;line-height:32px;color:#991b1b">1</div></div>
+            </div>
+            <div class="card" style="padding:14px"><div style="font:600 15px/21px Inter,sans-serif">Needs attention</div><div style="display:flex;align-items:center;justify-content:space-between;margin-top:10px;min-height:44px"><div><div style="font:500 15px/21px Inter,sans-serif">Cooking Oil</div><div style="font:400 13px/18px Inter,sans-serif;color:#64748b">of 40.000 L minimum</div></div><div style="text-align:right"><div class="tnum" style="font:700 16px/22px Inter,sans-serif">0.000 L</div><span class="pill" style="background:#fee2e2;color:#991b1b">Out of stock</span></div></div></div>
+          </div>
+        </div>
+        <div style="height:76px;border-top:1px solid #e2e8f0;background:#fff;display:grid;grid-template-columns:repeat(4,1fr);align-items:start;padding-top:8px;flex:none">
+          <div style="height:56px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px"><span style="width:22px;height:22px;border-radius:6px;background:#1d4ed8"></span><span style="font:600 12px/16px Inter,sans-serif;color:#1e40af">Home</span></div>
+          <div style="height:56px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px"><span style="width:22px;height:22px;border-radius:6px;background:#cbd5e1"></span><span style="font:500 12px/16px Inter,sans-serif;color:#64748b">Products</span></div>
+          <div style="height:56px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px"><span style="width:22px;height:22px;border-radius:6px;background:#cbd5e1"></span><span style="font:500 12px/16px Inter,sans-serif;color:#64748b">Receive</span></div>
+          <div style="height:56px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px"><span style="width:22px;height:22px;border-radius:6px;background:#cbd5e1"></span><span style="font:500 12px/16px Inter,sans-serif;color:#64748b">More</span></div>
+        </div>
+      </div>
+      <div class="card" style="width:390px;margin-top:12px;padding:13px 15px;box-sizing:border-box"><div style="font:600 13px/19px Inter,sans-serif">Four tabs, chosen by role</div><div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:3px">A Storekeeper gets Home, Products, Receive and More. A Procurement Manager gets Home, Orders, Receive and More. The fourth tab always holds the rest of that role's sidebar, so nothing becomes unreachable.</div></div>
+    </div>
+  </div>
+</div>
+<p class="dv-cap"><strong>Two devices, one navigation model.</strong> At 768 the sidebar hides behind a single 44 px control and returns unchanged; at 390 it is replaced by four tabs plus More, because a drawer alone would put the most-used destination two taps away from every screen.</p>
+</div>
+
+<div class="dv-opt" id="11d" data-screen-label="G11 tables to records">
+<div class="dv-olabel"><a class="dv-oid" href="#11d">11d</a>Tables → records — the product list at 1280, 768 and 390</div>
+<div class="dv-card" style="width:1320px">
+  <div style="background:#f8fafc;padding:20px 24px 24px">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:9px"><span class="wt">1280</span><span style="font:500 12px Inter,sans-serif;color:#475569">seven columns · 36 px rows · numerals right-aligned and tabular</span></div>
+    <div class="card" style="overflow:hidden;background:#fff">
+      <div class="g6h" style="grid-template-columns:minmax(0,1fr) 104px 96px 108px 108px 118px 128px;column-gap:12px"><span>Product</span><span>SKU</span><span>Category</span><span style="text-align:right">On hand</span><span style="text-align:right">Minimum</span><span style="text-align:right">Value</span><span style="text-align:right">Status</span></div>
+      <div class="g6r" style="grid-template-columns:minmax(0,1fr) 104px 96px 108px 108px 118px 128px;column-gap:12px;border-top-color:#e2e8f0"><span style="font-weight:600">Chicken Breast</span><span class="mono" style="font-size:13px;color:#475569">MEAT-001</span><span style="color:#475569">Meat</span><span class="tnum" style="text-align:right">120.000 KG</span><span class="tnum" style="text-align:right;color:#475569">20.000</span><span class="tnum" style="text-align:right">150,000.00</span><span style="text-align:right"><span class="pill" style="background:#dcfce7;color:#166534">In stock</span></span></div>
+      <div class="g6r" style="grid-template-columns:minmax(0,1fr) 104px 96px 108px 108px 118px 128px;column-gap:12px"><span style="font-weight:600">Cooking Oil</span><span class="mono" style="font-size:13px;color:#475569">DRY-004</span><span style="color:#475569">Dry Goods</span><span class="tnum" style="text-align:right;color:#991b1b;font-weight:600">0.000 L</span><span class="tnum" style="text-align:right;color:#475569">40.000</span><span class="tnum" style="text-align:right">0.00</span><span style="text-align:right"><span class="pill" style="background:#fee2e2;color:#991b1b">Out of stock</span></span></div>
+      <div class="g6r" style="grid-template-columns:minmax(0,1fr) 104px 96px 108px 108px 118px 128px;column-gap:12px"><span style="font-weight:600">Wheat Flour</span><span class="mono" style="font-size:13px;color:#475569">DRY-002</span><span style="color:#475569">Dry Goods</span><span class="tnum" style="text-align:right;color:#854d0e;font-weight:600">60.000 KG</span><span class="tnum" style="text-align:right;color:#475569">80.000</span><span class="tnum" style="text-align:right">14,400.00</span><span style="text-align:right"><span class="pill" style="background:#fef3c7;color:#854d0e">Low stock</span></span></div>
+      <div class="g6r" style="grid-template-columns:minmax(0,1fr) 104px 96px 108px 108px 118px 128px;column-gap:12px"><span style="font-weight:600">Butter Block</span><span class="mono" style="font-size:13px;color:#475569">DAIR-002</span><span style="color:#475569">Dairy</span><span class="tnum" style="text-align:right;color:#854d0e;font-weight:600">8.000 KG</span><span class="tnum" style="text-align:right;color:#475569">10.000</span><span class="tnum" style="text-align:right">14,400.00</span><span style="text-align:right"><span class="pill" style="background:#fef3c7;color:#854d0e">Low stock</span></span></div>
+      <div class="g6r" style="grid-template-columns:minmax(0,1fr) 104px 96px 108px 108px 118px 128px;column-gap:12px"><span style="font-weight:600">Fish Fillet</span><span class="mono" style="font-size:13px;color:#475569">MEAT-003</span><span style="color:#475569">Meat</span><span class="tnum" style="text-align:right;color:#854d0e;font-weight:600">10.000 KG</span><span class="tnum" style="text-align:right;color:#475569">12.000</span><span class="tnum" style="text-align:right">21,000.00</span><span style="text-align:right"><span class="pill" style="background:#fef3c7;color:#854d0e">Low stock</span></span></div>
+      <div class="pg"><span>Showing 1–5 of 12 active products · LKR 691,700.00 in total</span><span style="display:flex;gap:6px"><span class="pgb" style="color:#94a3b8">Previous</span><span class="pgb" style="background:#1d4ed8;color:#fff;border-color:#1d4ed8">1</span><span class="pgb">2</span><span class="pgb">3</span><span class="pgb">Next</span></span></div>
+    </div>
+    <div style="display:flex;gap:26px;margin-top:20px;flex-wrap:wrap;align-items:flex-start">
+      <div style="flex:none">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:9px"><span class="wt">768</span><span style="font:500 12px Inter,sans-serif;color:#475569">four columns · SKU, category and value fold under the name</span></div>
+        <div class="card" style="width:768px;overflow:hidden;background:#fff;box-sizing:border-box">
+          <div style="padding:12px 16px;border-bottom:1px solid #e2e8f0;display:flex;align-items:center;gap:10px;flex-wrap:wrap"><div class="fld" style="flex:1;min-width:220px;height:44px;justify-content:flex-start;color:#64748b">Search this list</div><span class="btns" style="height:44px">Category</span><span class="btns" style="height:44px">Status</span></div>
+          <div class="g6h" style="grid-template-columns:minmax(0,1fr) 138px 138px;column-gap:12px;height:38px"><span>Product</span><span style="text-align:right">On hand / minimum</span><span style="text-align:right">Status</span></div>
+          <div class="g6r" style="grid-template-columns:minmax(0,1fr) 138px 138px;column-gap:12px;border-top-color:#e2e8f0;min-height:56px;align-items:flex-start;padding:9px 16px"><span><span style="font-weight:600">Chicken Breast</span><div class="mono" style="font:500 12px/17px ui-monospace,Menlo,monospace;color:#64748b">MEAT-001 · Meat · LKR 150,000.00</div></span><span class="tnum" style="text-align:right">120.000 KG<div style="font:400 12px/17px Inter,sans-serif;color:#64748b">of 20.000 KG</div></span><span style="text-align:right"><span class="pill" style="background:#dcfce7;color:#166534">In stock</span></span></div>
+          <div class="g6r" style="grid-template-columns:minmax(0,1fr) 138px 138px;column-gap:12px;min-height:56px;align-items:flex-start;padding:9px 16px"><span><span style="font-weight:600">Cooking Oil</span><div class="mono" style="font:500 12px/17px ui-monospace,Menlo,monospace;color:#64748b">DRY-004 · Dry Goods · LKR 0.00</div></span><span class="tnum" style="text-align:right;color:#991b1b;font-weight:600">0.000 L<div style="font:400 12px/17px Inter,sans-serif;color:#64748b;font-weight:400">of 40.000 L</div></span><span style="text-align:right"><span class="pill" style="background:#fee2e2;color:#991b1b">Out of stock</span></span></div>
+          <div class="g6r" style="grid-template-columns:minmax(0,1fr) 138px 138px;column-gap:12px;min-height:56px;align-items:flex-start;padding:9px 16px"><span><span style="font-weight:600">Wheat Flour</span><div class="mono" style="font:500 12px/17px ui-monospace,Menlo,monospace;color:#64748b">DRY-002 · Dry Goods · LKR 14,400.00</div></span><span class="tnum" style="text-align:right;color:#854d0e;font-weight:600">60.000 KG<div style="font:400 12px/17px Inter,sans-serif;color:#64748b;font-weight:400">of 80.000 KG</div></span><span style="text-align:right"><span class="pill" style="background:#fef3c7;color:#854d0e">Low stock</span></span></div>
+          <div class="g6r" style="grid-template-columns:minmax(0,1fr) 138px 138px;column-gap:12px;min-height:56px;align-items:flex-start;padding:9px 16px"><span><span style="font-weight:600">Butter Block</span><div class="mono" style="font:500 12px/17px ui-monospace,Menlo,monospace;color:#64748b">DAIR-002 · Dairy · LKR 14,400.00</div></span><span class="tnum" style="text-align:right;color:#854d0e;font-weight:600">8.000 KG<div style="font:400 12px/17px Inter,sans-serif;color:#64748b;font-weight:400">of 10.000 KG</div></span><span style="text-align:right"><span class="pill" style="background:#fef3c7;color:#854d0e">Low stock</span></span></div>
+          <div class="pg" style="flex-wrap:wrap;gap:10px"><span>1–4 of 12 · LKR 691,700.00</span><span style="display:flex;gap:6px"><span class="pgb" style="min-width:44px;height:44px">Prev</span><span class="pgb" style="min-width:44px;height:44px;background:#1d4ed8;color:#fff;border-color:#1d4ed8">1</span><span class="pgb" style="min-width:44px;height:44px">2</span><span class="pgb" style="min-width:44px;height:44px">3</span><span class="pgb" style="min-width:44px;height:44px">Next</span></span></div>
+        </div>
+        <div class="card" style="width:768px;margin-top:12px;padding:13px 15px;box-sizing:border-box"><div style="font:600 13px/19px Inter,sans-serif">Nothing is removed — it is relocated</div><div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:3px">SKU, category and value are still on the row, in the monospace sub-line under the name. The two columns that stay are the two a person is scanning for: how much is there, and whether that is a problem.</div></div>
+      </div>
+      <div style="flex:none">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:9px"><span class="wt">390</span><span style="font:500 12px Inter,sans-serif;color:#475569">one record card per row</span></div>
+        <div class="ph" style="width:390px;height:640px">
+          <div class="sb"><span class="tnum">09:20</span><span style="display:flex;align-items:center;gap:5px"><svg width="17" height="11" viewBox="0 0 17 11" fill="#0f172a"><rect x="0" y="7" width="3" height="4" rx="1"></rect><rect x="4.6" y="5" width="3" height="6" rx="1"></rect><rect x="9.2" y="2.6" width="3" height="8.4" rx="1"></rect><rect x="13.8" y="0" width="3" height="11" rx="1"></rect></svg><svg width="24" height="12" viewBox="0 0 24 12" fill="none"><rect x="0.5" y="0.5" width="19" height="11" rx="3" stroke="#0f172a" opacity=".4"></rect><rect x="2" y="2" width="14" height="8" rx="1.6" fill="#0f172a"></rect><path d="M21.5 4v4a2.2 2.2 0 0 0 0-4" fill="#0f172a" opacity=".4"></path></svg></span></div>
+          <div style="padding:2px 14px 12px;border-bottom:1px solid #e2e8f0;flex:none">
+            <div style="height:44px;display:flex;align-items:center;justify-content:space-between"><span style="font:700 22px/30px Inter,sans-serif;letter-spacing:-.02em">Products</span><span style="font:500 13px Inter,sans-serif;color:#64748b">12 active</span></div>
+            <div style="height:48px;border:1px solid #64748b;border-radius:8px;display:flex;align-items:center;gap:9px;padding:0 13px;color:#64748b;font:400 16px Inter,sans-serif"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.6-3.6"></path></svg>Search products</div>
+            <div style="display:flex;gap:8px;margin-top:10px"><span class="pill" style="background:#1d4ed8;color:#fff;height:36px;align-items:center;padding:0 14px;font-size:13px">All 12</span><span class="pill" style="background:#fff;border:1px solid #cbd5e1;color:#334155;height:36px;align-items:center;padding:0 14px;font-size:13px">Low 3</span><span class="pill" style="background:#fff;border:1px solid #cbd5e1;color:#334155;height:36px;align-items:center;padding:0 14px;font-size:13px">Out 1</span></div>
+          </div>
+          <div style="flex:1;background:#f8fafc;padding:12px 14px;overflow:hidden;display:flex;flex-direction:column;gap:10px">
+            <div class="card" style="padding:13px 14px"><div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px"><div style="flex:1"><div style="font:600 16px/22px Inter,sans-serif">Chicken Breast</div><div class="mono" style="font:500 13px/19px ui-monospace,Menlo,monospace;color:#64748b">MEAT-001 · Meat</div></div><span class="pill" style="background:#dcfce7;color:#166534;height:26px;align-items:center;padding:0 11px;flex:none">In stock</span></div><div style="display:flex;align-items:baseline;justify-content:space-between;margin-top:9px"><span class="tnum" style="font:700 20px/28px Inter,sans-serif">120.000 KG</span><span class="tnum" style="font:500 13px Inter,sans-serif;color:#64748b">min 20.000 · LKR 150,000.00</span></div></div>
+            <div class="card" style="padding:13px 14px;border-color:#fca5a5"><div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px"><div style="flex:1"><div style="font:600 16px/22px Inter,sans-serif">Cooking Oil</div><div class="mono" style="font:500 13px/19px ui-monospace,Menlo,monospace;color:#64748b">DRY-004 · Dry Goods</div></div><span class="pill" style="background:#fee2e2;color:#991b1b;height:26px;align-items:center;padding:0 11px;flex:none">Out of stock</span></div><div style="display:flex;align-items:baseline;justify-content:space-between;margin-top:9px"><span class="tnum" style="font:700 20px/28px Inter,sans-serif;color:#991b1b">0.000 L</span><span class="tnum" style="font:500 13px Inter,sans-serif;color:#64748b">min 40.000 · LKR 0.00</span></div></div>
+            <div class="card" style="padding:13px 14px;border-color:#fbbf24"><div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px"><div style="flex:1"><div style="font:600 16px/22px Inter,sans-serif">Wheat Flour</div><div class="mono" style="font:500 13px/19px ui-monospace,Menlo,monospace;color:#64748b">DRY-002 · Dry Goods</div></div><span class="pill" style="background:#fef3c7;color:#854d0e;height:26px;align-items:center;padding:0 11px;flex:none">Low stock</span></div><div style="display:flex;align-items:baseline;justify-content:space-between;margin-top:9px"><span class="tnum" style="font:700 20px/28px Inter,sans-serif;color:#854d0e">60.000 KG</span><span class="tnum" style="font:500 13px Inter,sans-serif;color:#64748b">min 80.000 · LKR 14,400.00</span></div></div>
+            <div class="card" style="padding:13px 14px;border-color:#fbbf24"><div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px"><div style="flex:1"><div style="font:600 16px/22px Inter,sans-serif">Butter Block</div><div class="mono" style="font:500 13px/19px ui-monospace,Menlo,monospace;color:#64748b">DAIR-002 · Dairy</div></div><span class="pill" style="background:#fef3c7;color:#854d0e;height:26px;align-items:center;padding:0 11px;flex:none">Low stock</span></div><div style="display:flex;align-items:baseline;justify-content:space-between;margin-top:9px"><span class="tnum" style="font:700 20px/28px Inter,sans-serif;color:#854d0e">8.000 KG</span><span class="tnum" style="font:500 13px Inter,sans-serif;color:#64748b">min 10.000 · LKR 14,400.00</span></div></div>
+            <div style="height:48px;border:1px solid #64748b;border-radius:8px;display:flex;align-items:center;justify-content:center;font:600 15px Inter,sans-serif;background:#fff">Load the next 8</div>
+          </div>
+        </div>
+        <div class="card" style="width:390px;margin-top:12px;padding:13px 15px;box-sizing:border-box"><div style="font:600 13px/19px Inter,sans-serif">A record, not a squeezed row</div><div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:3px">The balance is the largest thing on the card because it is the reason anybody opened the list. The card border carries the status colour as well as the pill, and paging becomes one 48 px control instead of five small ones.</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+<p class="dv-cap"><strong>No horizontal scrolling at any width.</strong> Seven columns become four, then one card — and the two figures that carry every stock decision, on hand and minimum, are present and adjacent in all three.</p>
+</div>
+
+<div class="dv-opt" id="11e" data-screen-label="G11 forms and detail">
+<div class="dv-olabel"><a class="dv-oid" href="#11e">11e</a>Forms and detail layouts — 768 stacks the panel, 390 keeps the figures above the fold</div>
+<div class="dv-card" style="width:1320px">
+  <div style="background:#f8fafc;padding:20px 24px 24px;display:flex;gap:26px;flex-wrap:wrap;align-items:flex-start">
+    <div style="flex:none">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:9px"><span class="wt">768</span><span style="font:500 12px Inter,sans-serif;color:#475569">product detail · context panel moved below, order preserved</span></div>
+      <div style="width:768px;height:712px;background:#fff;border:1px solid #cbd5e1;border-radius:12px;overflow:hidden;display:flex;flex-direction:column">
+        <div style="padding:16px;border-bottom:1px solid #e2e8f0">
+          <div style="font:500 13px/19px Inter,sans-serif;color:#64748b">Products › Chicken Breast</div>
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-top:2px"><div><div style="font:700 24px/32px Inter,sans-serif;letter-spacing:-.02em">Chicken Breast</div><div class="mono" style="font:500 13px/19px ui-monospace,Menlo,monospace;color:#475569">MEAT-001 · Meat · counted in KG</div></div><span class="pill" style="background:#dcfce7;color:#166534;height:26px;align-items:center;padding:0 12px;flex:none">In stock</span></div>
+          <div style="display:flex;gap:10px;margin-top:14px"><span class="btnp" style="height:44px">Adjust stock</span><span class="btns" style="height:44px">Edit</span><span class="btns" style="height:44px">Archive</span></div>
+        </div>
+        <div style="flex:1;background:#f8fafc;padding:16px;overflow:hidden">
+          <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px">
+            <div class="kpi"><div class="kpil">On hand</div><div class="kpiv" style="font-size:22px;line-height:30px">120.000 KG</div><div class="kpim">Minimum 20.000 KG</div></div>
+            <div class="kpi"><div class="kpil">Unit cost</div><div class="kpiv" style="font-size:22px;line-height:30px">1,250.00</div><div class="kpim">LKR per KG</div></div>
+            <div class="kpi"><div class="kpil">Value</div><div class="kpiv" style="font-size:22px;line-height:30px">150,000.00</div><div class="kpim">LKR at today's cost</div></div>
+          </div>
+          <div class="card" style="margin-top:12px;overflow:hidden">
+            <div style="padding:11px 14px;border-bottom:1px solid #e2e8f0;font:600 15px/22px Inter,sans-serif">Where it is</div>
+            <div class="g6r" style="grid-template-columns:minmax(0,1fr) 130px;column-gap:12px;border-top:none;min-height:44px"><span>Cold Room</span><span class="tnum" style="text-align:right;font-weight:600">80.000 KG</span></div>
+            <div class="g6r" style="grid-template-columns:minmax(0,1fr) 130px;column-gap:12px;min-height:44px"><span>Main Store</span><span class="tnum" style="text-align:right;font-weight:600">40.000 KG</span></div>
+          </div>
+          <div class="card" style="margin-top:12px;overflow:hidden">
+            <div style="padding:11px 14px;border-bottom:1px solid #e2e8f0;font:600 15px/22px Inter,sans-serif">Recent movements</div>
+            <div class="g6h" style="grid-template-columns:minmax(0,1fr) 110px 118px;column-gap:12px"><span>Entry</span><span style="text-align:right">Change</span><span style="text-align:right">Balance</span></div>
+            <div class="g6r" style="grid-template-columns:minmax(0,1fr) 110px 118px;column-gap:12px;border-top-color:#e2e8f0;min-height:50px;align-items:flex-start;padding:8px 16px"><span>Received · CPO-2026-003<div style="font:400 12px/17px Inter,sans-serif;color:#64748b">12 Aug · Cold Room · Nimal Perera</div></span><span class="tnum" style="text-align:right;color:#166534;font-weight:600">+10.000</span><span class="tnum" style="text-align:right">120.000</span></div>
+            <div class="g6r" style="grid-template-columns:minmax(0,1fr) 110px 118px;column-gap:12px;min-height:50px;align-items:flex-start;padding:8px 16px"><span>Received · CPO-2026-003<div style="font:400 12px/17px Inter,sans-serif;color:#64748b">11 Aug · Cold Room · Nimal Perera</div></span><span class="tnum" style="text-align:right;color:#166534;font-weight:600">+40.000</span><span class="tnum" style="text-align:right">110.000</span></div>
+            <div class="g6r" style="grid-template-columns:minmax(0,1fr) 110px 118px;column-gap:12px;min-height:50px;align-items:flex-start;padding:8px 16px"><span>Correction · counted short<div style="font:400 12px/17px Inter,sans-serif;color:#64748b">2 Aug · Cold Room · Dilani Wickrama</div></span><span class="tnum" style="text-align:right;color:#166534;font-weight:600">+2.000</span><span class="tnum" style="text-align:right">20.000</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="card" style="width:768px;margin-top:12px;padding:13px 15px;box-sizing:border-box"><div style="font:600 13px/19px Inter,sans-serif">The panel becomes a section, in the same order</div><div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:3px">At 1280 the per-room balances and the movement ledger sit in a 430 px panel to the right. At 768 they drop underneath in the identical sequence, so somebody who learned the screen on a laptop is not relearning it on a tablet.</div></div>
+    </div>
+    <div style="flex:none">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:9px"><span class="wt">390</span><span style="font:500 12px Inter,sans-serif;color:#475569">product edit · one column, 48 px fields, sticky actions</span></div>
+      <div class="ph" style="width:390px;height:712px">
+        <div class="sb"><span class="tnum">09:26</span><span style="display:flex;align-items:center;gap:5px"><svg width="17" height="11" viewBox="0 0 17 11" fill="#0f172a"><rect x="0" y="7" width="3" height="4" rx="1"></rect><rect x="4.6" y="5" width="3" height="6" rx="1"></rect><rect x="9.2" y="2.6" width="3" height="8.4" rx="1"></rect><rect x="13.8" y="0" width="3" height="11" rx="1"></rect></svg><svg width="24" height="12" viewBox="0 0 24 12" fill="none"><rect x="0.5" y="0.5" width="19" height="11" rx="3" stroke="#0f172a" opacity=".4"></rect><rect x="2" y="2" width="14" height="8" rx="1.6" fill="#0f172a"></rect><path d="M21.5 4v4a2.2 2.2 0 0 0 0-4" fill="#0f172a" opacity=".4"></path></svg></span></div>
+        <div style="padding:0 14px 12px;border-bottom:1px solid #e2e8f0;flex:none">
+          <div style="height:44px;display:flex;align-items:center;gap:10px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0f172a" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"></path></svg><span style="font:500 15px Inter,sans-serif;color:#475569">Chicken Breast</span></div>
+          <div style="font:700 22px/30px Inter,sans-serif;letter-spacing:-.02em">Edit product</div>
+        </div>
+        <div style="flex:1;background:#f8fafc;padding:14px;overflow:hidden;display:flex;flex-direction:column;gap:14px">
+          <div><label class="lbl" style="font-size:14px">Name</label><div style="height:48px;border:1px solid #64748b;border-radius:8px;display:flex;align-items:center;padding:0 14px;font:400 16px Inter,sans-serif">Chicken Breast</div></div>
+          <div><label class="lbl" style="font-size:14px">SKU</label><div style="height:48px;border:1px solid #cbd5e1;background:#f1f5f9;border-radius:8px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;font:400 16px Inter,sans-serif;color:#475569"><span class="mono" style="font-size:15px">MEAT-001</span><span style="font:600 12px Inter,sans-serif;color:#64748b">Fixed</span></div><div class="hint">Movements and orders point at this code.</div></div>
+          <div><label class="lbl" style="font-size:14px">Base unit</label><div style="height:48px;border:1px solid #cbd5e1;background:#f1f5f9;border-radius:8px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;font:400 16px Inter,sans-serif;color:#475569"><span>KG — kilogram</span><span style="font:600 12px Inter,sans-serif;color:#64748b">Locked</span></div><div class="hint">Locked because 120.000 KG is already on hand. Changing it would make every past figure mean something else.</div></div>
+          <div><label class="lbl" style="font-size:14px">Minimum level</label><div class="tnum" style="height:48px;border:1px solid #1d4ed8;border-radius:8px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;font:600 17px Inter,sans-serif;box-shadow:0 0 0 3px rgb(29 78 216 / .18)">20.000<span style="font-weight:500;font-size:15px;color:#64748b">KG</span></div><div class="hint">At 120.000 KG on hand, this product stays in stock.</div></div>
+          <div><label class="lbl" style="font-size:14px">Unit cost</label><div class="tnum" style="height:48px;border:1px solid #64748b;border-radius:8px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;font:400 16px Inter,sans-serif"><span style="color:#64748b;font-size:14px">LKR</span>1,250.00</div><div class="hint">Changing it restates the value of what you hold to LKR 150,000.00 and is recorded.</div></div>
+        </div>
+        <div style="border-top:1px solid #e2e8f0;background:#fff;padding:12px 14px;display:flex;gap:10px;flex:none"><span style="flex:1;height:48px;border:1px solid #64748b;border-radius:8px;display:flex;align-items:center;justify-content:center;font:600 15px Inter,sans-serif">Cancel</span><span style="flex:1.4;height:48px;border-radius:8px;background:#1d4ed8;color:#fff;display:flex;align-items:center;justify-content:center;font:600 15px Inter,sans-serif">Save changes</span></div>
+      </div>
+      <div class="card" style="width:390px;margin-top:12px;padding:13px 15px;box-sizing:border-box"><div style="font:600 13px/19px Inter,sans-serif">Quantity is still not on this form</div><div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:3px">At every width, an edit form changes what a product <em>is</em> and never how much of it there is. Stock moves only through an adjustment, a transfer or a receipt, each of which states the resulting balance.</div></div>
+    </div>
+  </div>
+</div>
+<p class="dv-cap"><strong>Fields grow, rules do not.</strong> The 48 px field and 16 px input text at 390 px are the only changes to the form; the locked base unit, the fixed SKU and the recorded cost change carry the same words and the same consequences they carry at 1280.</p>
+</div>
+
+<div class="dv-opt" id="11f" data-screen-label="G11 dialogs to sheets">
+<div class="dv-olabel"><a class="dv-oid" href="#11f">11f</a>Dialogs → sheets — the stock adjustment and the archive confirmation</div>
+<div class="dv-card" style="width:1320px">
+  <div style="background:#f8fafc;padding:20px 24px 24px;display:flex;gap:26px;flex-wrap:wrap;align-items:flex-start">
+    <div style="flex:none;width:520px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:9px"><span class="wt">1280</span><span style="font:500 12px Inter,sans-serif;color:#475569">centred, 520 px, focus trapped</span></div>
+      <div style="border:1px solid #cbd5e1;border-radius:12px;overflow:hidden;box-shadow:0 20px 40px rgb(15 23 42 / .18);background:#fff">
+        <div style="padding:15px 18px;border-bottom:1px solid #e2e8f0"><div style="font:600 17px/25px Inter,sans-serif">Adjust Chicken Breast</div><div style="font:400 13px/19px Inter,sans-serif;color:#475569">Cold Room · 80.000 KG on hand there</div></div>
+        <div style="padding:16px 18px 18px">
+          <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px">
+            <div><label class="lbl">Direction</label><div class="fld">Reduce<span style="color:#64748b">▾</span></div></div>
+            <div><label class="lbl">Quantity</label><div class="fld tnum" style="border-color:#1d4ed8;box-shadow:0 0 0 2px #fff,0 0 0 4px #1d4ed8;font-weight:600;justify-content:space-between">5.000<span style="font-weight:400;color:#64748b">KG</span></div></div>
+          </div>
+          <div style="margin-top:14px"><label class="lbl">Reason</label><div class="fld" style="justify-content:flex-start">Issued to the kitchen</div><div class="hint">Required. It is the only explanation this entry will ever have.</div></div>
+          <div style="border:1px solid #cbd5e1;border-radius:8px;margin-top:14px;overflow:hidden">
+            <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr))">
+              <div style="padding:11px 13px;border-right:1px solid #f1f5f9"><div style="font:500 12px/17px Inter,sans-serif;color:#475569">Cold Room now</div><div class="tnum" style="font:600 16px/23px Inter,sans-serif">80.000 KG</div></div>
+              <div style="padding:11px 13px;border-right:1px solid #f1f5f9"><div style="font:500 12px/17px Inter,sans-serif;color:#475569">This entry</div><div class="tnum" style="font:600 16px/23px Inter,sans-serif;color:#991b1b">−5.000 KG</div></div>
+              <div style="padding:11px 13px;background:#f8fafc"><div style="font:500 12px/17px Inter,sans-serif;color:#475569">Cold Room after</div><div class="tnum" style="font:700 16px/23px Inter,sans-serif">75.000 KG</div></div>
+            </div>
+            <div style="padding:10px 13px;border-top:1px solid #e2e8f0;font:400 13px/19px Inter,sans-serif;color:#475569">Chicken Breast in total goes from 120.000 to 115.000 KG, which is still above its minimum of 20.000 KG.</div>
+          </div>
+          <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:16px"><span class="btns">Cancel</span><span class="btnp">Record adjustment</span></div>
+        </div>
+      </div>
+      <div class="card" style="margin-top:12px;padding:13px 15px"><div style="font:600 13px/19px Inter,sans-serif">One dialog, ever</div><div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:3px">A confirmation never opens on top of this. If an adjustment reduces more than half the balance, the extra warning appears inside this same dialog rather than stacking a second one over it.</div></div>
+      <div class="card" style="margin-top:12px;padding:14px 16px">
+        <div style="font:600 14px/20px Inter,sans-serif">The over-half warning, in place</div>
+        <div style="display:flex;gap:10px;padding:12px 14px;background:#fef3c7;border-radius:8px;margin-top:9px"><span style="width:20px;height:20px;border-radius:9999px;background:#854d0e;color:#fff;font:700 12px/20px Inter,sans-serif;text-align:center;flex:none">!</span><div style="font:500 13px/19px Inter,sans-serif">Reducing 50.000 KG removes more than half of what is in Cold Room. Confirm the count before recording it — this entry cannot be edited afterwards, only corrected by another.</div></div>
+      </div>
+    </div>
+    <div style="flex:none">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:9px"><span class="wt">390</span><span style="font:500 12px Inter,sans-serif;color:#475569">bottom sheet · actions pinned</span></div>
+      <div class="ph" style="width:390px;height:640px;position:relative">
+        <div class="sb"><span class="tnum">09:30</span><span style="display:flex;align-items:center;gap:5px"><svg width="17" height="11" viewBox="0 0 17 11" fill="#0f172a"><rect x="0" y="7" width="3" height="4" rx="1"></rect><rect x="4.6" y="5" width="3" height="6" rx="1"></rect><rect x="9.2" y="2.6" width="3" height="8.4" rx="1"></rect><rect x="13.8" y="0" width="3" height="11" rx="1"></rect></svg><svg width="24" height="12" viewBox="0 0 24 12" fill="none"><rect x="0.5" y="0.5" width="19" height="11" rx="3" stroke="#0f172a" opacity=".4"></rect><rect x="2" y="2" width="14" height="8" rx="1.6" fill="#0f172a"></rect><path d="M21.5 4v4a2.2 2.2 0 0 0 0-4" fill="#0f172a" opacity=".4"></path></svg></span></div>
+        <div style="flex:1;background:rgb(15 23 42 / .45);position:relative">
+          <div style="position:absolute;left:0;right:0;bottom:0;background:#fff;border-radius:18px 18px 0 0;display:flex;flex-direction:column;max-height:100%">
+            <div style="padding:8px 0 0;display:flex;justify-content:center;flex:none"><span style="width:44px;height:4px;border-radius:9999px;background:#cbd5e1"></span></div>
+            <div style="padding:10px 16px 12px;border-bottom:1px solid #e2e8f0;flex:none"><div style="font:600 18px/26px Inter,sans-serif">Adjust Chicken Breast</div><div style="font:400 14px/20px Inter,sans-serif;color:#475569">Cold Room · 80.000 KG on hand there</div></div>
+            <div style="padding:14px 16px;display:flex;flex-direction:column;gap:13px;overflow:hidden">
+              <div><label class="lbl" style="font-size:14px">Direction</label><div style="display:flex;gap:10px"><span style="flex:1;height:48px;border:1px solid #cbd5e1;border-radius:8px;display:flex;align-items:center;justify-content:center;font:600 15px Inter,sans-serif;color:#475569">Add</span><span style="flex:1;height:48px;border:1px solid #1d4ed8;background:#eff6ff;border-radius:8px;display:flex;align-items:center;justify-content:center;font:600 15px Inter,sans-serif;color:#1e40af">Reduce</span></div></div>
+              <div><label class="lbl" style="font-size:14px">Quantity</label><div style="display:flex;gap:10px"><span style="width:48px;height:48px;border:1px solid #64748b;border-radius:8px;display:flex;align-items:center;justify-content:center;font:600 22px Inter,sans-serif;flex:none">−</span><div class="tnum" style="flex:1;height:48px;border:1px solid #1d4ed8;border-radius:8px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;font:600 18px Inter,sans-serif;box-shadow:0 0 0 3px rgb(29 78 216 / .18)">5.000<span style="font-weight:500;font-size:15px;color:#64748b">KG</span></div><span style="width:48px;height:48px;border:1px solid #64748b;border-radius:8px;display:flex;align-items:center;justify-content:center;font:600 22px Inter,sans-serif;flex:none">+</span></div></div>
+              <div><label class="lbl" style="font-size:14px">Reason</label><div style="height:48px;border:1px solid #64748b;border-radius:8px;display:flex;align-items:center;padding:0 14px;font:400 16px Inter,sans-serif">Issued to the kitchen</div></div>
+              <div style="border:1px solid #cbd5e1;border-radius:12px;overflow:hidden">
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 14px;font:500 15px Inter,sans-serif"><span style="color:#475569">Cold Room now</span><span class="tnum">80.000 KG</span></div>
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-top:1px solid #f1f5f9;font:500 15px Inter,sans-serif"><span style="color:#475569">This entry</span><span class="tnum" style="color:#991b1b;font-weight:600">−5.000 KG</span></div>
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-top:1px solid #f1f5f9;background:#f8fafc;font:600 15px Inter,sans-serif"><span>Cold Room after</span><span class="tnum">75.000 KG</span></div>
+                <div style="padding:10px 14px;border-top:1px solid #f1f5f9;font:400 13px/19px Inter,sans-serif;color:#475569">Total goes to 115.000 KG · still above the 20.000 KG minimum</div>
+              </div>
+            </div>
+            <div style="border-top:1px solid #e2e8f0;padding:12px 16px;display:flex;gap:10px;flex:none"><span style="flex:1;height:48px;border:1px solid #64748b;border-radius:8px;display:flex;align-items:center;justify-content:center;font:600 15px Inter,sans-serif">Cancel</span><span style="flex:1.5;height:48px;border-radius:8px;background:#1d4ed8;color:#fff;display:flex;align-items:center;justify-content:center;font:600 15px Inter,sans-serif">Record adjustment</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="flex:none;width:390px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:9px"><span class="wt">390</span><span style="font:500 12px Inter,sans-serif;color:#475569">destructive confirmation as a sheet</span></div>
+      <div style="border:1px solid #cbd5e1;border-radius:18px 18px 12px 12px;overflow:hidden;box-shadow:0 20px 40px rgb(15 23 42 / .18);background:#fff">
+        <div style="padding:8px 0 0;display:flex;justify-content:center"><span style="width:44px;height:4px;border-radius:9999px;background:#cbd5e1"></span></div>
+        <div style="padding:12px 16px 14px;border-bottom:1px solid #e2e8f0"><div style="font:600 18px/26px Inter,sans-serif">Archive Chicken Breast?</div></div>
+        <div style="padding:14px 16px 16px">
+          <div style="font:400 15px/22px Inter,sans-serif;color:#0f172a">It will no longer appear when adding order lines or recording adjustments. Its 120.000 KG on hand and all six movements stay exactly as they are.</div>
+          <div style="display:flex;gap:10px;padding:12px 14px;background:#fef3c7;border-radius:8px;margin-top:13px"><span style="width:20px;height:20px;border-radius:9999px;background:#854d0e;color:#fff;font:700 12px/20px Inter,sans-serif;text-align:center;flex:none">!</span><div style="font:500 14px/20px Inter,sans-serif">Your verified mapping with Fresh Foods Ltd stops working while this product is archived, so CKN-B5 cannot be received.</div></div>
+          <div style="display:flex;flex-direction:column;gap:10px;margin-top:16px"><span style="height:48px;border-radius:8px;background:#b91c1c;color:#fff;display:flex;align-items:center;justify-content:center;font:600 16px Inter,sans-serif">Archive product</span><span style="height:48px;border:1px solid #64748b;border-radius:8px;display:flex;align-items:center;justify-content:center;font:600 16px Inter,sans-serif">Keep active</span></div>
+        </div>
+      </div>
+      <div class="card" style="margin-top:12px;padding:13px 15px"><div style="font:600 13px/19px Inter,sans-serif">Stacked, not side by side</div><div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:3px">At 390 px a pair of buttons on one row makes both easier to hit by accident. The destructive action goes on top with the archive-box wording, and Keep active sits under it at full width.</div></div>
+      <div class="card" style="margin-top:12px;padding:13px 15px"><div style="font:600 13px/19px Inter,sans-serif">The sheet is still a dialog</div><div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:3px">It takes the keyboard, the page behind it does not scroll, the drag handle and the backdrop both dismiss it, and focus returns to the Archive button that opened it.</div></div>
+    </div>
+  </div>
+</div>
+<p class="dv-cap"><strong>The arithmetic never leaves the screen.</strong> Whether the adjustment is a 520 px dialog or a bottom sheet, the four figures — now, this entry, after, and whether a minimum is crossed — are all visible at the same time as the button that commits them.</p>
+</div>
+
+<div class="dv-opt" id="11g" data-screen-label="G11 connected timeline reports">
+<div class="dv-olabel"><a class="dv-oid" href="#11g">11g</a>Two-party structures, timelines and reports at 768 and 390</div>
+<div class="dv-card" style="width:1320px">
+  <div style="background:#f8fafc;padding:20px 24px 24px;display:flex;gap:26px;flex-wrap:wrap;align-items:flex-start">
+    <div style="flex:none">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:9px"><span class="wt">768</span><span style="font:500 12px Inter,sans-serif;color:#475569">connected order · your side, then the boundary, then theirs</span></div>
+      <div style="width:768px;background:#fff;border:1px solid #cbd5e1;border-radius:12px;overflow:hidden">
+        <div style="padding:16px;border-bottom:1px solid #e2e8f0">
+          <div style="font:500 13px/19px Inter,sans-serif;color:#64748b">Purchase Orders › CPO-2026-003</div>
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:2px"><div style="font:700 24px/32px Inter,sans-serif;letter-spacing:-.02em">CPO-2026-003</div><span class="pill" style="background:#dcfce7;color:#166534;height:26px;align-items:center;padding:0 12px">Received</span><span class="pill" style="background:#eff6ff;color:#1e40af;height:26px;align-items:center;padding:0 12px">Connected order</span></div>
+          <div style="font:400 14px/21px Inter,sans-serif;color:#475569">Fresh Foods Ltd <span class="mono">@freshfoods</span> · submitted 11 Aug 2026, 09:00</div>
+        </div>
+        <div style="padding:16px;background:#f8fafc">
+          <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px">
+            <div class="kpi"><div class="kpil">Ordered</div><div class="kpiv" style="font-size:22px;line-height:30px">10 PACK</div><div class="kpim">50.000 KG at your conversion</div></div>
+            <div class="kpi"><div class="kpil">Received</div><div class="kpiv" style="font-size:22px;line-height:30px">10 PACK</div><div class="kpim">50.000 KG into Cold Room</div></div>
+          </div>
+          <div class="card" style="margin-top:12px;overflow:hidden">
+            <div style="padding:11px 14px;border-bottom:1px solid #e2e8f0;font:600 15px/22px Inter,sans-serif">Lines · written in their units</div>
+            <div class="g6r" style="grid-template-columns:minmax(0,1fr) 118px;column-gap:12px;border-top:none;min-height:52px;align-items:flex-start;padding:9px 16px"><span><span style="font-weight:600">Fresh Chicken Breast 5 KG Pack</span><div class="mono" style="font:500 12px/17px ui-monospace,Menlo,monospace;color:#64748b">CKN-B5 · 10 PACK at 6,250.00</div></span><span class="tnum" style="text-align:right;font-weight:600">62,500.00</span></div>
+            <div style="padding:10px 14px;border-top:1px solid #f1f5f9;background:#f8fafc;display:flex;align-items:center;gap:10px;flex-wrap:wrap"><span class="pill" style="background:#dcfce7;color:#166534">Verified mapping</span><span class="tnum" style="font:500 13px/19px Inter,sans-serif;color:#475569">1 PACK = 5 KG · 50.000 KG of your Chicken Breast</span></div>
+          </div>
+          <div class="card" style="margin-top:12px;overflow:hidden">
+            <div style="padding:11px 14px;border-bottom:1px solid #e2e8f0;font:600 15px/22px Inter,sans-serif">What has happened, and who did it</div>
+            <div style="padding:12px 14px">
+              <div style="display:grid;grid-template-columns:18px minmax(0,1fr);column-gap:11px;align-items:flex-start;padding-bottom:12px"><span style="width:10px;height:10px;border-radius:9999px;background:#166534;margin:6px 0 0 4px"></span><div><div style="font:600 14px/20px Inter,sans-serif">You received 2 PACK</div><div style="font:400 13px/19px Inter,sans-serif;color:#475569">10.000 KG into Cold Room. Chicken Breast reached 120.000 KG.</div><div class="tnum" style="font:500 12px/17px Inter,sans-serif;color:#64748b;margin-top:2px">12 Aug 2026, 15:40 · Nimal Perera</div></div></div>
+              <div style="display:grid;grid-template-columns:18px minmax(0,1fr);column-gap:11px;align-items:flex-start;padding:12px 0;border-top:1px solid #f1f5f9"><span style="width:10px;height:10px;border-radius:9999px;background:#1d4ed8;margin:6px 0 0 4px"></span><div><div style="font:600 14px/20px Inter,sans-serif">You received 8 PACK</div><div style="font:400 13px/19px Inter,sans-serif;color:#475569">40.000 KG into Cold Room. Chicken Breast went from 70.000 to 110.000 KG.</div><div class="tnum" style="font:500 12px/17px Inter,sans-serif;color:#64748b;margin-top:2px">11 Aug 2026, 14:20 · Nimal Perera</div></div></div>
+              <div style="display:grid;grid-template-columns:18px minmax(0,1fr);column-gap:11px;align-items:flex-start;padding:12px 0;border-top:1px solid #f1f5f9"><span style="width:10px;height:10px;border-radius:9999px;background:#cbd5e1;margin:6px 0 0 4px"></span><div><div style="font:600 14px/20px Inter,sans-serif">Fresh Foods Ltd shipped 10 PACK</div><div style="font:400 13px/19px Inter,sans-serif;color:#475569">The whole order, in one shipment, sent the same day they accepted it.</div><div class="tnum" style="font:500 12px/17px Inter,sans-serif;color:#64748b;margin-top:2px">11 Aug 2026, 12:00 · Fresh Foods Ltd</div></div></div>
+              <div style="display:grid;grid-template-columns:18px minmax(0,1fr);column-gap:11px;align-items:flex-start;padding-top:12px;border-top:1px solid #f1f5f9"><span style="width:10px;height:10px;border-radius:9999px;background:#cbd5e1;margin:6px 0 0 4px"></span><div><div style="font:600 14px/20px Inter,sans-serif">You submitted the order</div><div class="tnum" style="font:500 12px/17px Inter,sans-serif;color:#64748b;margin-top:2px">11 Aug 2026, 09:00 · Nohan Fernando</div></div></div>
+            </div>
+          </div>
+        </div>
+        <div style="height:8px;background:#cbd5e1"></div>
+        <div style="padding:16px">
+          <div class="eyb">The partner · and the silence</div>
+          <div class="card" style="margin-top:12px;padding:14px 16px">
+            <div style="display:flex;gap:12px;align-items:center"><span style="width:40px;height:40px;border-radius:9999px;background:#1d4ed8;color:#fff;font:700 14px Inter,sans-serif;display:inline-flex;align-items:center;justify-content:center;flex:none">FF</span><div><div style="font:600 15px/22px Inter,sans-serif">Fresh Foods Ltd</div><div class="mono" style="font:500 12px/17px ui-monospace,Menlo,monospace;color:#64748b">@freshfoods · Colombo</div></div></div>
+            <div style="font:600 14px/20px Inter,sans-serif;margin-top:12px">What they can see of this order</div>
+            <div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:4px">Your name, that you ordered 10 PACK of CKN-B5, that you received 8 PACK and later 2 PACK, and any note either side wrote.</div>
+            <div style="font:600 14px/20px Inter,sans-serif;margin-top:11px">What they cannot</div>
+            <div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:4px">That the packs became kilograms, that your balance is 120.000 KG, that it went into Cold Room, or anything about your product, unit, mapping or other suppliers.</div>
+          </div>
+        </div>
+      </div>
+      <div class="card" style="width:768px;margin-top:12px;padding:13px 15px;box-sizing:border-box"><div style="font:600 13px/19px Inter,sans-serif">The boundary survives stacking</div><div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:3px">At 1280 the two parties are adjacent panels with a 1 px rule between them. Stacked at 768 that rule becomes an 8 px band plus its own heading, so the reader still knows exactly where their workspace ends.</div></div>
+    </div>
+    <div style="flex:none;width:390px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:9px"><span class="wt">390</span><span style="font:500 12px Inter,sans-serif;color:#475569">reports · table, with the chart's summary in its place</span></div>
+      <div class="ph" style="width:390px;height:812px">
+        <div class="sb"><span class="tnum">09:34</span><span style="display:flex;align-items:center;gap:5px"><svg width="17" height="11" viewBox="0 0 17 11" fill="#0f172a"><rect x="0" y="7" width="3" height="4" rx="1"></rect><rect x="4.6" y="5" width="3" height="6" rx="1"></rect><rect x="9.2" y="2.6" width="3" height="8.4" rx="1"></rect><rect x="13.8" y="0" width="3" height="11" rx="1"></rect></svg><svg width="24" height="12" viewBox="0 0 24 12" fill="none"><rect x="0.5" y="0.5" width="19" height="11" rx="3" stroke="#0f172a" opacity=".4"></rect><rect x="2" y="2" width="14" height="8" rx="1.6" fill="#0f172a"></rect><path d="M21.5 4v4a2.2 2.2 0 0 0 0-4" fill="#0f172a" opacity=".4"></path></svg></span></div>
+        <div style="padding:0 14px 12px;border-bottom:1px solid #e2e8f0;flex:none">
+          <div style="height:44px;display:flex;align-items:center;justify-content:space-between"><span style="font:700 22px/30px Inter,sans-serif;letter-spacing:-.02em">Stock on Hand</span><span style="height:44px;display:inline-flex;align-items:center;font:600 14px Inter,sans-serif;color:#1d4ed8">Filters</span></div>
+          <div style="font:400 14px/20px Inter,sans-serif;color:#64748b">12 products · LKR 691,700.00 · 13 Aug 2026</div>
+        </div>
+        <div style="flex:1;background:#f8fafc;padding:12px 14px;overflow:hidden;display:flex;flex-direction:column;gap:12px">
+          <div class="card" style="padding:13px 14px">
+            <div style="font:600 15px/21px Inter,sans-serif">Stock status, in words</div>
+            <div style="font:400 14px/20px Inter,sans-serif;color:#475569;margin-top:4px">Of 12 active products, 8 are in stock, 3 are below their minimum and 1 is out. The chart that carries these four counts on a laptop is replaced here by this sentence and the table below, which hold the same figures.</div>
+          </div>
+          <div class="card" style="overflow:hidden">
+            <div class="g6h" style="grid-template-columns:minmax(0,1fr) 92px;column-gap:10px;height:38px;padding:0 14px"><span>Status</span><span style="text-align:right">Products</span></div>
+            <div class="g6r" style="grid-template-columns:minmax(0,1fr) 92px;column-gap:10px;border-top-color:#e2e8f0;min-height:44px;padding:6px 14px"><span style="display:flex;align-items:center;gap:8px"><span class="pill" style="background:#dcfce7;color:#166534">In stock</span></span><span class="tnum" style="text-align:right;font-weight:600">8</span></div>
+            <div class="g6r" style="grid-template-columns:minmax(0,1fr) 92px;column-gap:10px;min-height:44px;padding:6px 14px"><span style="display:flex;align-items:center;gap:8px"><span class="pill" style="background:#fef3c7;color:#854d0e">Low stock</span></span><span class="tnum" style="text-align:right;font-weight:600">3</span></div>
+            <div class="g6r" style="grid-template-columns:minmax(0,1fr) 92px;column-gap:10px;min-height:44px;padding:6px 14px"><span style="display:flex;align-items:center;gap:8px"><span class="pill" style="background:#fee2e2;color:#991b1b">Out of stock</span></span><span class="tnum" style="text-align:right;font-weight:600">1</span></div>
+            <div class="g6r" style="grid-template-columns:minmax(0,1fr) 92px;column-gap:10px;min-height:44px;padding:6px 14px;background:#f8fafc"><span style="font-weight:600">All active products</span><span class="tnum" style="text-align:right;font-weight:700">12</span></div>
+          </div>
+          <div class="card" style="overflow:hidden">
+            <div style="padding:11px 14px;border-bottom:1px solid #e2e8f0;font:600 15px/21px Inter,sans-serif">By store room</div>
+            <div class="g6r" style="grid-template-columns:minmax(0,1fr) 130px;column-gap:10px;border-top:none;min-height:44px;padding:6px 14px"><span>Cold Room<div style="font:400 12px/17px Inter,sans-serif;color:#64748b">Meat and Dairy</div></span><span class="tnum" style="text-align:right;font-weight:600">398,900.00</span></div>
+            <div class="g6r" style="grid-template-columns:minmax(0,1fr) 130px;column-gap:10px;min-height:44px;padding:6px 14px"><span>Main Store<div style="font:400 12px/17px Inter,sans-serif;color:#64748b">Dry Goods and Beverages</div></span><span class="tnum" style="text-align:right;font-weight:600">292,800.00</span></div>
+            <div class="g6r" style="grid-template-columns:minmax(0,1fr) 130px;column-gap:10px;min-height:44px;padding:6px 14px;background:#f8fafc"><span style="font-weight:600">Total</span><span class="tnum" style="text-align:right;font-weight:700">691,700.00</span></div>
+          </div>
+        </div>
+        <div style="border-top:1px solid #e2e8f0;background:#fff;padding:12px 14px;flex:none"><span style="display:flex;height:48px;border:1px solid #64748b;border-radius:8px;align-items:center;justify-content:center;font:600 15px Inter,sans-serif">Export these 12 rows</span></div>
+      </div>
+      <div class="card" style="margin-top:12px;padding:13px 15px"><div style="font:600 13px/19px Inter,sans-serif">The table is the report</div><div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:3px">A chart squeezed to 362 px would be less accurate than the counts it draws, so at 390 px it is dropped and its text summary takes its place. Export writes the twelve rows already on screen — never a wider query than the filters asked for.</div></div>
+    </div>
+  </div>
+</div>
+<p class="dv-cap"><strong>Every figure here is one already drawn.</strong> The stacked connected order, the single-column timeline and the chartless report all restate Gates 6 to 9 at a new width — 10 PACK, 50.000 KG, 120.000 KG, LKR 691,700.00 — without introducing a number the earlier gates were not held to.</p>
+</div>
+
+<div class="dv-opt" id="11h" data-screen-label="G11 mobile priority flows">
+<div class="dv-olabel"><a class="dv-oid" href="#11h">11h</a>The mobile-priority flows that had no 390 px frame yet</div>
+<div class="dv-card" style="width:1320px">
+  <div style="background:#f8fafc;padding:20px 24px 24px">
+    <div class="card" style="overflow:hidden;background:#fff">
+      <div style="padding:11px 16px;background:#f8fafc;border-bottom:1px solid #e2e8f0;font:600 13px Inter,sans-serif">The nine mobile-priority flows, and where each one is drawn at 390 px</div>
+      <div class="g6h" style="grid-template-columns:minmax(0,1fr) 180px 200px;column-gap:14px"><span>Flow</span><span>Drawn at 390 px in</span><span>Verdict</span></div>
+      <div class="g6r" style="grid-template-columns:minmax(0,1fr) 180px 200px;column-gap:14px;border-top-color:#e2e8f0"><span>Sign in and the workspace drawer</span><span style="color:#475569">Gate 5 · board 5m</span><span style="color:#166534;font-weight:600">Already compliant</span></div>
+      <div class="g6r" style="grid-template-columns:minmax(0,1fr) 180px 200px;column-gap:14px"><span>Product list and product detail</span><span style="color:#475569">Gate 6 · board 6m</span><span style="color:#166534;font-weight:600">Already compliant</span></div>
+      <div class="g6r" style="grid-template-columns:minmax(0,1fr) 180px 200px;column-gap:14px"><span>Private receiving</span><span style="color:#475569">Gate 7 · 390 px board</span><span style="color:#166534;font-weight:600">Already compliant</span></div>
+      <div class="g6r" style="grid-template-columns:minmax(0,1fr) 180px 200px;column-gap:14px"><span>Connected receiving</span><span style="color:#475569">Gate 9 · board 9i</span><span style="color:#166534;font-weight:600">Gold standard</span></div>
+      <div class="g6r" style="grid-template-columns:minmax(0,1fr) 180px 200px;column-gap:14px"><span>Notifications, team and settings</span><span style="color:#475569">Gate 10 · board 10h</span><span style="color:#166534;font-weight:600">Already compliant</span></div>
+      <div class="g6r" style="grid-template-columns:minmax(0,1fr) 180px 200px;column-gap:14px;background:#eff6ff;border-top-color:#bfdbfe"><span style="font-weight:600">Dashboard</span><span style="color:#1e40af;font-weight:600">This gate · <a href="#11c">11c</a></span><span style="color:#1e40af;font-weight:700">Added</span></div>
+      <div class="g6r" style="grid-template-columns:minmax(0,1fr) 180px 200px;column-gap:14px;background:#eff6ff"><span style="font-weight:600">Stock adjustment</span><span style="color:#1e40af;font-weight:600">This gate · <a href="#11f">11f</a></span><span style="color:#1e40af;font-weight:700">Added</span></div>
+      <div class="g6r" style="grid-template-columns:minmax(0,1fr) 180px 200px;column-gap:14px;background:#eff6ff"><span style="font-weight:600">Private purchase-order detail</span><span style="color:#1e40af;font-weight:600">This gate · below</span><span style="color:#1e40af;font-weight:700">Added</span></div>
+      <div class="g6r" style="grid-template-columns:minmax(0,1fr) 180px 200px;column-gap:14px;background:#eff6ff"><span style="font-weight:600">Product mapping</span><span style="color:#1e40af;font-weight:600">This gate · below</span><span style="color:#1e40af;font-weight:700">Added</span></div>
+    </div>
+    <div style="display:flex;gap:30px;justify-content:center;margin-top:20px;flex-wrap:wrap">
+      <div style="width:390px;flex:none">
+        <div style="font:600 12px/17px Inter,sans-serif;color:#475569;margin-bottom:8px">Private order detail · part delivered</div>
+        <div class="ph" style="width:390px;height:812px">
+          <div class="sb"><span class="tnum">09:42</span><span style="display:flex;align-items:center;gap:5px"><svg width="17" height="11" viewBox="0 0 17 11" fill="#0f172a"><rect x="0" y="7" width="3" height="4" rx="1"></rect><rect x="4.6" y="5" width="3" height="6" rx="1"></rect><rect x="9.2" y="2.6" width="3" height="8.4" rx="1"></rect><rect x="13.8" y="0" width="3" height="11" rx="1"></rect></svg><svg width="24" height="12" viewBox="0 0 24 12" fill="none"><rect x="0.5" y="0.5" width="19" height="11" rx="3" stroke="#0f172a" opacity=".4"></rect><rect x="2" y="2" width="14" height="8" rx="1.6" fill="#0f172a"></rect><path d="M21.5 4v4a2.2 2.2 0 0 0 0-4" fill="#0f172a" opacity=".4"></path></svg></span></div>
+          <div style="padding:0 14px 12px;border-bottom:1px solid #e2e8f0;flex:none">
+            <div style="height:44px;display:flex;align-items:center;gap:10px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0f172a" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"></path></svg><span style="font:500 15px Inter,sans-serif;color:#475569">Purchase Orders</span></div>
+            <div class="tnum" style="font:700 22px/30px Inter,sans-serif;letter-spacing:-.02em">PO-2026-001</div>
+            <div style="display:flex;align-items:center;gap:8px;margin-top:6px;flex-wrap:wrap"><span class="pill" style="background:#dcfce7;color:#166534;height:26px;align-items:center;padding:0 11px">Received</span><span style="font:400 14px/20px Inter,sans-serif;color:#64748b">Green Farm Poultry</span></div>
+          </div>
+          <div style="flex:1;background:#f8fafc;padding:12px 14px;overflow:hidden;display:flex;flex-direction:column;gap:11px">
+            <div class="card" style="overflow:hidden">
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;font:500 15px Inter,sans-serif"><span style="color:#475569">Ordered</span><span class="tnum" style="font-weight:600">50.000 KG</span></div>
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-top:1px solid #f1f5f9;font:500 15px Inter,sans-serif"><span style="color:#475569">Received</span><span class="tnum" style="font-weight:600">50.000 KG</span></div>
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-top:1px solid #f1f5f9;background:#f8fafc;font:600 15px Inter,sans-serif"><span>Outstanding</span><span class="tnum">0.000 KG</span></div>
+            </div>
+            <div class="card" style="padding:13px 14px">
+              <div style="font:600 15px/21px Inter,sans-serif">Chicken Breast</div>
+              <div class="mono" style="font:500 13px/19px ui-monospace,Menlo,monospace;color:#64748b">MEAT-001 · 50.000 KG at LKR 1,250.00</div>
+              <div style="display:flex;align-items:baseline;justify-content:space-between;margin-top:8px"><span style="font:400 14px/20px Inter,sans-serif;color:#475569">Line total</span><span class="tnum" style="font:700 18px/26px Inter,sans-serif">LKR 62,500.00</span></div>
+            </div>
+            <div class="card" style="overflow:hidden">
+              <div style="padding:11px 14px;border-bottom:1px solid #e2e8f0;font:600 15px/21px Inter,sans-serif">Two receipts, one order</div>
+              <div style="padding:12px 14px;display:flex;justify-content:space-between;gap:12px"><div><div style="font:500 15px/21px Inter,sans-serif">Received 40.000 KG</div><div style="font:400 13px/18px Inter,sans-serif;color:#64748b">4 Aug · Cold Room · Nimal Perera</div></div><div class="tnum" style="text-align:right;flex:none"><div style="font:600 15px/21px Inter,sans-serif;color:#166534">+40.000</div><div style="font:400 13px/18px Inter,sans-serif;color:#64748b">100.000 KG</div></div></div>
+              <div style="padding:12px 14px;border-top:1px solid #f1f5f9;display:flex;justify-content:space-between;gap:12px"><div><div style="font:500 15px/21px Inter,sans-serif">Received 10.000 KG</div><div style="font:400 13px/18px Inter,sans-serif;color:#64748b">7 Aug · Cold Room · Nimal Perera</div></div><div class="tnum" style="text-align:right;flex:none"><div style="font:600 15px/21px Inter,sans-serif;color:#166534">+10.000</div><div style="font:400 13px/18px Inter,sans-serif;color:#64748b">110.000 KG</div></div></div>
+            </div>
+            <div class="card" style="padding:13px 14px;background:#f8fafc">
+              <div style="font:600 15px/21px Inter,sans-serif">Nothing left to receive</div>
+              <div style="font:400 14px/20px Inter,sans-serif;color:#475569;margin-top:3px">This order is complete, so no receiving action is offered and it cannot be cancelled — the goods are on the shelf.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="width:390px;flex:none">
+        <div style="font:600 12px/17px Inter,sans-serif;color:#475569;margin-bottom:8px">Product mapping · the conversion stage</div>
+        <div class="ph" style="width:390px;height:812px">
+          <div class="sb"><span class="tnum">09:48</span><span style="display:flex;align-items:center;gap:5px"><svg width="17" height="11" viewBox="0 0 17 11" fill="#0f172a"><rect x="0" y="7" width="3" height="4" rx="1"></rect><rect x="4.6" y="5" width="3" height="6" rx="1"></rect><rect x="9.2" y="2.6" width="3" height="8.4" rx="1"></rect><rect x="13.8" y="0" width="3" height="11" rx="1"></rect></svg><svg width="24" height="12" viewBox="0 0 24 12" fill="none"><rect x="0.5" y="0.5" width="19" height="11" rx="3" stroke="#0f172a" opacity=".4"></rect><rect x="2" y="2" width="14" height="8" rx="1.6" fill="#0f172a"></rect><path d="M21.5 4v4a2.2 2.2 0 0 0 0-4" fill="#0f172a" opacity=".4"></path></svg></span></div>
+          <div style="padding:0 14px 12px;border-bottom:1px solid #e2e8f0;flex:none">
+            <div style="height:44px;display:flex;align-items:center;gap:10px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0f172a" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"></path></svg><span style="font:500 15px Inter,sans-serif;color:#475569">New mapping</span></div>
+            <div style="font:700 22px/30px Inter,sans-serif;letter-spacing:-.02em">The conversion</div>
+            <div style="display:flex;align-items:center;gap:6px;margin-top:8px"><span style="flex:1;height:5px;border-radius:9999px;background:#1d4ed8"></span><span style="flex:1;height:5px;border-radius:9999px;background:#1d4ed8"></span><span style="flex:1;height:5px;border-radius:9999px;background:#1d4ed8"></span><span style="flex:1;height:5px;border-radius:9999px;background:#1d4ed8"></span><span style="flex:1;height:5px;border-radius:9999px;background:#e2e8f0"></span></div>
+            <div style="font:500 13px/19px Inter,sans-serif;color:#64748b;margin-top:5px">Stage 4 of 5</div>
+          </div>
+          <div style="flex:1;background:#f8fafc;padding:12px 14px;overflow:hidden;display:flex;flex-direction:column;gap:12px">
+            <div class="card" style="padding:13px 14px">
+              <div style="font:500 13px/19px Inter,sans-serif;color:#64748b">Their item</div>
+              <div style="font:600 16px/22px Inter,sans-serif">Fresh Chicken Breast 5 KG Pack</div>
+              <div class="mono" style="font:500 13px/19px ui-monospace,Menlo,monospace;color:#64748b">CKN-B5 · sold by the PACK</div>
+              <div style="height:1px;background:#f1f5f9;margin:11px 0"></div>
+              <div style="font:500 13px/19px Inter,sans-serif;color:#64748b">Your product</div>
+              <div style="font:600 16px/22px Inter,sans-serif">Chicken Breast</div>
+              <div class="mono" style="font:500 13px/19px ui-monospace,Menlo,monospace;color:#64748b">MEAT-001 · counted in KG</div>
+            </div>
+            <div>
+              <label class="lbl" style="font-size:14px">One PACK from them is how many KG for you?</label>
+              <div style="display:flex;align-items:center;gap:10px">
+                <div class="tnum" style="width:78px;height:48px;border:1px solid #cbd5e1;background:#f1f5f9;border-radius:8px;display:flex;align-items:center;justify-content:center;font:600 17px Inter,sans-serif;color:#475569;flex:none">1</div>
+                <span style="font:500 15px Inter,sans-serif;color:#64748b">PACK =</span>
+                <div class="tnum" style="flex:1;height:48px;border:1px solid #1d4ed8;border-radius:8px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;font:600 18px Inter,sans-serif;box-shadow:0 0 0 3px rgb(29 78 216 / .18)">5<span style="font-weight:500;font-size:15px;color:#64748b">KG</span></div>
+              </div>
+              <div class="hint">It runs one way only: their unit into yours. Nothing converts kilograms back into packs.</div>
+            </div>
+            <div class="card" style="overflow:hidden">
+              <div style="padding:10px 14px;background:#f8fafc;border-bottom:1px solid #e2e8f0;font:600 13px Inter,sans-serif">What that means when you receive</div>
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 14px;font:500 15px Inter,sans-serif"><span class="tnum" style="color:#475569">1 PACK</span><span class="tnum" style="font-weight:600">5.000 KG</span></div>
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-top:1px solid #f1f5f9;font:500 15px Inter,sans-serif"><span class="tnum" style="color:#475569">2 PACK</span><span class="tnum" style="font-weight:600">10.000 KG</span></div>
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-top:1px solid #f1f5f9;background:#f8fafc;font:500 15px Inter,sans-serif"><span class="tnum" style="color:#475569">10 PACK</span><span class="tnum" style="font-weight:700">50.000 KG</span></div>
+            </div>
+            <div style="display:flex;gap:9px;padding:12px 13px;background:#fef3c7;border-radius:8px"><span style="width:20px;height:20px;border-radius:9999px;background:#854d0e;color:#fff;font:700 12px/20px Inter,sans-serif;text-align:center;flex:none">!</span><div style="font:500 13px/19px Inter,sans-serif">A wrong factor here is silent for weeks. Check it against a pack you have actually weighed.</div></div>
+          </div>
+          <div style="border-top:1px solid #e2e8f0;background:#fff;padding:12px 14px;display:flex;gap:10px;flex:none"><span style="flex:1;height:48px;border:1px solid #64748b;border-radius:8px;display:flex;align-items:center;justify-content:center;font:600 15px Inter,sans-serif">Back</span><span style="flex:1.4;height:48px;border-radius:8px;background:#1d4ed8;color:#fff;display:flex;align-items:center;justify-content:center;font:600 15px Inter,sans-serif">Review mapping</span></div>
+        </div>
+      </div>
+      <div style="width:390px;flex:none">
+        <div style="font:600 12px/17px Inter,sans-serif;color:#475569;margin-bottom:8px">State screens at 390 px · unchanged rules, full-width action</div>
+        <div class="ph" style="width:390px;height:812px">
+          <div class="sb"><span class="tnum">09:52</span><span style="display:flex;align-items:center;gap:5px"><svg width="17" height="11" viewBox="0 0 17 11" fill="#0f172a"><rect x="0" y="7" width="3" height="4" rx="1"></rect><rect x="4.6" y="5" width="3" height="6" rx="1"></rect><rect x="9.2" y="2.6" width="3" height="8.4" rx="1"></rect><rect x="13.8" y="0" width="3" height="11" rx="1"></rect></svg><svg width="24" height="12" viewBox="0 0 24 12" fill="none"><rect x="0.5" y="0.5" width="19" height="11" rx="3" stroke="#0f172a" opacity=".4"></rect><rect x="2" y="2" width="14" height="8" rx="1.6" fill="#0f172a"></rect><path d="M21.5 4v4a2.2 2.2 0 0 0 0-4" fill="#0f172a" opacity=".4"></path></svg></span></div>
+          <div style="flex:1;background:#f8fafc;padding:14px;overflow:hidden;display:flex;flex-direction:column;gap:12px">
+            <div class="card" style="padding:28px 18px 22px;text-align:center">
+              <span style="width:56px;height:56px;border-radius:9999px;background:#f1f5f9;display:inline-flex;align-items:center;justify-content:center"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.6-3.6"></path></svg></span>
+              <div style="font:600 17px/24px Inter,sans-serif;margin-top:12px">No product matches "chikn"</div>
+              <div style="font:400 14px/20px Inter,sans-serif;color:#475569;margin-top:4px">All 12 products are still here. Try a shorter word, or clear the search.</div>
+              <span style="display:flex;height:48px;border:1px solid #64748b;border-radius:8px;align-items:center;justify-content:center;font:600 15px Inter,sans-serif;margin-top:14px">Clear search</span>
+            </div>
+            <div class="card" style="padding:28px 18px 22px;text-align:center">
+              <span style="width:56px;height:56px;border-radius:9999px;background:#fef3c7;display:inline-flex;align-items:center;justify-content:center"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#854d0e" stroke-width="2.2" stroke-linecap="round"><rect x="4" y="10.5" width="16" height="10" rx="2"></rect><path d="M8 10.5V7a4 4 0 0 1 8 0v3.5"></path></svg></span>
+              <div style="font:600 17px/24px Inter,sans-serif;margin-top:12px">You need the Procurement Manager role</div>
+              <div style="font:400 14px/20px Inter,sans-serif;color:#475569;margin-top:4px">You're signed in as Storekeeper. Nohan or Ayesha can change it.</div>
+              <span style="display:flex;height:48px;border-radius:8px;background:#1d4ed8;color:#fff;align-items:center;justify-content:center;font:600 15px Inter,sans-serif;margin-top:14px">Back to dashboard</span>
+            </div>
+            <div class="card" style="padding:28px 18px 22px;text-align:center">
+              <span style="width:56px;height:56px;border-radius:9999px;background:#fee2e2;display:inline-flex;align-items:center;justify-content:center"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#991b1b" stroke-width="2.2" stroke-linecap="round"><path d="M12 8v5"></path><path d="M12 16.5h.01"></path><circle cx="12" cy="12" r="9"></circle></svg></span>
+              <div style="font:600 17px/24px Inter,sans-serif;margin-top:12px">We couldn't load your products</div>
+              <div style="font:400 14px/20px Inter,sans-serif;color:#475569;margin-top:4px">Nothing has changed. This is a reading problem — your 12 products and LKR 691,700.00 are intact.</div>
+              <span style="display:flex;height:48px;border-radius:8px;background:#1d4ed8;color:#fff;align-items:center;justify-content:center;font:600 15px Inter,sans-serif;margin-top:14px">Try again</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<p class="dv-cap"><strong>Four flows added, five confirmed rather than redrawn.</strong> The order detail keeps all three quantities and both receipts; the mapping stage keeps the conversion table that makes a wrong factor visible; and the state screens keep the 56 px icon, the single sentence and the one honest next step, now at 48 px full width.</p>
+</div>
+
+<div class="dv-opt" id="11i" data-screen-label="G11 production checks">
+<div class="dv-olabel"><a class="dv-oid" href="#11i">11i</a>The production checks, measured rather than asserted</div>
+<div class="dv-card" style="width:1320px">
+  <div style="padding:22px 24px">
+    <div class="card" style="overflow:hidden">
+      <div style="padding:11px 16px;background:#f8fafc;border-bottom:1px solid #e2e8f0;font:600 13px Inter,sans-serif">Four production rules, checked at each width</div>
+      <div class="g6h" style="grid-template-columns:200px minmax(0,1fr) 130px 130px 130px 130px;column-gap:14px;height:40px"><span>Rule</span><span>How it is met</span><span style="text-align:right">390</span><span style="text-align:right">768</span><span style="text-align:right">1280</span><span style="text-align:right">1920</span></div>
+      <div class="g6r" style="grid-template-columns:200px minmax(0,1fr) 130px 130px 130px 130px;column-gap:14px;border-top-color:#e2e8f0;min-height:56px;align-items:flex-start;padding:11px 16px"><span style="font-weight:600">Text never below 12 px</span><span style="color:#475569">The smallest customer-facing size in the system is the 12 px hint and pill text. Body copy is 13–14 px on desktop and 14–16 px on the phone, where reading distance is longer.</span><span class="tnum" style="text-align:right;color:#166534;font-weight:600">min 12 px</span><span class="tnum" style="text-align:right;color:#166534;font-weight:600">min 12 px</span><span class="tnum" style="text-align:right;color:#166534;font-weight:600">min 12 px</span><span class="tnum" style="text-align:right;color:#166534;font-weight:600">min 12 px</span></div>
+      <div class="g6r" style="grid-template-columns:200px minmax(0,1fr) 130px 130px 130px 130px;column-gap:14px;min-height:56px;align-items:flex-start;padding:11px 16px"><span style="font-weight:600">Touch targets at least 44 px</span><span style="color:#475569">On the phone every button, field, stepper, filter chip and tab item is 44 px or more, and the primary actions are 48 px. On the desktop the 32 px paging control is a pointer target and grows to 44 px from 768 down.</span><span class="tnum" style="text-align:right;color:#166534;font-weight:600">44–56 px</span><span class="tnum" style="text-align:right;color:#166534;font-weight:600">44 px</span><span class="tnum" style="text-align:right;color:#475569">32–40 px pointer</span><span class="tnum" style="text-align:right;color:#475569">32–40 px pointer</span></div>
+      <div class="g6r" style="grid-template-columns:200px minmax(0,1fr) 130px 130px 130px 130px;column-gap:14px;min-height:56px;align-items:flex-start;padding:11px 16px"><span style="font-weight:600">No critical horizontal scrolling</span><span style="color:#475569">No table keeps more columns than the width allows. The seven-column product list becomes four columns at 768 and one card at 390; the connected order's two parties stack rather than scroll sideways.</span><span class="tnum" style="text-align:right;color:#166534;font-weight:600">0</span><span class="tnum" style="text-align:right;color:#166534;font-weight:600">0</span><span class="tnum" style="text-align:right;color:#166534;font-weight:600">0</span><span class="tnum" style="text-align:right;color:#166534;font-weight:600">0</span></div>
+      <div class="g6r" style="grid-template-columns:200px minmax(0,1fr) 130px 130px 130px 130px;column-gap:14px;min-height:56px;align-items:flex-start;padding:11px 16px;background:#f8fafc"><span style="font-weight:600">Nothing important truncated</span><span style="color:#475569">Product names, business names, store-room names and every quantity wrap instead of clipping. The single ellipsis in the system is on the invitation token, which is copied rather than read.</span><span class="tnum" style="text-align:right;color:#166534;font-weight:600">1 · the token</span><span class="tnum" style="text-align:right;color:#166534;font-weight:600">1 · the token</span><span class="tnum" style="text-align:right;color:#166534;font-weight:600">1 · the token</span><span class="tnum" style="text-align:right;color:#166534;font-weight:600">1 · the token</span></div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:14px">
+      <div class="card" style="padding:13px 15px"><div style="font:600 13px/19px Inter,sans-serif">Where 12 px is used, and where it is not</div><div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:3px">12 px carries hints, status pills and secondary metadata. No figure a person acts on — a balance, a quantity, a price, a minimum — is ever smaller than 13 px, and on the phone they are 15 to 20 px.</div></div>
+      <div class="card" style="padding:13px 15px"><div style="font:600 13px/19px Inter,sans-serif">Why the desktop rows stay at 36 px</div><div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:3px">A 44 px row would cost eight of the twenty-five rows on a page, and a storekeeper scanning a full page with a mouse loses more from paging than from a smaller row. The 44 px rule is a touch rule, applied where there is touch.</div></div>
+      <div class="card" style="padding:13px 15px"><div style="font:600 13px/19px Inter,sans-serif">The one place scrolling is allowed</div><div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:3px">Long ledgers scroll vertically, which is the direction a reader expects. No screen in the system requires a sideways drag to reach a figure or an action at any of the four widths.</div></div>
+      <div class="card" style="padding:13px 15px"><div style="font:600 13px/19px Inter,sans-serif">Landscape and text scaling</div><div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:3px">At 844 × 390 the phone screens become the 768 layout, which is why that width exists in the contract. Doubling the reader's text size reflows every screen into a single column without clipping, because nothing is positioned by fixed height.</div></div>
+    </div>
+  </div>
+</div>
+<p class="dv-cap"><strong>Reconciliation, closed.</strong> Nine transformations frozen, nine mobile-priority flows accounted for, and four production rules checked at all four widths — with the 390 px connected receipt in Gate 9 still the screen every other small-screen decision was tested against.</p>
+</div>
+
+</div>
+</section>
+</x-dc>
+</body>
+</html>

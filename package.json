@@ -1,0 +1,48 @@
+{
+  "name": "stockmok",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": "22.x"
+  },
+  "workspaces": [
+    "packages/*",
+    "functions"
+  ],
+  "scripts": {
+    "build": "npm run build:shared && npm run build:functions",
+    "build:shared": "npm run build --workspace @stockmok/shared",
+    "build:functions": "npm run build --workspace @stockmok/functions",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "format:check": "prettier --check package.json package-lock.json firebase.json firestore.indexes.json tsconfig.json vitest.config.ts eslint.config.js prettier.config.js README.md \"packages/shared/**/*.{json,ts}\" \"functions/**/*.{json,ts}\" \"scripts/**/*.ts\" \"tests/**/*.ts\" \"docs/implementation-evidence/*.md\" \".github/workflows/*.yml\"",
+    "test:unit": "vitest run --exclude tests/bootstrap/**",
+    "verify:indexes": "tsx scripts/verify-indexes.ts",
+    "verify:architecture": "tsx scripts/verify-architecture.ts",
+    "verify:functions": "tsx scripts/verify-functions.ts",
+    "verify": "npm run format:check && npm run typecheck && npm run lint && npm run test:unit && npm run verify:indexes && npm run verify:architecture && npm run verify:functions && npm run build",
+    "emu": "firebase emulators:start --project stockmok --import ./.emulator-data --export-on-exit ./.emulator-data",
+    "emu:clean": "firebase emulators:start --project stockmok",
+    "seed:bootstrap": "tsx scripts/bootstrap/seed.ts --target=emulator",
+    "replay:bootstrap": "tsx scripts/bootstrap/replay.ts --target=emulator",
+    "reset:emulator": "tsx scripts/bootstrap/reset.ts --target=emulator",
+    "reseed:bootstrap": "npm run reset:emulator && npm run seed:bootstrap",
+    "test:bootstrap:t0:inner": "tsx scripts/bootstrap/test-bootstrap.ts t0 --target=emulator",
+    "test:bootstrap:replay:inner": "tsx scripts/bootstrap/test-bootstrap.ts replay --target=emulator",
+    "test:bootstrap:t0": "firebase emulators:exec --project stockmok --only auth,firestore \"npm run test:bootstrap:t0:inner\"",
+    "test:bootstrap:replay": "firebase emulators:exec --project stockmok --only auth,firestore \"npm run test:bootstrap:replay:inner\""
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.5",
+    "@types/node": "^22.19.15",
+    "eslint": "^9.39.5",
+    "eslint-config-prettier": "^10.1.8",
+    "firebase-tools": "^15.26.0",
+    "prettier": "^3.9.6",
+    "tsx": "^4.23.12",
+    "typescript": "5.9.3",
+    "typescript-eslint": "^8.67.0",
+    "vitest": "4.1.10"
+  }
+}

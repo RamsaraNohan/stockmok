@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics><meta name="design_doc_mode" content="canvas"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"><style>body{margin:0;background:#e8ecf1;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;color:#0f172a}a{color:#1d4ed8}a:hover{color:#1e40af}.dv-turn{padding:40px 44px 32px;border-bottom:1px solid rgba(15,23,42,.08);scroll-margin-top:16px}.dv-thd{display:flex;align-items:baseline;gap:10px;margin:0 0 20px}.dv-tid{font:600 10px ui-monospace,Menlo,monospace;padding:3px 7px;background:#0f172a;color:#fff;border-radius:4px;text-decoration:none}.dv-tname{font:600 13px/1.2 Inter,system-ui,sans-serif}.dv-opts{display:flex;flex-wrap:wrap;gap:36px;align-items:flex-start}.dv-opt{flex:none;display:flex;flex-direction:column;gap:9px;scroll-margin-top:16px;max-width:1320px}.dv-oid{font:600 10.5px ui-monospace,Menlo,monospace;padding:3px 7px;background:rgba(15,23,42,.08);color:#0f172a;border-radius:5px;text-decoration:none}.dv-olabel{display:flex;align-items:baseline;gap:8px;font:400 11px/1.3 Inter,system-ui,sans-serif;color:rgba(15,23,42,.55)}.dv-card{max-width:100%;background:#fff;border:1px solid rgba(15,23,42,.12);border-radius:12px;box-shadow:0 1px 3px rgb(15 23 42 / .07);overflow:hidden}.dv-opt:target .dv-oid{background:#1d4ed8;color:#fff}.dv-cap{margin:0;max-width:1320px;font:400 12px/17px Inter,system-ui,sans-serif;color:#475569}.eyb{font:700 12px/16px Inter,sans-serif;letter-spacing:.1em;text-transform:uppercase;color:#64748b;padding-bottom:10px;border-bottom:1px solid #cbd5e1}.tnum{font-variant-numeric:tabular-nums}.g6r{display:grid;align-items:center;min-height:36px;padding:6px 16px;border-top:1px solid #f1f5f9;font:500 14px Inter,sans-serif}.g6h{display:grid;align-items:center;height:36px;padding:0 16px;background:#f1f5f9;font:600 12px Inter,sans-serif;color:#475569}.sect{font:700 12px/16px Inter,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#64748b;padding:12px 20px 4px}.nav{height:36px;display:flex;align-items:center;gap:10px;padding:0 12px;margin:2px 8px;border-radius:6px;font:500 14px/20px Inter,sans-serif;color:#334155}.dot{width:6px;height:6px;border-radius:9999px;background:#cbd5e1;flex:none}.kpi{border:1px solid #cbd5e1;border-radius:8px;background:#fff;padding:14px 16px 16px}.kpil{font:500 13px/19px Inter,sans-serif;color:#475569}.kpiv{font:700 26px/34px Inter,sans-serif;letter-spacing:-.01em;font-variant-numeric:tabular-nums;margin-top:2px}.kpim{font:500 12px/17px Inter,sans-serif;color:#64748b;margin-top:4px}.btnp{box-sizing:border-box;height:40px;display:inline-flex;align-items:center;padding:0 16px;border-radius:6px;font:600 14px Inter,sans-serif;background:#1d4ed8;color:#fff}.btns{box-sizing:border-box;height:40px;display:inline-flex;align-items:center;padding:0 16px;border-radius:6px;font:600 14px Inter,sans-serif;border:1px solid #64748b;background:#fff;color:#0f172a}.pill{display:inline-flex;padding:2px 9px;border-radius:9999px;font:600 12px/18px Inter,sans-serif}.fld{box-sizing:border-box;height:40px;border:1px solid #64748b;border-radius:6px;display:flex;align-items:center;justify-content:space-between;padding:0 12px;font:400 14px Inter,sans-serif;background:#fff}.lbl{display:block;font:600 13px/19px Inter,sans-serif;margin-bottom:5px}.hint{font:400 12px/17px Inter,sans-serif;color:#64748b;margin-top:5px}.pg{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-top:1px solid #e2e8f0;font:500 13px Inter,sans-serif;color:#475569}.pgb{min-width:32px;height:32px;display:inline-flex;align-items:center;justify-content:center;border:1px solid #cbd5e1;border-radius:6px;font:600 13px Inter,sans-serif;background:#fff;padding:0 8px}.mk{width:22px;height:22px;flex:none}.card{background:#fff;border:1px solid #cbd5e1;border-radius:8px}.mono{font-family:ui-monospace,Menlo,monospace}.stg{display:flex;align-items:center;gap:9px;padding:9px 13px;border-radius:8px;border:1px solid #e2e8f0;background:#fff;font:600 13px Inter,sans-serif;color:#64748b}.stgn{width:20px;height:20px;border-radius:9999px;background:#e2e8f0;color:#475569;font:700 12px/20px Inter,sans-serif;text-align:center;flex:none}.sk{background:#e2e8f0;border-radius:4px}</style></helmet>
+
+<section class="dv-turn" id="t10">
+<div class="dv-thd"><a class="dv-tid" href="#t10">10</a><span class="dv-tname">Gate 10 — Supporting operations · notifications · team and memberships · settings · permission, not-found and network-off surfaces</span></div>
+<div class="dv-opts">
+
+<div class="dv-opt" id="10a" data-screen-label="G10 coverage key">
+<div class="dv-olabel"><a class="dv-oid" href="#10a">10a</a>What was still uncovered by the frozen screen registry, and where it is now drawn</div>
+<div class="dv-card" style="width:1320px">
+  <div style="padding:22px 24px">
+    <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border:1px solid #cbd5e1;border-radius:8px;overflow:hidden">
+      <div style="padding:12px 15px;border-right:1px solid #e2e8f0;background:#f8fafc"><div style="font:600 13px/19px Inter,sans-serif">Notifications</div><div style="font:400 12px/17px Inter,sans-serif;color:#475569;margin-top:3px">The bell, the list, the read state, and the only three things that create one.</div></div>
+      <div style="padding:12px 15px;border-right:1px solid #e2e8f0;background:#f8fafc"><div style="font:600 13px/19px Inter,sans-serif">Team and memberships</div><div style="font:400 12px/17px Inter,sans-serif;color:#475569;margin-top:3px">Five members, one protected Owner, one suspension, one pending invitation with an expiry.</div></div>
+      <div style="padding:12px 15px;border-right:1px solid #e2e8f0;background:#f8fafc"><div style="font:600 13px/19px Inter,sans-serif">Settings</div><div style="font:400 12px/17px Inter,sans-serif;color:#475569;margin-top:3px">What can be changed, what is fixed forever, and what is recorded when it changes.</div></div>
+      <div style="padding:12px 15px;background:#f8fafc"><div style="font:600 13px/19px Inter,sans-serif">The three refusal surfaces</div><div style="font:400 12px/17px Inter,sans-serif;color:#475569;margin-top:3px">Wrong role, wrong address, and a business whose network features are off.</div></div>
+    </div>
+    <div class="card" style="margin-top:16px;overflow:hidden">
+      <div style="padding:11px 16px;background:#f8fafc;border-bottom:1px solid #e2e8f0;font:600 13px Inter,sans-serif">Every registry screen, and the gate that draws it — nothing drawn twice</div>
+      <div class="g6h" style="grid-template-columns:64px minmax(0,1fr) 190px 150px 210px;column-gap:14px"><span>Pri</span><span>Screen</span><span>Family</span><span>Release</span><span>Drawn in</span></div>
+      <div class="g6r" style="grid-template-columns:64px minmax(0,1fr) 190px 150px 210px;column-gap:14px;border-top-color:#e2e8f0"><span style="color:#64748b">P0</span><span>Public home · sign up · global login · branded login · invitation accept · workspace selector · onboarding · app shell</span><span style="color:#475569">Public and auth</span><span style="color:#475569">A</span><span style="color:#166534;font-weight:600">Gate 5 — complete</span></div>
+      <div class="g6r" style="grid-template-columns:64px minmax(0,1fr) 190px 150px 210px;column-gap:14px"><span style="color:#64748b">P0</span><span>Empty and populated dashboard · products list, create, detail · categories · warehouses · stock adjustment · movement history · reports</span><span style="color:#475569">Inventory</span><span style="color:#475569">A</span><span style="color:#166534;font-weight:600">Gate 6 — complete</span></div>
+      <div class="g6r" style="grid-template-columns:64px minmax(0,1fr) 190px 150px 210px;column-gap:14px"><span style="color:#64748b">P0</span><span>Suppliers · buyers · partner detail · order list, builder and detail · receiving</span><span style="color:#475569">Private procurement</span><span style="color:#475569">A</span><span style="color:#166534;font-weight:600">Gate 7 — complete</span></div>
+      <div class="g6r" style="grid-template-columns:64px minmax(0,1fr) 190px 150px 210px;column-gap:14px"><span style="color:#64748b">P1</span><span>Connected businesses · discovery panel · connection detail · partner catalog, both sides · mappings list</span><span style="color:#475569">Network foundation</span><span style="color:#475569">B</span><span style="color:#166534;font-weight:600">Gate 8 — complete</span></div>
+      <div class="g6r" style="grid-template-columns:64px minmax(0,1fr) 190px 150px 210px;column-gap:14px"><span style="color:#64748b">P1</span><span>Product mapping wizard · connected order, both sides · connected receiving</span><span style="color:#475569">Connected workflows</span><span style="color:#475569">B</span><span style="color:#166534;font-weight:600">Gate 9 — complete</span></div>
+      <div class="g6r" style="grid-template-columns:64px minmax(0,1fr) 190px 150px 210px;column-gap:14px;background:#eff6ff;border-top-color:#bfdbfe"><span style="color:#1e40af;font-weight:700">P0</span><span style="font-weight:600">Notifications</span><span style="color:#1e40af">Supporting</span><span style="color:#475569">A</span><span style="color:#1e40af;font-weight:700">This gate · <a href="#10b">10b</a> <a href="#10c">10c</a> <a href="#10h">10h</a></span></div>
+      <div class="g6r" style="grid-template-columns:64px minmax(0,1fr) 190px 150px 210px;column-gap:14px;background:#eff6ff"><span style="color:#1e40af;font-weight:700">P0</span><span style="font-weight:600">Team · memberships · invitation management</span><span style="color:#1e40af">Supporting</span><span style="color:#475569">A</span><span style="color:#1e40af;font-weight:700">This gate · <a href="#10d">10d</a> <a href="#10e">10e</a> <a href="#10h">10h</a></span></div>
+      <div class="g6r" style="grid-template-columns:64px minmax(0,1fr) 190px 150px 210px;column-gap:14px;background:#eff6ff"><span style="color:#1e40af;font-weight:700">P0</span><span style="font-weight:600">Settings</span><span style="color:#1e40af">Supporting</span><span style="color:#475569">A</span><span style="color:#1e40af;font-weight:700">This gate · <a href="#10f">10f</a> <a href="#10h">10h</a></span></div>
+      <div class="g6r" style="grid-template-columns:64px minmax(0,1fr) 190px 150px 210px;column-gap:14px;background:#eff6ff"><span style="color:#1e40af;font-weight:700">P0</span><span style="font-weight:600">Permission denied · not found</span><span style="color:#1e40af">Supporting</span><span style="color:#475569">A</span><span style="color:#1e40af;font-weight:700">This gate · <a href="#10g">10g</a></span></div>
+      <div class="g6r" style="grid-template-columns:64px minmax(0,1fr) 190px 150px 210px;column-gap:14px;background:#eff6ff"><span style="color:#1e40af;font-weight:700">P1</span><span style="font-weight:600">Network features off for this business</span><span style="color:#1e40af">Supporting</span><span style="color:#475569">B</span><span style="color:#1e40af;font-weight:700">This gate · <a href="#10g">10g</a></span></div>
+      <div class="g6r" style="grid-template-columns:64px minmax(0,1fr) 190px 150px 210px;column-gap:14px;background:#f8fafc"><span style="color:#94a3b8">P2</span><span style="color:#64748b">Public storefront catalog</span><span style="color:#94a3b8">Storefront</span><span style="color:#94a3b8">C</span><span style="color:#94a3b8">Not built in this release</span></div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:14px">
+      <div class="card" style="padding:13px 15px"><div style="font:600 13px/19px Inter,sans-serif">No new component, no new capability</div><div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:3px">Every screen on this gate is assembled from the 25 frozen components. Nothing here writes anything the system cannot already write: a notification's read flag, a membership, an invitation, a settings value.</div></div>
+      <div class="card" style="padding:13px 15px"><div style="font:600 13px/19px Inter,sans-serif">The same workspace, the same day</div><div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:3px">Grand Ocean Hotel, 13 August 2026, 09:12. Three unread notifications, and all three are traceable to a figure already drawn in Gates 6 to 9 — the out-of-stock oil, the low flour, and Ocean Blue's request.</div></div>
+      <div class="card" style="padding:13px 15px"><div style="font:600 13px/19px Inter,sans-serif">Refusals are screens, not redirects</div><div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:3px">A member who opens a page their role cannot see is told which role it needs and which one they hold. They are not bounced to the dashboard, because a silent redirect hides the mistake instead of naming it.</div></div>
+    </div>
+  </div>
+</div>
+<p class="dv-cap"><strong>Coverage, stated before it is drawn.</strong> Forty of the forty-one registry screens are now designed; the forty-first is Release C and is deliberately absent. The eight boards that follow finish the four remaining families and introduce no figure that Gates 5 to 9 have not already been held to.</p>
+</div>
+
+<div class="dv-opt" id="10b" data-screen-label="G10-01 Notifications populated">
+<div class="dv-olabel"><a class="dv-oid" href="#10b">10b</a>Notifications — three unread, and the bell that counts them</div>
+<div class="dv-card" style="width:1320px">
+  <div style="height:64px;border-bottom:1px solid #cbd5e1;display:flex;align-items:center;justify-content:space-between;padding:0 22px;background:#fff">
+    <div style="display:flex;align-items:center;gap:14px">
+      <svg class="mk" viewBox="0 0 24 24" fill="#1d4ed8"><g stroke="none"><rect x="3.2" y="2" width="17.6" height="4.4" rx="1.2"></rect><rect x="3.2" y="9.8" width="17.6" height="4.4" rx="1.2"></rect><rect x="3.2" y="17.6" width="17.6" height="4.4" rx="1.2"></rect></g></svg>
+      <div style="display:flex;align-items:center;gap:10px;padding-left:14px;border-left:1px solid #e2e8f0"><span style="width:32px;height:32px;border-radius:8px;background:#1d4ed8;color:#fff;font:700 12px Inter,sans-serif;display:inline-flex;align-items:center;justify-content:center">GO</span><span style="font:600 15px Inter,sans-serif">Grand Ocean Hotel</span><span class="pill" style="background:#eff6ff;color:#1e40af">Owner</span></div>
+    </div>
+    <div style="display:flex;align-items:center;gap:14px">
+      <span style="position:relative;width:40px;height:40px;border-radius:8px;background:#eff6ff;display:inline-flex;align-items:center;justify-content:center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1d4ed8" stroke-width="2" stroke-linecap="round"><path d="M18 9a6 6 0 1 0-12 0c0 5-2 6-2 6h16s-2-1-2-6"></path><path d="M10.5 20a2 2 0 0 0 3 0"></path></svg><span class="tnum" style="position:absolute;top:-3px;right:-3px;min-width:19px;height:19px;border-radius:9999px;background:#b91c1c;color:#fff;font:700 11px/19px Inter,sans-serif;text-align:center;padding:0 4px;box-sizing:border-box">3</span></span>
+      <span style="width:34px;height:34px;border-radius:9999px;background:#0f172a;color:#fff;font:700 12px Inter,sans-serif;display:inline-flex;align-items:center;justify-content:center">NF</span>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:minmax(0,1fr) 1px 430px;background:#f8fafc">
+    <div style="padding:22px 24px 26px">
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:20px">
+        <div><div style="font:500 13px/19px Inter,sans-serif;color:#64748b">Notifications</div><div style="font:700 26px/34px Inter,sans-serif;letter-spacing:-.02em">Notifications</div><div style="font:400 14px/21px Inter,sans-serif;color:#475569;margin-top:2px">8 in the last seven days · 3 unread</div></div>
+        <span class="btns">Mark all as read</span>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:16px">
+        <span class="pill" style="background:#1d4ed8;color:#fff;height:32px;align-items:center;padding:0 14px;font-size:13px">All 8</span>
+        <span class="pill" style="background:#fff;color:#334155;height:32px;align-items:center;padding:0 14px;font-size:13px;border:1px solid #cbd5e1">Unread 3</span>
+        <span class="pill" style="background:#fff;color:#334155;height:32px;align-items:center;padding:0 14px;font-size:13px;border:1px solid #cbd5e1">Stock 4</span>
+        <span class="pill" style="background:#fff;color:#334155;height:32px;align-items:center;padding:0 14px;font-size:13px;border:1px solid #cbd5e1">Orders 2</span>
+        <span class="pill" style="background:#fff;color:#334155;height:32px;align-items:center;padding:0 14px;font-size:13px;border:1px solid #cbd5e1">Network 2</span>
+      </div>
+      <div class="card" style="margin-top:14px;overflow:hidden">
+        <div style="display:grid;grid-template-columns:8px 40px minmax(0,1fr) 168px 132px;column-gap:14px;align-items:flex-start;padding:14px 16px 14px 12px;background:#eff6ff;border-bottom:1px solid #e2e8f0">
+          <span style="width:8px;height:8px;border-radius:9999px;background:#1d4ed8;margin-top:7px"></span>
+          <span style="width:34px;height:34px;border-radius:8px;background:#fee2e2;display:inline-flex;align-items:center;justify-content:center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#991b1b" stroke-width="2.2" stroke-linecap="round"><path d="M12 8v5"></path><path d="M12 16.5h.01"></path><path d="M10.3 3.9 2.6 17.4A1.6 1.6 0 0 0 4 19.8h16a1.6 1.6 0 0 0 1.4-2.4L13.7 3.9a1.6 1.6 0 0 0-2.8 0Z"></path></svg></span>
+          <div><div style="font:600 15px/22px Inter,sans-serif">Cooking Oil is out of stock</div><div style="font:400 13px/19px Inter,sans-serif;color:#475569">0.000 L on hand against a minimum of 40.000 L. No purchase order is open for it.</div></div>
+          <div><span class="pill" style="background:#fee2e2;color:#991b1b">Out of stock</span></div>
+          <div class="tnum" style="font:500 13px/19px Inter,sans-serif;color:#475569;text-align:right">13 Aug, 07:05<div style="font-weight:600;color:#1e40af">Unread</div></div>
+        </div>
+        <div style="display:grid;grid-template-columns:8px 40px minmax(0,1fr) 168px 132px;column-gap:14px;align-items:flex-start;padding:14px 16px 14px 12px;background:#eff6ff;border-bottom:1px solid #e2e8f0">
+          <span style="width:8px;height:8px;border-radius:9999px;background:#1d4ed8;margin-top:7px"></span>
+          <span style="width:34px;height:34px;border-radius:8px;background:#fef3c7;display:inline-flex;align-items:center;justify-content:center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#854d0e" stroke-width="2.2" stroke-linecap="round"><path d="M12 7.5v5.5"></path><path d="M12 16.5h.01"></path><circle cx="12" cy="12" r="9"></circle></svg></span>
+          <div><div style="font:600 15px/22px Inter,sans-serif">Wheat Flour fell below its minimum</div><div style="font:400 13px/19px Inter,sans-serif;color:#475569">60.000 KG on hand against a minimum of 80.000 KG, after 20.000 KG was issued to the kitchen.</div></div>
+          <div><span class="pill" style="background:#fef3c7;color:#854d0e">Low stock</span></div>
+          <div class="tnum" style="font:500 13px/19px Inter,sans-serif;color:#475569;text-align:right">12 Aug, 18:40<div style="font-weight:600;color:#1e40af">Unread</div></div>
+        </div>
+        <div style="display:grid;grid-template-columns:8px 40px minmax(0,1fr) 168px 132px;column-gap:14px;align-items:flex-start;padding:14px 16px 14px 12px;background:#eff6ff;border-bottom:1px solid #e2e8f0">
+          <span style="width:8px;height:8px;border-radius:9999px;background:#1d4ed8;margin-top:7px"></span>
+          <span style="width:34px;height:34px;border-radius:8px;background:#eff6ff;border:1px solid #bfdbfe;display:inline-flex;align-items:center;justify-content:center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1e40af" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 20v-1.6a3.4 3.4 0 0 0-3.4-3.4H6.4A3.4 3.4 0 0 0 3 18.4V20"></path><circle cx="9.5" cy="7.5" r="3.5"></circle><path d="M18 8h4"></path><path d="M20 6v4"></path></svg></span>
+          <div><div style="font:600 15px/22px Inter,sans-serif">Ocean Blue Restaurant asked to connect</div><div style="font:400 13px/19px Inter,sans-serif;color:#475569">They would buy from you. Accepting lets them see your Partner Catalog and place orders; it never shows them your stock.</div></div>
+          <div><span class="pill" style="background:#eff6ff;color:#1e40af">Request received</span></div>
+          <div class="tnum" style="font:500 13px/19px Inter,sans-serif;color:#475569;text-align:right">12 Aug, 11:20<div style="font-weight:600;color:#1e40af">Unread</div></div>
+        </div>
+        <div style="display:grid;grid-template-columns:8px 40px minmax(0,1fr) 168px 132px;column-gap:14px;align-items:flex-start;padding:13px 16px 13px 12px;border-bottom:1px solid #f1f5f9">
+          <span></span>
+          <span style="width:34px;height:34px;border-radius:8px;background:#dcfce7;display:inline-flex;align-items:center;justify-content:center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#166534" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m4.5 12.5 5 5 10-11"></path></svg></span>
+          <div><div style="font:500 15px/22px Inter,sans-serif;color:#334155">CPO-2026-003 is complete</div><div style="font:400 13px/19px Inter,sans-serif;color:#64748b">All 10 PACK from Fresh Foods Ltd have been received.</div></div>
+          <div><span class="pill" style="background:#dcfce7;color:#166534">Received</span></div>
+          <div class="tnum" style="font:500 13px/19px Inter,sans-serif;color:#64748b;text-align:right">12 Aug, 15:40<div>Read</div></div>
+        </div>
+        <div style="display:grid;grid-template-columns:8px 40px minmax(0,1fr) 168px 132px;column-gap:14px;align-items:flex-start;padding:13px 16px 13px 12px;border-bottom:1px solid #f1f5f9">
+          <span></span>
+          <span style="width:34px;height:34px;border-radius:8px;background:#f1f5f9;display:inline-flex;align-items:center;justify-content:center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h11v9H3z"></path><path d="M14 10h4l3 3v3h-7z"></path><circle cx="7" cy="18" r="1.8"></circle><circle cx="17" cy="18" r="1.8"></circle></svg></span>
+          <div><div style="font:500 15px/22px Inter,sans-serif;color:#334155">Fresh Foods Ltd shipped CPO-2026-003</div><div style="font:400 13px/19px Inter,sans-serif;color:#64748b">10 PACK left their premises. Your stock changes only when you receive it.</div></div>
+          <div><span class="pill" style="background:#eff6ff;color:#1e40af">Shipped</span></div>
+          <div class="tnum" style="font:500 13px/19px Inter,sans-serif;color:#64748b;text-align:right">11 Aug, 12:00<div>Read</div></div>
+        </div>
+        <div style="display:grid;grid-template-columns:8px 40px minmax(0,1fr) 168px 132px;column-gap:14px;align-items:flex-start;padding:13px 16px 13px 12px;border-bottom:1px solid #f1f5f9">
+          <span></span>
+          <span style="width:34px;height:34px;border-radius:8px;background:#fef3c7;display:inline-flex;align-items:center;justify-content:center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#854d0e" stroke-width="2.2" stroke-linecap="round"><path d="M12 7.5v5.5"></path><path d="M12 16.5h.01"></path><circle cx="12" cy="12" r="9"></circle></svg></span>
+          <div><div style="font:500 15px/22px Inter,sans-serif;color:#334155">Butter Block fell below its minimum</div><div style="font:400 13px/19px Inter,sans-serif;color:#64748b">8.000 KG on hand against a minimum of 10.000 KG.</div></div>
+          <div><span class="pill" style="background:#fef3c7;color:#854d0e">Low stock</span></div>
+          <div class="tnum" style="font:500 13px/19px Inter,sans-serif;color:#64748b;text-align:right">11 Aug, 06:30<div>Read</div></div>
+        </div>
+        <div style="display:grid;grid-template-columns:8px 40px minmax(0,1fr) 168px 132px;column-gap:14px;align-items:flex-start;padding:13px 16px 13px 12px;border-bottom:1px solid #f1f5f9">
+          <span></span>
+          <span style="width:34px;height:34px;border-radius:8px;background:#f1f5f9;display:inline-flex;align-items:center;justify-content:center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="2.2" stroke-linecap="round"><path d="M5 5l14 14"></path><circle cx="12" cy="12" r="9"></circle></svg></span>
+          <div><div style="font:500 15px/22px Inter,sans-serif;color:#334155">Highland Dairy disabled the connection</div><div style="font:400 13px/19px Inter,sans-serif;color:#64748b">No new order can be placed either way. Your past orders and history are unchanged.</div></div>
+          <div><span class="pill" style="background:#f1f5f9;color:#475569">Disabled</span></div>
+          <div class="tnum" style="font:500 13px/19px Inter,sans-serif;color:#64748b;text-align:right">10 Aug, 14:05<div>Read</div></div>
+        </div>
+        <div style="display:grid;grid-template-columns:8px 40px minmax(0,1fr) 168px 132px;column-gap:14px;align-items:flex-start;padding:13px 16px 13px 12px">
+          <span></span>
+          <span style="width:34px;height:34px;border-radius:8px;background:#fef3c7;display:inline-flex;align-items:center;justify-content:center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#854d0e" stroke-width="2.2" stroke-linecap="round"><path d="M12 7.5v5.5"></path><path d="M12 16.5h.01"></path><circle cx="12" cy="12" r="9"></circle></svg></span>
+          <div><div style="font:500 15px/22px Inter,sans-serif;color:#334155">Fish Fillet fell below its minimum</div><div style="font:400 13px/19px Inter,sans-serif;color:#64748b">10.000 KG on hand against a minimum of 12.000 KG.</div></div>
+          <div><span class="pill" style="background:#fef3c7;color:#854d0e">Low stock</span></div>
+          <div class="tnum" style="font:500 13px/19px Inter,sans-serif;color:#64748b;text-align:right">9 Aug, 16:15<div>Read</div></div>
+        </div>
+        <div class="pg"><span>Showing 8 of 8 from the last seven days</span><span style="display:flex;gap:6px"><span class="pgb" style="color:#94a3b8">Older</span></span></div>
+      </div>
+    </div>
+    <div style="background:#cbd5e1"></div>
+    <div style="padding:22px 22px 26px">
+      <div class="eyb">The bell, opened</div>
+      <div style="border:1px solid #cbd5e1;border-radius:12px;margin-top:14px;overflow:hidden;box-shadow:0 20px 40px rgb(15 23 42 / .16);background:#fff">
+        <div style="padding:12px 16px;border-bottom:1px solid #e2e8f0;display:flex;align-items:center;justify-content:space-between"><span style="font:600 15px Inter,sans-serif">Notifications</span><span class="tnum" style="font:600 12px Inter,sans-serif;color:#1e40af">3 unread</span></div>
+        <div style="padding:11px 16px;border-bottom:1px solid #f1f5f9;background:#eff6ff;display:flex;gap:10px"><span style="width:7px;height:7px;border-radius:9999px;background:#1d4ed8;margin-top:6px;flex:none"></span><div><div style="font:600 14px/20px Inter,sans-serif">Cooking Oil is out of stock</div><div class="tnum" style="font:400 12px/17px Inter,sans-serif;color:#64748b">13 Aug, 07:05</div></div></div>
+        <div style="padding:11px 16px;border-bottom:1px solid #f1f5f9;background:#eff6ff;display:flex;gap:10px"><span style="width:7px;height:7px;border-radius:9999px;background:#1d4ed8;margin-top:6px;flex:none"></span><div><div style="font:600 14px/20px Inter,sans-serif">Wheat Flour fell below its minimum</div><div class="tnum" style="font:400 12px/17px Inter,sans-serif;color:#64748b">12 Aug, 18:40</div></div></div>
+        <div style="padding:11px 16px;border-bottom:1px solid #f1f5f9;background:#eff6ff;display:flex;gap:10px"><span style="width:7px;height:7px;border-radius:9999px;background:#1d4ed8;margin-top:6px;flex:none"></span><div><div style="font:600 14px/20px Inter,sans-serif">Ocean Blue Restaurant asked to connect</div><div class="tnum" style="font:400 12px/17px Inter,sans-serif;color:#64748b">12 Aug, 11:20</div></div></div>
+        <div style="padding:11px 16px;border-bottom:1px solid #f1f5f9;display:flex;gap:10px"><span style="width:7px;flex:none"></span><div><div style="font:500 14px/20px Inter,sans-serif;color:#334155">CPO-2026-003 is complete</div><div class="tnum" style="font:400 12px/17px Inter,sans-serif;color:#64748b">12 Aug, 15:40</div></div></div>
+        <div style="padding:11px 16px;text-align:center;background:#f8fafc;font:600 13px Inter,sans-serif;color:#1d4ed8">See all notifications</div>
+      </div>
+      <div class="card" style="margin-top:12px;padding:14px 16px">
+        <div style="font:600 14px/20px Inter,sans-serif">Only three things create one</div>
+        <div style="display:flex;flex-direction:column;gap:8px;margin-top:9px">
+          <div style="display:flex;gap:9px"><span class="stgn" style="background:#fef3c7;color:#854d0e">1</span><div style="font:400 13px/19px Inter,sans-serif;color:#475569"><strong style="color:#0f172a">A product crossed its minimum.</strong> Written only when the derived status actually changed, so a product that is already low does not notify again on every issue.</div></div>
+          <div style="display:flex;gap:9px"><span class="stgn" style="background:#eff6ff;color:#1e40af">2</span><div style="font:400 13px/19px Inter,sans-serif;color:#475569"><strong style="color:#0f172a">A connected order changed state.</strong> Accepted, rejected, shipped, received — the transitions the other business set, and yours.</div></div>
+          <div style="display:flex;gap:9px"><span class="stgn" style="background:#f1f5f9;color:#475569">3</span><div style="font:400 13px/19px Inter,sans-serif;color:#475569"><strong style="color:#0f172a">A connection changed.</strong> A request arrived, was answered, or was disabled by either side.</div></div>
+        </div>
+      </div>
+      <div class="card" style="margin-top:12px;padding:14px 16px">
+        <div style="font:600 14px/20px Inter,sans-serif">What a notification is not</div>
+        <div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:4px">It is not an email — nothing is sent outside Stockmok in this release. It is not a task list: nothing here can be assigned, snoozed or escalated. And it carries no figure a partner should not see, because a notification about a connected order names the quantity in the unit that was ordered and nothing about your stock.</div>
+      </div>
+      <div class="card" style="margin-top:12px;padding:14px 16px;background:#f8fafc">
+        <div style="font:600 14px/20px Inter,sans-serif">The only thing a reader may change</div>
+        <div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:4px">Read or unread. The title, the message and the time were written when the event happened and stay as they were, which is what makes the list usable as a record of what the business was told and when.</div>
+      </div>
+    </div>
+  </div>
+</div>
+<p class="dv-cap"><strong>Status is never colour alone.</strong> Every row carries an icon, a worded state pill and the reading itself — 0.000 L against 40.000 L — so the difference between low and out survives greyscale, and the unread rows are marked by a dot and the word Unread as well as the tinted background.</p>
+</div>
+
+<div class="dv-opt" id="10c" data-screen-label="G10-02 Notifications empty loading role">
+<div class="dv-olabel"><a class="dv-oid" href="#10c">10c</a>Notifications — caught up, still loading, and seen by a Storekeeper</div>
+<div class="dv-card" style="width:1320px">
+  <div style="background:#f8fafc;padding:22px 24px 26px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px">
+    <div>
+      <div class="eyb">Nothing to report</div>
+      <div class="card" style="margin-top:12px;overflow:hidden;background:#fff">
+        <div style="padding:14px 16px;border-bottom:1px solid #e2e8f0"><div style="font:700 20px/28px Inter,sans-serif;letter-spacing:-.02em">Notifications</div><div style="font:400 13px/19px Inter,sans-serif;color:#475569">Nothing unread</div></div>
+        <div style="padding:44px 24px 46px;text-align:center">
+          <span style="width:56px;height:56px;border-radius:9999px;background:#dcfce7;display:inline-flex;align-items:center;justify-content:center"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#166534" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m4.5 12.5 5 5 10-11"></path></svg></span>
+          <div style="font:600 16px/24px Inter,sans-serif;margin-top:12px">You're all caught up</div>
+          <div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:4px;max-width:300px;margin-left:auto;margin-right:auto">Stockmok will tell you here when a product crosses its minimum, when a connected order moves, or when a business asks to connect.</div>
+          <span class="btns" style="margin-top:16px">Open the dashboard</span>
+        </div>
+      </div>
+      <div class="card" style="margin-top:12px;padding:13px 15px"><div style="font:600 13px/19px Inter,sans-serif">Distinct from a filter that found nothing</div><div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:3px">This is the first-run wording: there has never been a notification. Filtering the populated list down to nothing says <em>No notification matches Unread</em> and offers Clear filter, because the two situations need different next steps.</div></div>
+    </div>
+    <div>
+      <div class="eyb">Still loading</div>
+      <div class="card" style="margin-top:12px;overflow:hidden;background:#fff">
+        <div style="padding:14px 16px;border-bottom:1px solid #e2e8f0"><div style="font:700 20px/28px Inter,sans-serif;letter-spacing:-.02em">Notifications</div><div class="sk" style="width:120px;height:13px;margin-top:6px"></div></div>
+        <div style="display:flex;gap:8px;padding:12px 16px"><div class="sk" style="width:64px;height:28px;border-radius:9999px"></div><div class="sk" style="width:78px;height:28px;border-radius:9999px"></div><div class="sk" style="width:70px;height:28px;border-radius:9999px"></div></div>
+        <div style="padding:0 16px 14px;display:flex;flex-direction:column;gap:0">
+          <div style="display:grid;grid-template-columns:34px minmax(0,1fr) 76px;column-gap:12px;align-items:flex-start;padding:13px 0;border-top:1px solid #f1f5f9"><div class="sk" style="width:34px;height:34px;border-radius:8px"></div><div><div class="sk" style="width:74%;height:14px"></div><div class="sk" style="width:92%;height:12px;margin-top:7px"></div></div><div class="sk" style="width:60px;height:12px;margin-left:auto"></div></div>
+          <div style="display:grid;grid-template-columns:34px minmax(0,1fr) 76px;column-gap:12px;align-items:flex-start;padding:13px 0;border-top:1px solid #f1f5f9"><div class="sk" style="width:34px;height:34px;border-radius:8px"></div><div><div class="sk" style="width:62%;height:14px"></div><div class="sk" style="width:86%;height:12px;margin-top:7px"></div></div><div class="sk" style="width:60px;height:12px;margin-left:auto"></div></div>
+          <div style="display:grid;grid-template-columns:34px minmax(0,1fr) 76px;column-gap:12px;align-items:flex-start;padding:13px 0;border-top:1px solid #f1f5f9"><div class="sk" style="width:34px;height:34px;border-radius:8px"></div><div><div class="sk" style="width:80%;height:14px"></div><div class="sk" style="width:70%;height:12px;margin-top:7px"></div></div><div class="sk" style="width:60px;height:12px;margin-left:auto"></div></div>
+          <div style="display:grid;grid-template-columns:34px minmax(0,1fr) 76px;column-gap:12px;align-items:flex-start;padding:13px 0;border-top:1px solid #f1f5f9"><div class="sk" style="width:34px;height:34px;border-radius:8px"></div><div><div class="sk" style="width:56%;height:14px"></div><div class="sk" style="width:78%;height:12px;margin-top:7px"></div></div><div class="sk" style="width:60px;height:12px;margin-left:auto"></div></div>
+        </div>
+      </div>
+      <div class="card" style="margin-top:12px;padding:13px 15px"><div style="font:600 13px/19px Inter,sans-serif">The skeleton is the layout</div><div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:3px">Four rows at the real row height, with the icon square, two text lines and the timestamp column in their final places, so nothing moves when the data lands. A centred spinner on an empty page is not used anywhere in this system.</div></div>
+      <div class="card" style="margin-top:12px;padding:14px 16px">
+        <div style="font:600 14px/20px Inter,sans-serif">If the list cannot be read</div>
+        <div style="display:flex;gap:10px;padding:12px 14px;background:#fee2e2;border-radius:8px;margin-top:9px"><span style="width:20px;height:20px;border-radius:9999px;background:#991b1b;color:#fff;font:700 12px/20px Inter,sans-serif;text-align:center;flex:none">!</span><div style="font:500 13px/19px Inter,sans-serif">Your notifications could not be loaded. Nothing has been lost — this is a reading problem, not a record problem.</div></div>
+        <div style="display:flex;justify-content:flex-end;margin-top:10px"><span class="btnp">Try again</span></div>
+      </div>
+    </div>
+    <div>
+      <div class="eyb">The same screen · Storekeeper</div>
+      <div class="card" style="margin-top:12px;overflow:hidden;background:#fff">
+        <div style="padding:14px 16px;border-bottom:1px solid #e2e8f0;display:flex;align-items:center;justify-content:space-between"><div><div style="font:700 20px/28px Inter,sans-serif;letter-spacing:-.02em">Notifications</div><div style="font:400 13px/19px Inter,sans-serif;color:#475569">4 in the last seven days · 2 unread</div></div><span class="pill" style="background:#f1f5f9;color:#475569;height:26px;align-items:center;padding:0 11px">Storekeeper</span></div>
+        <div style="display:grid;grid-template-columns:8px 34px minmax(0,1fr) 92px;column-gap:12px;align-items:flex-start;padding:13px 14px 13px 12px;background:#eff6ff;border-bottom:1px solid #f1f5f9"><span style="width:8px;height:8px;border-radius:9999px;background:#1d4ed8;margin-top:7px"></span><span style="width:30px;height:30px;border-radius:8px;background:#fee2e2;display:inline-flex;align-items:center;justify-content:center;font:700 13px Inter,sans-serif;color:#991b1b">!</span><div><div style="font:600 14px/20px Inter,sans-serif">Cooking Oil is out of stock</div><div style="font:400 12px/17px Inter,sans-serif;color:#475569">0.000 L against a minimum of 40.000 L</div></div><div class="tnum" style="font:500 12px/17px Inter,sans-serif;color:#475569;text-align:right">13 Aug<div style="font-weight:600;color:#1e40af">Unread</div></div></div>
+        <div style="display:grid;grid-template-columns:8px 34px minmax(0,1fr) 92px;column-gap:12px;align-items:flex-start;padding:13px 14px 13px 12px;background:#eff6ff;border-bottom:1px solid #f1f5f9"><span style="width:8px;height:8px;border-radius:9999px;background:#1d4ed8;margin-top:7px"></span><span style="width:30px;height:30px;border-radius:8px;background:#fef3c7;display:inline-flex;align-items:center;justify-content:center;font:700 13px Inter,sans-serif;color:#854d0e">!</span><div><div style="font:600 14px/20px Inter,sans-serif">Wheat Flour fell below its minimum</div><div style="font:400 12px/17px Inter,sans-serif;color:#475569">60.000 KG against a minimum of 80.000 KG</div></div><div class="tnum" style="font:500 12px/17px Inter,sans-serif;color:#475569;text-align:right">12 Aug<div style="font-weight:600;color:#1e40af">Unread</div></div></div>
+        <div style="display:grid;grid-template-columns:8px 34px minmax(0,1fr) 92px;column-gap:12px;align-items:flex-start;padding:13px 14px 13px 12px;border-bottom:1px solid #f1f5f9"><span></span><span style="width:30px;height:30px;border-radius:8px;background:#fef3c7;display:inline-flex;align-items:center;justify-content:center;font:700 13px Inter,sans-serif;color:#854d0e">!</span><div><div style="font:500 14px/20px Inter,sans-serif;color:#334155">Butter Block fell below its minimum</div><div style="font:400 12px/17px Inter,sans-serif;color:#64748b">8.000 KG against a minimum of 10.000 KG</div></div><div class="tnum" style="font:500 12px/17px Inter,sans-serif;color:#64748b;text-align:right">11 Aug<div>Read</div></div></div>
+        <div style="display:grid;grid-template-columns:8px 34px minmax(0,1fr) 92px;column-gap:12px;align-items:flex-start;padding:13px 14px 13px 12px"><span></span><span style="width:30px;height:30px;border-radius:8px;background:#fef3c7;display:inline-flex;align-items:center;justify-content:center;font:700 13px Inter,sans-serif;color:#854d0e">!</span><div><div style="font:500 14px/20px Inter,sans-serif;color:#334155">Fish Fillet fell below its minimum</div><div style="font:400 12px/17px Inter,sans-serif;color:#64748b">10.000 KG against a minimum of 12.000 KG</div></div><div class="tnum" style="font:500 12px/17px Inter,sans-serif;color:#64748b;text-align:right">9 Aug<div>Read</div></div></div>
+      </div>
+      <div class="card" style="margin-top:12px;padding:13px 15px"><div style="font:600 13px/19px Inter,sans-serif">Four rows, not eight</div><div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:3px">A Storekeeper is told about stock, because stock is what they act on. The order and connection notifications are not greyed out for them — they were never addressed to them, and the filter row shrinks to All and Unread accordingly.</div></div>
+      <div class="card" style="margin-top:12px;padding:14px 16px;background:#f8fafc"><div style="font:600 14px/20px Inter,sans-serif">Bounded by design</div><div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:4px">One event notifies at most fifty people, and the recipients are worked out before anything is written. A business that grows past that does not silently lose notifications: the limit is a stated rule rather than an accident of scale.</div></div>
+    </div>
+  </div>
+</div>
+<p class="dv-cap"><strong>Three states of one screen, drawn rather than described.</strong> The empty state names what would appear here and offers a real next step; the skeleton holds the exact row geometry; and the role view differs by which events were ever addressed to the reader, not by disabling rows they can see.</p>
+</div>
+
+<div class="dv-opt" id="10d" data-screen-label="G10-03 Team members">
+<div class="dv-olabel"><a class="dv-oid" href="#10d">10d</a>Team — five members, a protected Owner, and one invitation still outstanding</div>
+<div class="dv-card" style="width:1320px">
+  <div style="display:grid;grid-template-columns:minmax(0,1fr) 1px 430px;background:#f8fafc">
+    <div style="padding:22px 24px 26px">
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:20px">
+        <div><div style="font:500 13px/19px Inter,sans-serif;color:#64748b">Team</div><div style="font:700 26px/34px Inter,sans-serif;letter-spacing:-.02em">Team</div><div style="font:400 14px/21px Inter,sans-serif;color:#475569;margin-top:2px">5 members · 4 active, 1 suspended · 1 invitation waiting</div></div>
+        <span class="btnp">Invite a member</span>
+      </div>
+      <div class="card" style="margin-top:16px;overflow:hidden">
+        <div class="g6h" style="grid-template-columns:minmax(0,1fr) 190px 140px 150px 200px;column-gap:14px;height:40px"><span>Member</span><span>Role</span><span>Status</span><span>Joined</span><span style="text-align:right">Actions</span></div>
+        <div class="g6r" style="grid-template-columns:minmax(0,1fr) 190px 140px 150px 200px;column-gap:14px;border-top-color:#e2e8f0;min-height:56px;background:#f8fafc">
+          <span style="display:flex;align-items:center;gap:11px"><span style="width:36px;height:36px;border-radius:9999px;background:#0f172a;color:#fff;font:700 13px Inter,sans-serif;display:inline-flex;align-items:center;justify-content:center;flex:none">NF</span><span><span style="font-weight:600">Nohan Fernando</span><div style="font:400 12px/17px Inter,sans-serif;color:#64748b">nohan@grandocean.lk · you</div></span></span>
+          <span style="display:flex;align-items:center;gap:7px"><span class="pill" style="background:#0f172a;color:#fff">Owner</span></span>
+          <span><span class="pill" style="background:#dcfce7;color:#166534">Active</span></span>
+          <span class="tnum" style="color:#475569">1 Aug 2026</span>
+          <span style="text-align:right;font:400 13px/19px Inter,sans-serif;color:#64748b">Protected — the Owner cannot be changed, suspended or removed</span>
+        </div>
+        <div class="g6r" style="grid-template-columns:minmax(0,1fr) 190px 140px 150px 200px;column-gap:14px;min-height:56px">
+          <span style="display:flex;align-items:center;gap:11px"><span style="width:36px;height:36px;border-radius:9999px;background:#1d4ed8;color:#fff;font:700 13px Inter,sans-serif;display:inline-flex;align-items:center;justify-content:center;flex:none">AS</span><span><span style="font-weight:600">Ayesha Silva</span><div style="font:400 12px/17px Inter,sans-serif;color:#64748b">ayesha@grandocean.lk</div></span></span>
+          <span><span class="pill" style="background:#eff6ff;color:#1e40af">Admin</span></span>
+          <span><span class="pill" style="background:#dcfce7;color:#166534">Active</span></span>
+          <span class="tnum" style="color:#475569">2 Aug 2026</span>
+          <span style="text-align:right;display:flex;gap:7px;justify-content:flex-end"><span class="btns" style="height:32px;font-size:13px;padding:0 11px">Change role</span><span class="btns" style="height:32px;font-size:13px;padding:0 11px">Suspend</span></span>
+        </div>
+        <div class="g6r" style="grid-template-columns:minmax(0,1fr) 190px 140px 150px 200px;column-gap:14px;min-height:56px">
+          <span style="display:flex;align-items:center;gap:11px"><span style="width:36px;height:36px;border-radius:9999px;background:#f1f5f9;border:1px solid #cbd5e1;color:#334155;font:700 13px Inter,sans-serif;display:inline-flex;align-items:center;justify-content:center;flex:none">RJ</span><span><span style="font-weight:600">Ruwan Jayasuriya</span><div style="font:400 12px/17px Inter,sans-serif;color:#64748b">ruwan@grandocean.lk</div></span></span>
+          <span><span class="pill" style="background:#f1f5f9;color:#334155">Procurement Manager</span></span>
+          <span><span class="pill" style="background:#dcfce7;color:#166534">Active</span></span>
+          <span class="tnum" style="color:#475569">3 Aug 2026</span>
+          <span style="text-align:right;display:flex;gap:7px;justify-content:flex-end"><span class="btns" style="height:32px;font-size:13px;padding:0 11px">Change role</span><span class="btns" style="height:32px;font-size:13px;padding:0 11px">Suspend</span></span>
+        </div>
+        <div class="g6r" style="grid-template-columns:minmax(0,1fr) 190px 140px 150px 200px;column-gap:14px;min-height:56px">
+          <span style="display:flex;align-items:center;gap:11px"><span style="width:36px;height:36px;border-radius:9999px;background:#f1f5f9;border:1px solid #cbd5e1;color:#334155;font:700 13px Inter,sans-serif;display:inline-flex;align-items:center;justify-content:center;flex:none">NP</span><span><span style="font-weight:600">Nimal Perera</span><div style="font:400 12px/17px Inter,sans-serif;color:#64748b">nimal@grandocean.lk</div></span></span>
+          <span><span class="pill" style="background:#f1f5f9;color:#334155">Storekeeper</span></span>
+          <span><span class="pill" style="background:#dcfce7;color:#166534">Active</span></span>
+          <span class="tnum" style="color:#475569">3 Aug 2026</span>
+          <span style="text-align:right;display:flex;gap:7px;justify-content:flex-end"><span class="btns" style="height:32px;font-size:13px;padding:0 11px">Change role</span><span class="btns" style="height:32px;font-size:13px;padding:0 11px">Suspend</span></span>
+        </div>
+        <div class="g6r" style="grid-template-columns:minmax(0,1fr) 190px 140px 150px 200px;column-gap:14px;min-height:56px;background:#f8fafc">
+          <span style="display:flex;align-items:center;gap:11px"><span style="width:36px;height:36px;border-radius:9999px;background:#e2e8f0;color:#64748b;font:700 13px Inter,sans-serif;display:inline-flex;align-items:center;justify-content:center;flex:none">DW</span><span><span style="font-weight:600;color:#475569">Dilani Wickrama</span><div style="font:400 12px/17px Inter,sans-serif;color:#64748b">dilani@grandocean.lk</div></span></span>
+          <span><span class="pill" style="background:#f1f5f9;color:#64748b">Inventory Manager</span></span>
+          <span><span class="pill" style="background:#fef3c7;color:#854d0e">Suspended</span></span>
+          <span class="tnum" style="color:#64748b">3 Aug 2026</span>
+          <span style="text-align:right;display:flex;gap:7px;justify-content:flex-end"><span class="btns" style="height:32px;font-size:13px;padding:0 11px">Reactivate</span><span class="btns" style="height:32px;font-size:13px;padding:0 11px;border-color:#991b1b;color:#991b1b">Remove</span></span>
+        </div>
+        <div style="padding:11px 16px;border-top:1px solid #f1f5f9;background:#f8fafc;font:400 13px/19px Inter,sans-serif;color:#475569">Suspended on 11 Aug 2026 by Nohan Fernando. Dilani cannot sign in to this workspace, and the 43 stock movements she recorded stay in the history under her name.</div>
+      </div>
+      <div class="card" style="margin-top:14px;overflow:hidden">
+        <div style="padding:12px 16px;border-bottom:1px solid #e2e8f0;display:flex;align-items:center;justify-content:space-between"><div style="font:600 15px/22px Inter,sans-serif">Invitations waiting</div><div style="font:400 13px/19px Inter,sans-serif;color:#475569">One per email address at a time</div></div>
+        <div class="g6h" style="grid-template-columns:minmax(0,1fr) 190px 140px 150px 200px;column-gap:14px"><span>Invited address</span><span>Role offered</span><span>Status</span><span>Expires</span><span style="text-align:right">Actions</span></div>
+        <div class="g6r" style="grid-template-columns:minmax(0,1fr) 190px 140px 150px 200px;column-gap:14px;border-top-color:#e2e8f0;min-height:48px">
+          <span><span style="font-weight:600">kasun@grandocean.lk</span><div style="font:400 12px/17px Inter,sans-serif;color:#64748b">Invited 12 Aug 2026 by Nohan Fernando</div></span>
+          <span><span class="pill" style="background:#f1f5f9;color:#334155">Analyst</span></span>
+          <span><span class="pill" style="background:#fef3c7;color:#854d0e">Waiting</span></span>
+          <span class="tnum" style="color:#475569">19 Aug 2026</span>
+          <span style="text-align:right;display:flex;gap:7px;justify-content:flex-end"><span class="btns" style="height:32px;font-size:13px;padding:0 11px;border-color:#991b1b;color:#991b1b">Revoke</span></span>
+        </div>
+        <div style="padding:11px 16px;border-top:1px solid #f1f5f9;background:#f8fafc;font:400 13px/19px Inter,sans-serif;color:#475569">The link was shown once, on 12 August, and cannot be shown again. If Kasun has lost it, revoke this invitation and create a new one.</div>
+      </div>
+    </div>
+    <div style="background:#cbd5e1"></div>
+    <div style="padding:22px 22px 26px">
+      <div class="eyb">What a role actually decides</div>
+      <div class="card" style="margin-top:14px;overflow:hidden">
+        <div class="g6h" style="grid-template-columns:minmax(0,1fr) 78px;column-gap:10px;font-size:11.5px"><span>Role · what they may do here</span><span style="text-align:right">Sidebar</span></div>
+        <div class="g6r" style="grid-template-columns:minmax(0,1fr) 78px;column-gap:10px;border-top-color:#e2e8f0;font-size:13px;min-height:46px"><span><strong>Owner</strong><div style="font:400 12px/17px Inter,sans-serif;color:#64748b">Everything, and cannot be removed by anyone</div></span><span class="tnum" style="text-align:right;color:#475569">16 items</span></div>
+        <div class="g6r" style="grid-template-columns:minmax(0,1fr) 78px;column-gap:10px;font-size:13px;min-height:46px"><span><strong>Admin</strong><div style="font:400 12px/17px Inter,sans-serif;color:#64748b">Everything except touching the Owner</div></span><span class="tnum" style="text-align:right;color:#475569">16 items</span></div>
+        <div class="g6r" style="grid-template-columns:minmax(0,1fr) 78px;column-gap:10px;font-size:13px;min-height:46px"><span><strong>Inventory Manager</strong><div style="font:400 12px/17px Inter,sans-serif;color:#64748b">Products, categories, store rooms, movements, receiving</div></span><span class="tnum" style="text-align:right;color:#475569">8 items</span></div>
+        <div class="g6r" style="grid-template-columns:minmax(0,1fr) 78px;column-gap:10px;font-size:13px;min-height:46px"><span><strong>Procurement Manager</strong><div style="font:400 12px/17px Inter,sans-serif;color:#64748b">Orders, receiving, suppliers, buyers, the whole network</div></span><span class="tnum" style="text-align:right;color:#475569">10 items</span></div>
+        <div class="g6r" style="grid-template-columns:minmax(0,1fr) 78px;column-gap:10px;font-size:13px;min-height:46px"><span><strong>Storekeeper</strong><div style="font:400 12px/17px Inter,sans-serif;color:#64748b">Receiving and adjustments; reads products</div></span><span class="tnum" style="text-align:right;color:#475569">5 items</span></div>
+        <div class="g6r" style="grid-template-columns:minmax(0,1fr) 78px;column-gap:10px;font-size:13px;min-height:46px"><span><strong>Analyst</strong><div style="font:400 12px/17px Inter,sans-serif;color:#64748b">Reads products, movements, orders and reports</div></span><span class="tnum" style="text-align:right;color:#475569">6 items</span></div>
+        <div class="g6r" style="grid-template-columns:minmax(0,1fr) 78px;column-gap:10px;font-size:13px;min-height:46px;background:#f8fafc"><span><strong>Viewer</strong><div style="font:400 12px/17px Inter,sans-serif;color:#64748b">Dashboard, products, and Stock on Hand only</div></span><span class="tnum" style="text-align:right;color:#475569">4 items</span></div>
+      </div>
+      <div class="card" style="margin-top:12px;padding:14px 16px">
+        <div style="font:600 14px/20px Inter,sans-serif">One role per person</div>
+        <div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:4px">There is no role builder and no stacking of two roles. A person who needs both purchasing and stock work is made an Admin, and that decision is visible in one column of this table rather than buried in a permission matrix nobody reads.</div>
+      </div>
+      <div class="card" style="margin-top:12px;padding:14px 16px">
+        <div style="font:600 14px/20px Inter,sans-serif">Why the Owner row has words instead of buttons</div>
+        <div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:4px">A disabled Change role button invites somebody to keep clicking it. The destructive actions are absent from this row, and the reason is written where the buttons would have been.</div>
+      </div>
+      <div class="card" style="margin-top:12px;padding:14px 16px;background:#f8fafc">
+        <div style="font:600 14px/20px Inter,sans-serif">Suspended, not deleted</div>
+        <div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:4px">Removing a member ends their access; it never removes their name from the movements, receipts and orders they recorded. A ledger that forgets who did something is worth less than no ledger at all.</div>
+      </div>
+    </div>
+  </div>
+</div>
+<p class="dv-cap"><strong>Membership is the only thing that grants anything.</strong> The role in this table is what the server checks on every command — the sidebar column simply states how much of the product each role can see, so the difference between hiding an action and refusing it stays legible to whoever is administering the team.</p>
+</div>
+
+<div class="dv-opt" id="10e" data-screen-label="G10-04 Team dialogs">
+<div class="dv-olabel"><a class="dv-oid" href="#10e">10e</a>Team — inviting, the link shown once, changing a role, suspending and removing</div>
+<div class="dv-card" style="width:1320px">
+  <div style="background:#f8fafc;padding:22px 24px 26px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px">
+    <div>
+      <div class="eyb">Create the invitation</div>
+      <div style="border:1px solid #cbd5e1;border-radius:12px;margin-top:12px;overflow:hidden;box-shadow:0 20px 40px rgb(15 23 42 / .16);background:#fff">
+        <div style="padding:15px 18px;border-bottom:1px solid #e2e8f0"><div style="font:600 17px/25px Inter,sans-serif">Invite a member</div><div style="font:400 13px/19px Inter,sans-serif;color:#475569">They will join Grand Ocean Hotel with the role you choose.</div></div>
+        <div style="padding:16px 18px 18px">
+          <label class="lbl" for="g10-inv-email">Email address</label>
+          <div class="fld" id="g10-inv-email" style="justify-content:flex-start;border-color:#1d4ed8;box-shadow:0 0 0 2px #fff,0 0 0 4px #1d4ed8">kasun@grandocean.lk</div>
+          <div class="hint">They must accept while signed in with this exact address.</div>
+          <div style="margin-top:14px"><label class="lbl" for="g10-inv-role">Role</label><div class="fld" id="g10-inv-role">Analyst<span style="color:#64748b">▾</span></div><div class="hint">Reads products, movements, orders and reports. Cannot change stock.</div></div>
+          <div style="border:1px solid #e2e8f0;border-radius:8px;background:#f8fafc;padding:12px 14px;margin-top:14px"><div style="font:600 13px/19px Inter,sans-serif">What happens when you press Create</div><div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:2px">Stockmok makes a single-use link that works for seven days. Nothing is emailed — you copy the link and send it yourself, once.</div></div>
+          <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:16px"><span class="btns">Cancel</span><span class="btnp">Create invitation</span></div>
+        </div>
+      </div>
+      <div class="card" style="margin-top:12px;padding:14px 16px">
+        <div style="font:600 14px/20px Inter,sans-serif">That address already has an invitation</div>
+        <div class="fld" style="margin-top:9px;justify-content:flex-start;border-color:#991b1b">kasun@grandocean.lk</div>
+        <div style="font:500 12px/18px Inter,sans-serif;color:#991b1b;margin-top:6px">An invitation for kasun@grandocean.lk is already waiting and expires on 19 August. Revoke it first if you want to offer a different role.</div>
+      </div>
+      <div class="card" style="margin-top:12px;padding:14px 16px">
+        <div style="font:600 14px/20px Inter,sans-serif">That address is already a member</div>
+        <div class="fld" style="margin-top:9px;justify-content:flex-start;border-color:#991b1b">nimal@grandocean.lk</div>
+        <div style="font:500 12px/18px Inter,sans-serif;color:#991b1b;margin-top:6px">Nimal Perera is already an active member of this workspace. Change their role from the team list instead.</div>
+      </div>
+    </div>
+    <div>
+      <div class="eyb">Shown once, and only once</div>
+      <div style="border:1px solid #166534;border-radius:12px;margin-top:12px;overflow:hidden;box-shadow:0 20px 40px rgb(15 23 42 / .16);background:#fff">
+        <div style="padding:15px 18px;border-bottom:1px solid #bbf7d0;background:#dcfce7;display:flex;gap:11px;align-items:center"><span style="width:26px;height:26px;border-radius:9999px;background:#166534;display:inline-flex;align-items:center;justify-content:center;flex:none"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m4.5 12.5 5 5 10-11"></path></svg></span><div style="font:600 16px/24px Inter,sans-serif;color:#166534">Invitation created</div></div>
+        <div style="padding:16px 18px 18px">
+          <div style="font:400 14px/21px Inter,sans-serif;color:#0f172a">Send this link to <strong>kasun@grandocean.lk</strong>. It works once, expires on 19 August 2026, and will not be shown again after you close this dialog.</div>
+          <div style="border:1px solid #cbd5e1;border-radius:8px;background:#f8fafc;padding:12px 14px;margin-top:14px;display:flex;align-items:center;gap:12px">
+            <span class="mono" style="font:500 13px/19px ui-monospace,Menlo,monospace;color:#334155;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">stockmok.app/invite/8f31c0a94b7e5d62a1f0</span>
+            <span class="btns" style="height:36px;font-size:13px;padding:0 13px;flex:none">Copy link</span>
+          </div>
+          <div style="display:flex;gap:10px;padding:12px 14px;background:#fef3c7;border-radius:8px;margin-top:14px"><span style="width:20px;height:20px;border-radius:9999px;background:#854d0e;color:#fff;font:700 12px/20px Inter,sans-serif;text-align:center;flex:none">!</span><div style="font:500 13px/19px Inter,sans-serif;color:#0f172a">Copy it now. Stockmok keeps only a one-way check of this link, so it cannot be read back — not by you, and not by anyone else.</div></div>
+          <div style="display:flex;justify-content:flex-end;margin-top:16px"><span class="btnp">I have copied the link</span></div>
+        </div>
+      </div>
+      <div class="card" style="margin-top:12px;padding:14px 16px">
+        <div style="font:600 14px/20px Inter,sans-serif">Change Ayesha's role</div>
+        <div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:4px">From <strong style="color:#0f172a">Admin</strong> to</div>
+        <div class="fld" style="margin-top:7px">Procurement Manager<span style="color:#64748b">▾</span></div>
+        <div style="display:flex;gap:10px;padding:12px 14px;background:#f1f5f9;border-radius:8px;margin-top:12px"><span style="width:20px;height:20px;border-radius:9999px;background:#475569;color:#fff;font:700 12px/20px Inter,sans-serif;text-align:center;flex:none">i</span><div style="font:500 13px/19px Inter,sans-serif">Ayesha loses Team, Settings, Categories and Store Rooms, and keeps Purchase Orders, Receiving, Suppliers, Buyers and the whole network. It takes effect the next time she loads a page.</div></div>
+        <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:14px"><span class="btns" style="height:36px;font-size:13px">Keep Admin</span><span class="btnp" style="height:36px;font-size:13px">Change role</span></div>
+      </div>
+    </div>
+    <div>
+      <div class="eyb">The two destructive confirmations</div>
+      <div style="border:1px solid #cbd5e1;border-radius:12px;margin-top:12px;overflow:hidden;box-shadow:0 20px 40px rgb(15 23 42 / .16);background:#fff">
+        <div style="padding:15px 18px;border-bottom:1px solid #e2e8f0;font:600 17px/25px Inter,sans-serif">Suspend Dilani Wickrama?</div>
+        <div style="padding:16px 18px 18px">
+          <div style="font:400 14px/21px Inter,sans-serif;color:#0f172a">She will not be able to sign in to Grand Ocean Hotel. Her 43 stock movements, 2 receipts and every audit line keep her name.</div>
+          <div style="display:flex;gap:10px;padding:12px 14px;background:#f1f5f9;border-radius:8px;margin-top:13px"><span style="width:20px;height:20px;border-radius:9999px;background:#475569;color:#fff;font:700 12px/20px Inter,sans-serif;text-align:center;flex:none">i</span><div style="font:500 13px/19px Inter,sans-serif">Suspension is reversible from the same row. Nothing about the workspace's stock changes.</div></div>
+          <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:16px"><span class="btns">Keep active</span><span class="btnp" style="background:#b91c1c">Suspend member</span></div>
+        </div>
+      </div>
+      <div style="border:1px solid #cbd5e1;border-radius:12px;margin-top:14px;overflow:hidden;box-shadow:0 20px 40px rgb(15 23 42 / .16);background:#fff">
+        <div style="padding:15px 18px;border-bottom:1px solid #e2e8f0;font:600 17px/25px Inter,sans-serif">Remove Dilani Wickrama?</div>
+        <div style="padding:16px 18px 18px">
+          <div style="font:400 14px/21px Inter,sans-serif;color:#0f172a">Her membership of Grand Ocean Hotel ends. Everything she recorded stays, attributed to her, and she can be invited again later.</div>
+          <div style="display:flex;gap:10px;padding:12px 14px;background:#fee2e2;border-radius:8px;margin-top:13px"><span style="width:20px;height:20px;border-radius:9999px;background:#991b1b;color:#fff;font:700 12px/20px Inter,sans-serif;text-align:center;flex:none">!</span><div style="font:500 13px/19px Inter,sans-serif">Unlike suspension, this is not reversible from the team list. Bringing her back means a fresh invitation.</div></div>
+          <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:16px"><span class="btns">Keep membership</span><span class="btnp" style="background:#b91c1c">Remove member</span></div>
+        </div>
+      </div>
+      <div class="card" style="margin-top:14px;padding:14px 16px">
+        <div style="font:600 14px/20px Inter,sans-serif">Revoke the invitation to kasun@grandocean.lk?</div>
+        <div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:4px">The link stops working immediately. If he opens it afterwards he is told the invitation is no longer valid and to ask you for a new one.</div>
+        <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:13px"><span class="btns" style="height:36px;font-size:13px">Keep it</span><span class="btnp" style="height:36px;font-size:13px;background:#b91c1c">Revoke</span></div>
+      </div>
+      <div class="card" style="margin-top:12px;padding:14px 16px;background:#f8fafc">
+        <div style="font:600 14px/20px Inter,sans-serif">One dialog at a time</div>
+        <div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:4px">These five are drawn side by side so they can be compared. In the product only one is ever open: it takes the keyboard, closes on Escape, and returns focus to the button that opened it.</div>
+      </div>
+    </div>
+  </div>
+</div>
+<p class="dv-cap"><strong>Every confirmation names its object and its consequence.</strong> Suspend says what stays; Remove says what cannot be undone; Revoke says what the other person will read. The invitation link appears exactly once, with the warning next to it rather than after it, because there is no second chance to display it.</p>
+</div>
+
+<div class="dv-opt" id="10f" data-screen-label="G10-05 Settings">
+<div class="dv-olabel"><a class="dv-oid" href="#10f">10f</a>Settings — what may change, what is fixed forever, what is recorded</div>
+<div class="dv-card" style="width:1320px">
+  <div style="display:grid;grid-template-columns:minmax(0,1fr) 1px 430px;background:#f8fafc">
+    <div style="padding:22px 24px 26px">
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:20px">
+        <div><div style="font:500 13px/19px Inter,sans-serif;color:#64748b">Settings</div><div style="font:700 26px/34px Inter,sans-serif;letter-spacing:-.02em">Settings</div><div style="font:400 14px/21px Inter,sans-serif;color:#475569;margin-top:2px">Grand Ocean Hotel · changed by Owners and Admins only</div></div>
+        <div style="display:flex;gap:8px"><span class="btns">Discard changes</span><span class="btnp">Save settings</span></div>
+      </div>
+      <div class="card" style="margin-top:16px;overflow:hidden">
+        <div style="padding:12px 16px;border-bottom:1px solid #e2e8f0;font:600 15px/22px Inter,sans-serif">The business</div>
+        <div style="padding:16px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px">
+          <div><label class="lbl" for="g10-set-name">Business name</label><div class="fld" id="g10-set-name" style="justify-content:flex-start">Grand Ocean Hotel</div><div class="hint">Shown to connected businesses and on your branded sign-in page.</div></div>
+          <div><label class="lbl" for="g10-set-handle">Handle</label><div class="fld" id="g10-set-handle" style="justify-content:space-between;background:#f1f5f9;border-color:#cbd5e1;color:#475569"><span class="mono">@grand-ocean</span><span style="display:inline-flex;align-items:center;gap:6px;font:600 12px Inter,sans-serif;color:#64748b"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2.2" stroke-linecap="round"><rect x="4" y="10.5" width="16" height="10" rx="2"></rect><path d="M8 10.5V7a4 4 0 0 1 8 0v3.5"></path></svg>Fixed</span></div><div class="hint">A handle can never be changed. Partners look you up by it, and old orders point at it.</div></div>
+          <div><label class="lbl" for="g10-set-industry">Industry</label><div class="fld" id="g10-set-industry">Hospitality<span style="color:#64748b">▾</span></div></div>
+          <div><label class="lbl" for="g10-set-country">Country</label><div class="fld" id="g10-set-country">Sri Lanka<span style="color:#64748b">▾</span></div></div>
+        </div>
+      </div>
+      <div class="card" style="margin-top:14px;overflow:hidden">
+        <div style="padding:12px 16px;border-bottom:1px solid #e2e8f0;font:600 15px/22px Inter,sans-serif">How quantities and money are written</div>
+        <div style="padding:16px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px">
+          <div><label class="lbl" for="g10-set-ccy">Currency</label><div class="fld" id="g10-set-ccy" style="justify-content:space-between;background:#f1f5f9;border-color:#cbd5e1;color:#475569"><span>LKR — Sri Lankan rupee</span><span style="font:600 12px Inter,sans-serif;color:#64748b">Fixed</span></div><div class="hint">Locked once the first movement was recorded, because every past figure is written in it. There is no second currency.</div></div>
+          <div><label class="lbl" for="g10-set-tz">Time zone</label><div class="fld" id="g10-set-tz">Asia/Colombo<span style="color:#64748b">▾</span></div><div class="hint">Every date and time in Stockmok is shown in this zone, including the movement history.</div></div>
+          <div><label class="lbl" for="g10-set-wh">Default store room</label><div class="fld" id="g10-set-wh">Cold Room<span style="color:#64748b">▾</span></div><div class="hint">Offered first when receiving or adjusting stock. Cold Room and Main Store are your two active rooms.</div></div>
+          <div><label class="lbl" for="g10-set-pfx">Purchase order prefix</label><div class="fld tnum" id="g10-set-pfx" style="justify-content:flex-start">PO-</div><div class="hint">Applies to orders numbered from now on. PO-2026-001 to PO-2026-004 keep the numbers they were given.</div></div>
+          <div><label class="lbl" for="g10-set-prec">Quantity decimals</label><div class="fld" id="g10-set-prec" style="justify-content:space-between;background:#f1f5f9;border-color:#cbd5e1;color:#475569"><span class="tnum">3 — 120.000 KG</span><span style="font:600 12px Inter,sans-serif;color:#64748b">Fixed in this release</span></div><div class="hint">Three decimals everywhere, so a balance never rounds differently on two screens.</div></div>
+        </div>
+      </div>
+      <div class="card" style="margin-top:14px;overflow:hidden">
+        <div style="padding:12px 16px;border-bottom:1px solid #e2e8f0;font:600 15px/22px Inter,sans-serif">Notifications and features</div>
+        <div style="padding:6px 16px 16px">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:14px 0;border-bottom:1px solid #f1f5f9">
+            <div style="flex:1"><div style="font:600 14px/20px Inter,sans-serif">Tell us when a product crosses its minimum</div><div style="font:400 13px/19px Inter,sans-serif;color:#475569">On. Four of your twelve products are at or below their minimum today, and each one produced a single notification when it crossed.</div></div>
+            <span style="width:46px;height:26px;border-radius:9999px;background:#1d4ed8;display:inline-flex;align-items:center;justify-content:flex-end;padding:0 3px;flex:none;box-sizing:border-box"><span style="width:20px;height:20px;border-radius:9999px;background:#fff"></span></span>
+          </div>
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:14px 0;border-bottom:1px solid #f1f5f9">
+            <div style="flex:1"><div style="font:600 14px/20px Inter,sans-serif">Network — connect to other Stockmok businesses</div><div style="font:400 13px/19px Inter,sans-serif;color:#475569">On. Turning it off hides Connected Businesses, Partner Catalog and Product Mappings from everyone's sidebar; it does not disable your existing connection with Fresh Foods Ltd or cancel CPO-2026-003.</div></div>
+            <span style="width:46px;height:26px;border-radius:9999px;background:#1d4ed8;display:inline-flex;align-items:center;justify-content:flex-end;padding:0 3px;flex:none;box-sizing:border-box"><span style="width:20px;height:20px;border-radius:9999px;background:#fff"></span></span>
+          </div>
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:14px 0">
+            <div style="flex:1"><div style="font:600 14px/20px Inter,sans-serif;color:#64748b">Public storefront</div><div style="font:400 13px/19px Inter,sans-serif;color:#64748b">Not part of this release. It is listed here so you know it is a deliberate absence rather than a setting somebody forgot.</div></div>
+            <span class="pill" style="background:#f1f5f9;color:#64748b;height:26px;align-items:center;padding:0 11px;flex:none">Unavailable</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="background:#cbd5e1"></div>
+    <div style="padding:22px 22px 26px">
+      <div class="eyb">Three kinds of setting</div>
+      <div class="card" style="margin-top:14px;padding:14px 16px">
+        <div style="display:flex;gap:9px"><span class="stgn" style="background:#dcfce7;color:#166534">1</span><div><div style="font:600 14px/20px Inter,sans-serif">Changeable, and harmless</div><div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:2px">Name, industry, country, time zone, default store room, order prefix. Change them freely; nothing already recorded moves.</div></div></div>
+      </div>
+      <div class="card" style="margin-top:12px;padding:14px 16px">
+        <div style="display:flex;gap:9px"><span class="stgn" style="background:#fef3c7;color:#854d0e">2</span><div><div style="font:600 14px/20px Inter,sans-serif">Changeable, and consequential</div><div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:2px">The two toggles. Each one states what it changes and, more importantly, what it does not: turning Network off hides three sidebar items, it does not end a relationship or touch an order.</div></div></div>
+      </div>
+      <div class="card" style="margin-top:12px;padding:14px 16px">
+        <div style="display:flex;gap:9px"><span class="stgn" style="background:#f1f5f9;color:#475569">3</span><div><div style="font:600 14px/20px Inter,sans-serif">Fixed, and shown anyway</div><div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:2px">Handle, currency, decimals. They are on the page because a person needs to read them, greyed with the word Fixed and a sentence saying why — never removed, which would look like a missing feature.</div></div></div>
+      </div>
+      <div class="card" style="margin-top:14px;padding:14px 16px">
+        <div style="font:600 14px/20px Inter,sans-serif">Saved</div>
+        <div style="display:flex;gap:10px;padding:12px 14px;background:#dcfce7;border-radius:8px;margin-top:9px"><span style="width:20px;height:20px;border-radius:9999px;background:#166534;color:#fff;font:700 12px/20px Inter,sans-serif;text-align:center;flex:none">✓</span><div style="font:500 13px/19px Inter,sans-serif">Settings saved. Default store room is now Cold Room, and low-stock notifications stay on.</div></div>
+      </div>
+      <div class="card" style="margin-top:12px;padding:14px 16px">
+        <div style="font:600 14px/20px Inter,sans-serif">Not saved</div>
+        <div style="display:flex;gap:10px;padding:12px 14px;background:#fee2e2;border-radius:8px;margin-top:9px"><span style="width:20px;height:20px;border-radius:9999px;background:#991b1b;color:#fff;font:700 12px/20px Inter,sans-serif;text-align:center;flex:none">!</span><div style="font:500 13px/19px Inter,sans-serif">Your settings were not saved and nothing has changed. Your edits are still on the form — try again.</div></div>
+        <div style="display:flex;justify-content:flex-end;margin-top:10px"><span class="btnp" style="height:36px;font-size:13px">Try again</span></div>
+      </div>
+      <div class="card" style="margin-top:12px;padding:14px 16px;background:#f8fafc">
+        <div style="font:600 14px/20px Inter,sans-serif">Recorded when it matters</div>
+        <div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:4px">A change to the two toggles or the default store room is written to the audit record with who made it and when. Renaming the business is not, because nothing about it can be disputed later.</div>
+      </div>
+    </div>
+  </div>
+</div>
+<p class="dv-cap"><strong>An immutable field is a design statement, not an omission.</strong> The handle, the currency and the decimal precision are all drawn, all greyed, all labelled Fixed, and each one carries the single sentence that explains what would break if it could change.</p>
+</div>
+
+<div class="dv-opt" id="10g" data-screen-label="G10-06 Refusal surfaces">
+<div class="dv-olabel"><a class="dv-oid" href="#10g">10g</a>Wrong role · wrong address · a business whose network features are off</div>
+<div class="dv-card" style="width:1320px">
+  <div style="background:#f8fafc;padding:22px 24px 26px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px">
+    <div>
+      <div class="eyb">You need a different role</div>
+      <div class="card" style="margin-top:12px;overflow:hidden;background:#fff">
+        <div style="padding:44px 26px 30px;text-align:center">
+          <span style="width:56px;height:56px;border-radius:9999px;background:#fef3c7;display:inline-flex;align-items:center;justify-content:center"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#854d0e" stroke-width="2.2" stroke-linecap="round"><rect x="4" y="10.5" width="16" height="10" rx="2"></rect><path d="M8 10.5V7a4 4 0 0 1 8 0v3.5"></path></svg></span>
+          <div style="font:700 20px/28px Inter,sans-serif;margin-top:14px;letter-spacing:-.01em">You need the Procurement Manager role to open this page</div>
+          <div style="font:400 14px/21px Inter,sans-serif;color:#475569;margin-top:6px;max-width:330px;margin-left:auto;margin-right:auto">You're signed in as <strong style="color:#0f172a">Storekeeper</strong>. Nohan Fernando or Ayesha Silva can change your role from the team list.</div>
+          <div style="display:flex;gap:8px;justify-content:center;margin-top:18px"><span class="btns">Back to dashboard</span><span class="btnp">Open receiving</span></div>
+        </div>
+        <div style="padding:12px 16px;border-top:1px solid #e2e8f0;background:#f8fafc;font:400 13px/19px Inter,sans-serif;color:#475569">Purchase Orders was never in this reader's sidebar. This screen appears because they followed a link or typed an address, and it says which role is needed and which one they hold.</div>
+      </div>
+      <div class="card" style="margin-top:12px;padding:14px 16px">
+        <div style="font:600 14px/20px Inter,sans-serif">Why not a redirect</div>
+        <div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:4px">Bouncing this person to the dashboard would leave them believing the link was broken and telling a colleague so. Naming the role turns a dead end into a request somebody can act on in thirty seconds.</div>
+      </div>
+      <div class="card" style="margin-top:12px;padding:14px 16px;background:#f8fafc">
+        <div style="font:600 14px/20px Inter,sans-serif">Hiding is convenience, refusing is the boundary</div>
+        <div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:4px">The sidebar hides what a role cannot use. This screen exists because that hiding is not what stops anybody: the refusal is decided when the data is asked for, and it would happen even if every item were visible.</div>
+      </div>
+    </div>
+    <div>
+      <div class="eyb">There is nothing at this address</div>
+      <div class="card" style="margin-top:12px;overflow:hidden;background:#fff">
+        <div style="padding:44px 26px 30px;text-align:center">
+          <span style="width:56px;height:56px;border-radius:9999px;background:#f1f5f9;display:inline-flex;align-items:center;justify-content:center"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.6-3.6"></path></svg></span>
+          <div style="font:700 20px/28px Inter,sans-serif;margin-top:14px;letter-spacing:-.01em">We couldn't find that page</div>
+          <div style="font:400 14px/21px Inter,sans-serif;color:#475569;margin-top:6px;max-width:320px;margin-left:auto;margin-right:auto">It may have been archived, or the address may have a typo in it. Everything Stockmok holds for Grand Ocean Hotel is still where it was.</div>
+          <div style="display:flex;gap:8px;justify-content:center;margin-top:18px"><span class="btns">Back to dashboard</span><span class="btnp">Open products</span></div>
+        </div>
+      </div>
+      <div class="card" style="margin-top:12px;overflow:hidden;background:#fff">
+        <div style="padding:14px 16px;border-bottom:1px solid #e2e8f0;font:600 15px/22px Inter,sans-serif">The archived-product case, told properly</div>
+        <div style="padding:14px 16px">
+          <div style="display:flex;gap:10px;padding:12px 14px;background:#fef3c7;border-radius:8px"><span style="width:20px;height:20px;border-radius:9999px;background:#854d0e;color:#fff;font:700 12px/20px Inter,sans-serif;text-align:center;flex:none">!</span><div style="font:500 13px/19px Inter,sans-serif">Butter Block was archived on 12 August 2026. Its 8.000 KG and its whole movement history are still readable, and it cannot be ordered or adjusted while archived.</div></div>
+          <div style="display:flex;gap:8px;margin-top:13px"><span class="btns" style="height:36px;font-size:13px">View history</span><span class="btnp" style="height:36px;font-size:13px">Restore product</span></div>
+          <div class="hint">An archived record is not a missing page, so it never shows the not-found screen. Restoring a product is something the system genuinely does, which is why the button is here and not on the screen above.</div>
+        </div>
+      </div>
+      <div class="card" style="margin-top:12px;padding:14px 16px;background:#f8fafc">
+        <div style="font:600 14px/20px Inter,sans-serif">No detective work</div>
+        <div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:4px">The not-found screen never guesses what you meant, and never says whether the thing at that address exists in some other business. Suggesting a near match would leak the existence of records the reader has no right to.</div>
+      </div>
+    </div>
+    <div>
+      <div class="eyb">Network features are off here</div>
+      <div class="card" style="margin-top:12px;overflow:hidden;background:#fff">
+        <div style="display:grid;grid-template-columns:212px minmax(0,1fr)">
+          <div style="border-right:1px solid #e2e8f0;padding:10px 0 14px;background:#fff">
+            <div class="sect">Main</div>
+            <div class="nav">Dashboard</div>
+            <div class="sect">Inventory</div>
+            <div class="nav">Products</div>
+            <div class="nav">Categories</div>
+            <div class="nav">Store Rooms</div>
+            <div class="nav">Stock Movements</div>
+            <div class="sect">Procurement</div>
+            <div class="nav">Purchase Orders</div>
+            <div class="nav">Receiving</div>
+            <div class="nav">Suppliers</div>
+            <div class="nav">Buyers</div>
+            <div class="sect">More</div>
+            <div class="nav">Reports</div>
+            <div class="nav">Notifications</div>
+            <div class="nav">Team</div>
+            <div class="nav" style="background:#eff6ff;color:#1e40af;font-weight:600">Settings</div>
+            <div style="margin:10px 12px 0;padding:9px 11px;border:1px dashed #cbd5e1;border-radius:8px;font:400 12px/17px Inter,sans-serif;color:#64748b">No Network section. It is absent, not greyed — there is nothing here for this business to open.</div>
+          </div>
+          <div style="padding:34px 24px 26px;text-align:center;background:#f8fafc">
+            <span style="width:56px;height:56px;border-radius:9999px;background:#f1f5f9;border:1px solid #cbd5e1;display:inline-flex;align-items:center;justify-content:center"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="2.6"></circle><circle cx="18" cy="18" r="2.6"></circle><path d="M8.2 8.2 15.8 15.8"></path><path d="M4 20 20 4"></path></svg></span>
+            <div style="font:700 18px/26px Inter,sans-serif;margin-top:13px;letter-spacing:-.01em">Network features are turned off for this business</div>
+            <div style="font:400 14px/21px Inter,sans-serif;color:#475569;margin-top:6px">Connecting to other Stockmok businesses, publishing a Partner Catalog and mapping partner codes are all switched off in Settings. Your products, orders and stock are unaffected.</div>
+            <div style="display:flex;gap:8px;justify-content:center;margin-top:16px"><span class="btns">Back to dashboard</span><span class="btnp">Open settings</span></div>
+            <div style="border:1px solid #cbd5e1;border-radius:8px;background:#fff;padding:12px 14px;margin-top:16px;text-align:left;font:400 13px/19px Inter,sans-serif;color:#475569">Only an Owner or Admin can turn it back on. A Storekeeper who lands here is told the same thing and pointed at the two people who can.</div>
+          </div>
+        </div>
+      </div>
+      <div class="card" style="margin-top:12px;padding:14px 16px">
+        <div style="font:600 14px/20px Inter,sans-serif">Off is not the same as broken</div>
+        <div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:4px">This screen never appears in Grand Ocean Hotel, whose network is on. It is what a business that has not enabled the feature sees if somebody follows a shared link — a stated setting with a named next step, not an error.</div>
+      </div>
+    </div>
+  </div>
+</div>
+<p class="dv-cap"><strong>Three refusals, three different truths.</strong> One is about the reader's role, one about the address, one about the business's own settings — and none of them is a generic <em>Something went wrong</em>. Each names what is wrong, who can change it, and where to go next.</p>
+</div>
+
+<div class="dv-opt" id="10h" data-screen-label="G10-07 Mobile supporting 390">
+<div class="dv-olabel"><a class="dv-oid" href="#10h">10h</a>390 px — notifications, team and settings on a phone</div>
+<div class="dv-card" style="width:1320px">
+  <div style="background:#f8fafc;padding:22px 24px 26px">
+    <div style="display:flex;gap:30px;justify-content:center">
+      <div style="width:390px;flex:none">
+        <div style="font:600 12px/17px Inter,sans-serif;color:#475569;margin-bottom:8px">Notifications · three unread</div>
+        <div style="width:390px;height:844px;background:#fff;border:1px solid #cbd5e1;border-radius:22px;overflow:hidden;display:flex;flex-direction:column">
+          <div style="height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 22px;font:600 14px Inter,sans-serif"><span class="tnum">09:12</span><span style="display:flex;align-items:center;gap:5px"><svg width="17" height="11" viewBox="0 0 17 11" fill="#0f172a"><rect x="0" y="7" width="3" height="4" rx="1"></rect><rect x="4.6" y="5" width="3" height="6" rx="1"></rect><rect x="9.2" y="2.6" width="3" height="8.4" rx="1"></rect><rect x="13.8" y="0" width="3" height="11" rx="1"></rect></svg><svg width="24" height="12" viewBox="0 0 24 12" fill="none"><rect x="0.5" y="0.5" width="19" height="11" rx="3" stroke="#0f172a" opacity=".4"></rect><rect x="2" y="2" width="14" height="8" rx="1.6" fill="#0f172a"></rect><path d="M21.5 4v4a2.2 2.2 0 0 0 0-4" fill="#0f172a" opacity=".4"></path></svg></span></div>
+          <div style="padding:4px 16px 12px;border-bottom:1px solid #e2e8f0">
+            <div style="height:44px;display:flex;align-items:center;justify-content:space-between"><span style="font:700 22px/30px Inter,sans-serif;letter-spacing:-.02em">Notifications</span><span style="height:44px;display:inline-flex;align-items:center;font:600 14px Inter,sans-serif;color:#1d4ed8">Mark all read</span></div>
+            <div style="display:flex;gap:8px;margin-top:4px"><span class="pill" style="background:#1d4ed8;color:#fff;height:36px;align-items:center;padding:0 14px;font-size:13px">All 8</span><span class="pill" style="background:#fff;border:1px solid #cbd5e1;color:#334155;height:36px;align-items:center;padding:0 14px;font-size:13px">Unread 3</span><span class="pill" style="background:#fff;border:1px solid #cbd5e1;color:#334155;height:36px;align-items:center;padding:0 14px;font-size:13px">Stock 4</span></div>
+          </div>
+          <div style="flex:1;background:#f8fafc;padding:12px 14px;overflow:hidden;display:flex;flex-direction:column;gap:10px">
+            <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:12px;padding:13px 14px;min-height:44px;box-sizing:border-box">
+              <div style="display:flex;gap:10px;align-items:flex-start"><span style="width:32px;height:32px;border-radius:8px;background:#fee2e2;color:#991b1b;font:700 15px/32px Inter,sans-serif;text-align:center;flex:none">!</span><div style="flex:1"><div style="font:600 15px/21px Inter,sans-serif">Cooking Oil is out of stock</div><div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:1px">0.000 L against a minimum of 40.000 L</div><div style="display:flex;align-items:center;gap:8px;margin-top:7px"><span class="pill" style="background:#fee2e2;color:#991b1b">Out of stock</span><span class="tnum" style="font:500 12px Inter,sans-serif;color:#64748b">13 Aug, 07:05 · Unread</span></div></div></div>
+            </div>
+            <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:12px;padding:13px 14px">
+              <div style="display:flex;gap:10px;align-items:flex-start"><span style="width:32px;height:32px;border-radius:8px;background:#fef3c7;color:#854d0e;font:700 15px/32px Inter,sans-serif;text-align:center;flex:none">!</span><div style="flex:1"><div style="font:600 15px/21px Inter,sans-serif">Wheat Flour fell below its minimum</div><div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:1px">60.000 KG against a minimum of 80.000 KG</div><div style="display:flex;align-items:center;gap:8px;margin-top:7px"><span class="pill" style="background:#fef3c7;color:#854d0e">Low stock</span><span class="tnum" style="font:500 12px Inter,sans-serif;color:#64748b">12 Aug, 18:40 · Unread</span></div></div></div>
+            </div>
+            <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:12px;padding:13px 14px">
+              <div style="display:flex;gap:10px;align-items:flex-start"><span style="width:32px;height:32px;border-radius:8px;background:#fff;border:1px solid #bfdbfe;color:#1e40af;font:700 14px/30px Inter,sans-serif;text-align:center;flex:none">+</span><div style="flex:1"><div style="font:600 15px/21px Inter,sans-serif">Ocean Blue Restaurant asked to connect</div><div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:1px">They would buy from you</div><div style="display:flex;align-items:center;gap:8px;margin-top:7px"><span class="pill" style="background:#eff6ff;color:#1e40af">Request received</span><span class="tnum" style="font:500 12px Inter,sans-serif;color:#64748b">12 Aug, 11:20 · Unread</span></div></div></div>
+            </div>
+            <div style="background:#fff;border:1px solid #cbd5e1;border-radius:12px;padding:13px 14px">
+              <div style="display:flex;gap:10px;align-items:flex-start"><span style="width:32px;height:32px;border-radius:8px;background:#dcfce7;display:inline-flex;align-items:center;justify-content:center;flex:none"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#166534" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m4.5 12.5 5 5 10-11"></path></svg></span><div style="flex:1"><div style="font:500 15px/21px Inter,sans-serif;color:#334155">CPO-2026-003 is complete</div><div style="font:400 13px/19px Inter,sans-serif;color:#64748b;margin-top:1px">All 10 PACK from Fresh Foods Ltd received</div><div class="tnum" style="font:500 12px Inter,sans-serif;color:#64748b;margin-top:7px">12 Aug, 15:40 · Read</div></div></div>
+            </div>
+            <div style="background:#fff;border:1px solid #cbd5e1;border-radius:12px;padding:13px 14px">
+              <div style="display:flex;gap:10px;align-items:flex-start"><span style="width:32px;height:32px;border-radius:8px;background:#fef3c7;color:#854d0e;font:700 15px/32px Inter,sans-serif;text-align:center;flex:none">!</span><div style="flex:1"><div style="font:500 15px/21px Inter,sans-serif;color:#334155">Butter Block fell below its minimum</div><div style="font:400 13px/19px Inter,sans-serif;color:#64748b;margin-top:1px">8.000 KG against a minimum of 10.000 KG</div><div class="tnum" style="font:500 12px Inter,sans-serif;color:#64748b;margin-top:7px">11 Aug, 06:30 · Read</div></div></div>
+            </div>
+          </div>
+          <div style="height:76px;border-top:1px solid #e2e8f0;background:#fff;display:grid;grid-template-columns:repeat(4,1fr);align-items:start;padding-top:8px">
+            <div style="height:56px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px"><span style="width:22px;height:22px;border-radius:6px;background:#cbd5e1"></span><span style="font:500 12px/16px Inter,sans-serif;color:#64748b">Home</span></div>
+            <div style="height:56px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px"><span style="width:22px;height:22px;border-radius:6px;background:#cbd5e1"></span><span style="font:500 12px/16px Inter,sans-serif;color:#64748b">Products</span></div>
+            <div style="height:56px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px"><span style="width:22px;height:22px;border-radius:6px;background:#cbd5e1"></span><span style="font:500 12px/16px Inter,sans-serif;color:#64748b">Receive</span></div>
+            <div style="height:56px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px"><span style="position:relative;width:22px;height:22px;border-radius:6px;background:#1d4ed8"><span class="tnum" style="position:absolute;top:-6px;right:-8px;min-width:17px;height:17px;border-radius:9999px;background:#b91c1c;color:#fff;font:700 10px/17px Inter,sans-serif;text-align:center;padding:0 3px;box-sizing:border-box">3</span></span><span style="font:600 12px/16px Inter,sans-serif;color:#1e40af">More</span></div>
+          </div>
+        </div>
+      </div>
+      <div style="width:390px;flex:none">
+        <div style="font:600 12px/17px Inter,sans-serif;color:#475569;margin-bottom:8px">Team · one card per member</div>
+        <div style="width:390px;height:844px;background:#fff;border:1px solid #cbd5e1;border-radius:22px;overflow:hidden;display:flex;flex-direction:column">
+          <div style="height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 22px;font:600 14px Inter,sans-serif"><span class="tnum">09:14</span><span style="display:flex;align-items:center;gap:5px"><svg width="17" height="11" viewBox="0 0 17 11" fill="#0f172a"><rect x="0" y="7" width="3" height="4" rx="1"></rect><rect x="4.6" y="5" width="3" height="6" rx="1"></rect><rect x="9.2" y="2.6" width="3" height="8.4" rx="1"></rect><rect x="13.8" y="0" width="3" height="11" rx="1"></rect></svg><svg width="24" height="12" viewBox="0 0 24 12" fill="none"><rect x="0.5" y="0.5" width="19" height="11" rx="3" stroke="#0f172a" opacity=".4"></rect><rect x="2" y="2" width="14" height="8" rx="1.6" fill="#0f172a"></rect><path d="M21.5 4v4a2.2 2.2 0 0 0 0-4" fill="#0f172a" opacity=".4"></path></svg></span></div>
+          <div style="padding:4px 16px 12px;border-bottom:1px solid #e2e8f0">
+            <div style="height:44px;display:flex;align-items:center"><span style="font:700 22px/30px Inter,sans-serif;letter-spacing:-.02em">Team</span></div>
+            <div style="font:400 14px/20px Inter,sans-serif;color:#64748b">4 active · 1 suspended · 1 invitation waiting</div>
+          </div>
+          <div style="flex:1;background:#f8fafc;padding:12px 14px;overflow:hidden;display:flex;flex-direction:column;gap:10px">
+            <div style="background:#fff;border:1px solid #cbd5e1;border-radius:12px;padding:14px">
+              <div style="display:flex;gap:11px;align-items:center"><span style="width:40px;height:40px;border-radius:9999px;background:#0f172a;color:#fff;font:700 14px Inter,sans-serif;display:inline-flex;align-items:center;justify-content:center;flex:none">NF</span><div style="flex:1"><div style="font:600 16px/22px Inter,sans-serif">Nohan Fernando</div><div style="font:400 13px/19px Inter,sans-serif;color:#64748b">nohan@grandocean.lk · you</div></div></div>
+              <div style="display:flex;align-items:center;gap:8px;margin-top:11px"><span class="pill" style="background:#0f172a;color:#fff">Owner</span><span class="pill" style="background:#dcfce7;color:#166534">Active</span></div>
+              <div style="font:400 13px/19px Inter,sans-serif;color:#64748b;margin-top:9px">Protected — the Owner cannot be changed, suspended or removed.</div>
+            </div>
+            <div style="background:#fff;border:1px solid #cbd5e1;border-radius:12px;padding:14px">
+              <div style="display:flex;gap:11px;align-items:center"><span style="width:40px;height:40px;border-radius:9999px;background:#1d4ed8;color:#fff;font:700 14px Inter,sans-serif;display:inline-flex;align-items:center;justify-content:center;flex:none">AS</span><div style="flex:1"><div style="font:600 16px/22px Inter,sans-serif">Ayesha Silva</div><div style="font:400 13px/19px Inter,sans-serif;color:#64748b">ayesha@grandocean.lk</div></div></div>
+              <div style="display:flex;align-items:center;gap:8px;margin-top:11px"><span class="pill" style="background:#eff6ff;color:#1e40af">Admin</span><span class="pill" style="background:#dcfce7;color:#166534">Active</span></div>
+              <div style="display:flex;gap:10px;margin-top:12px"><span style="flex:1;height:44px;border:1px solid #64748b;border-radius:8px;display:flex;align-items:center;justify-content:center;font:600 14px Inter,sans-serif">Change role</span><span style="flex:1;height:44px;border:1px solid #64748b;border-radius:8px;display:flex;align-items:center;justify-content:center;font:600 14px Inter,sans-serif">Suspend</span></div>
+            </div>
+            <div style="background:#fff;border:1px solid #cbd5e1;border-radius:12px;padding:14px">
+              <div style="display:flex;gap:11px;align-items:center"><span style="width:40px;height:40px;border-radius:9999px;background:#f1f5f9;border:1px solid #cbd5e1;color:#334155;font:700 14px Inter,sans-serif;display:inline-flex;align-items:center;justify-content:center;flex:none">NP</span><div style="flex:1"><div style="font:600 16px/22px Inter,sans-serif">Nimal Perera</div><div style="font:400 13px/19px Inter,sans-serif;color:#64748b">nimal@grandocean.lk</div></div></div>
+              <div style="display:flex;align-items:center;gap:8px;margin-top:11px"><span class="pill" style="background:#f1f5f9;color:#334155">Storekeeper</span><span class="pill" style="background:#dcfce7;color:#166534">Active</span></div>
+              <div style="display:flex;gap:10px;margin-top:12px"><span style="flex:1;height:44px;border:1px solid #64748b;border-radius:8px;display:flex;align-items:center;justify-content:center;font:600 14px Inter,sans-serif">Change role</span><span style="flex:1;height:44px;border:1px solid #64748b;border-radius:8px;display:flex;align-items:center;justify-content:center;font:600 14px Inter,sans-serif">Suspend</span></div>
+            </div>
+            <div style="background:#fff;border:1px solid #cbd5e1;border-radius:12px;padding:14px;opacity:.96">
+              <div style="display:flex;gap:11px;align-items:center"><span style="width:40px;height:40px;border-radius:9999px;background:#e2e8f0;color:#64748b;font:700 14px Inter,sans-serif;display:inline-flex;align-items:center;justify-content:center;flex:none">DW</span><div style="flex:1"><div style="font:600 16px/22px Inter,sans-serif;color:#475569">Dilani Wickrama</div><div style="font:400 13px/19px Inter,sans-serif;color:#64748b">Suspended 11 Aug 2026</div></div></div>
+              <div style="display:flex;align-items:center;gap:8px;margin-top:11px"><span class="pill" style="background:#f1f5f9;color:#64748b">Inventory Manager</span><span class="pill" style="background:#fef3c7;color:#854d0e">Suspended</span></div>
+              <div style="display:flex;gap:10px;margin-top:12px"><span style="flex:1;height:44px;border:1px solid #64748b;border-radius:8px;display:flex;align-items:center;justify-content:center;font:600 14px Inter,sans-serif">Reactivate</span><span style="flex:1;height:44px;border:1px solid #991b1b;color:#991b1b;border-radius:8px;display:flex;align-items:center;justify-content:center;font:600 14px Inter,sans-serif">Remove</span></div>
+            </div>
+          </div>
+          <div style="border-top:1px solid #e2e8f0;background:#fff;padding:12px 16px"><span style="display:flex;height:48px;border-radius:8px;background:#1d4ed8;color:#fff;align-items:center;justify-content:center;font:600 16px Inter,sans-serif">Invite a member</span></div>
+        </div>
+      </div>
+      <div style="width:390px;flex:none">
+        <div style="font:600 12px/17px Inter,sans-serif;color:#475569;margin-bottom:8px">Settings · fixed fields still shown</div>
+        <div style="width:390px;height:844px;background:#fff;border:1px solid #cbd5e1;border-radius:22px;overflow:hidden;display:flex;flex-direction:column">
+          <div style="height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 22px;font:600 14px Inter,sans-serif"><span class="tnum">09:16</span><span style="display:flex;align-items:center;gap:5px"><svg width="17" height="11" viewBox="0 0 17 11" fill="#0f172a"><rect x="0" y="7" width="3" height="4" rx="1"></rect><rect x="4.6" y="5" width="3" height="6" rx="1"></rect><rect x="9.2" y="2.6" width="3" height="8.4" rx="1"></rect><rect x="13.8" y="0" width="3" height="11" rx="1"></rect></svg><svg width="24" height="12" viewBox="0 0 24 12" fill="none"><rect x="0.5" y="0.5" width="19" height="11" rx="3" stroke="#0f172a" opacity=".4"></rect><rect x="2" y="2" width="14" height="8" rx="1.6" fill="#0f172a"></rect><path d="M21.5 4v4a2.2 2.2 0 0 0 0-4" fill="#0f172a" opacity=".4"></path></svg></span></div>
+          <div style="padding:4px 16px 12px;border-bottom:1px solid #e2e8f0">
+            <div style="height:44px;display:flex;align-items:center"><span style="font:700 22px/30px Inter,sans-serif;letter-spacing:-.02em">Settings</span></div>
+            <div style="font:400 14px/20px Inter,sans-serif;color:#64748b">Grand Ocean Hotel</div>
+          </div>
+          <div style="flex:1;background:#f8fafc;padding:12px 14px;overflow:hidden;display:flex;flex-direction:column;gap:12px">
+            <div style="background:#fff;border:1px solid #cbd5e1;border-radius:12px;padding:14px">
+              <div style="font:700 12px/16px Inter,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#64748b">The business</div>
+              <div style="margin-top:10px"><label class="lbl" style="font-size:14px">Business name</label><div style="height:48px;border:1px solid #64748b;border-radius:8px;display:flex;align-items:center;padding:0 14px;font:400 16px Inter,sans-serif">Grand Ocean Hotel</div></div>
+              <div style="margin-top:12px"><label class="lbl" style="font-size:14px">Handle</label><div style="height:48px;border:1px solid #cbd5e1;background:#f1f5f9;border-radius:8px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;font:400 16px Inter,sans-serif;color:#475569"><span class="mono" style="font-size:15px">@grand-ocean</span><span style="font:600 12px Inter,sans-serif;color:#64748b">Fixed</span></div><div class="hint">Partners look you up by it, so it can never change.</div></div>
+            </div>
+            <div style="background:#fff;border:1px solid #cbd5e1;border-radius:12px;padding:14px">
+              <div style="font:700 12px/16px Inter,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#64748b">Quantities and money</div>
+              <div style="margin-top:10px"><label class="lbl" style="font-size:14px">Currency</label><div style="height:48px;border:1px solid #cbd5e1;background:#f1f5f9;border-radius:8px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;font:400 16px Inter,sans-serif;color:#475569"><span>LKR</span><span style="font:600 12px Inter,sans-serif;color:#64748b">Fixed</span></div></div>
+              <div style="margin-top:12px"><label class="lbl" style="font-size:14px">Default store room</label><div style="height:48px;border:1px solid #64748b;border-radius:8px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;font:400 16px Inter,sans-serif">Cold Room<span style="color:#64748b">▾</span></div></div>
+            </div>
+            <div style="background:#fff;border:1px solid #cbd5e1;border-radius:12px;padding:14px">
+              <div style="font:700 12px/16px Inter,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#64748b">Features</div>
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid #f1f5f9;min-height:44px"><div style="flex:1;font:500 15px/21px Inter,sans-serif">Low-stock notifications</div><span style="width:52px;height:30px;border-radius:9999px;background:#1d4ed8;display:inline-flex;align-items:center;justify-content:flex-end;padding:0 3px;flex:none;box-sizing:border-box"><span style="width:24px;height:24px;border-radius:9999px;background:#fff"></span></span></div>
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;min-height:44px"><div style="flex:1;font:500 15px/21px Inter,sans-serif">Network</div><span style="width:52px;height:30px;border-radius:9999px;background:#1d4ed8;display:inline-flex;align-items:center;justify-content:flex-end;padding:0 3px;flex:none;box-sizing:border-box"><span style="width:24px;height:24px;border-radius:9999px;background:#fff"></span></span></div>
+            </div>
+          </div>
+          <div style="border-top:1px solid #e2e8f0;background:#fff;padding:12px 16px;display:flex;gap:10px"><span style="flex:1;height:48px;border:1px solid #64748b;border-radius:8px;display:flex;align-items:center;justify-content:center;font:600 15px Inter,sans-serif">Discard</span><span style="flex:1.4;height:48px;border-radius:8px;background:#1d4ed8;color:#fff;display:flex;align-items:center;justify-content:center;font:600 15px Inter,sans-serif">Save settings</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<p class="dv-cap"><strong>Drawn at true 390 × 844.</strong> Table rows become cards, the action pair sits at 44 px, the sticky bar carries the one primary action, and the bell's unread count moves onto the More tab so it is still visible when the header has no room for it.</p>
+</div>
+
+</div>
+</section>
+</x-dc>
+</body>
+</html>

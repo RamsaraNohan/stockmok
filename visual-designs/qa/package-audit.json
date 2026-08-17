@@ -1,0 +1,20 @@
+{
+  "verifiedAt": "2026-08-11T04:33:00+05:30",
+  "archive": "Stockmok_UI_Design_Pack.zip",
+  "allowlist": [
+    "docs/ui-final/",
+    "visual-designs/",
+    "STOCKMOK_UI_DESIGN_PACK_INDEX.md"
+  ],
+  "excluded": [
+    "control packs",
+    "application source",
+    "node_modules",
+    "caches",
+    "secrets and credentials",
+    "nested ZIP history"
+  ],
+  "expectedEntriesAfterIncludingThisAudit": 312,
+  "forbiddenEntries": 0,
+  "result": "PASS"
+}

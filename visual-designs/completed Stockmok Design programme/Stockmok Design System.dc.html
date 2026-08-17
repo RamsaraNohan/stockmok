@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics><meta name="design_doc_mode" content="canvas"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"><style>body{margin:0;background:#e8ecf1;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;color:#0f172a}a{color:#1d4ed8}a:hover{color:#1e40af}.ds{padding:40px 44px 48px;display:flex;flex-direction:column;gap:26px;width:1440px}.ds-h{display:flex;align-items:baseline;gap:10px}.ds-hid{font:600 10px ui-monospace,Menlo,monospace;padding:3px 7px;background:#0f172a;color:#fff;border-radius:4px;text-decoration:none}.ds-card{background:#fff;border:1px solid #cbd5e1;border-radius:12px;overflow:hidden;scroll-margin-top:16px}.ds-hd{padding:16px 22px;border-bottom:1px solid #e2e8f0;display:flex;align-items:baseline;justify-content:space-between;gap:16px}.ds-t{font:700 20px/28px Inter,sans-serif;letter-spacing:-.01em}.ds-s{font:400 13px/19px Inter,sans-serif;color:#475569}.ds-b{padding:22px}.ds-g{display:grid;gap:16px}.ds-cc{border:1px solid #cbd5e1;border-radius:8px;overflow:hidden;display:flex;flex-direction:column}.ds-ch{padding:10px 14px;background:#f8fafc;border-bottom:1px solid #e2e8f0;display:flex;align-items:baseline;justify-content:space-between;gap:10px}.ds-cid{font:600 11px ui-monospace,Menlo,monospace;color:#1d4ed8}.ds-cn{font:600 14px/20px Inter,sans-serif}.ds-cs{padding:16px 14px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;flex:1}.ds-cf{padding:10px 14px;border-top:1px solid #e2e8f0;font:400 12px/17px Inter,sans-serif;color:#475569;background:#fff}</style></helmet>
+
+<div class="ds">
+
+<div class="ds-h"><a class="ds-hid" href="#top">Gate 4</a><span style="font:600 13px/1.2 Inter,sans-serif">Stockmok master design system · frozen for production handoff · 25/25 components</span></div>
+
+<div class="ds-card" id="top">
+  <div class="ds-hd"><div><div class="ds-t">Foundations — colour</div><div class="ds-s">Every value below is frozen. Contrast figures are measured against the surface each token is used on.</div></div><span style="font:600 12px/16px Inter,sans-serif;color:#166534;background:#dcfce7;padding:4px 10px;border-radius:9999px">WCAG AA · pass</span></div>
+  <div class="ds-b">
+    <sc-for list="{{ colorGroups }}" as="g" hint-placeholder-count="4">
+      <div style="font:700 10px/13px Inter,sans-serif;letter-spacing:.12em;text-transform:uppercase;color:#64748b;margin:0 0 10px">{{ g.name }}</div>
+      <div style="display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px;margin-bottom:22px">
+        <sc-for list="{{ g.items }}" as="c" hint-placeholder-count="6">
+          <div style="border:1px solid #cbd5e1;border-radius:8px;overflow:hidden">
+            <div style="height:56px;background:{{ c.hex }};border-bottom:1px solid #e2e8f0"></div>
+            <div style="padding:9px 11px"><div style="font:600 12px/16px Inter,sans-serif">{{ c.token }}</div><div style="font:500 11px/15px ui-monospace,Menlo,monospace;color:#475569">{{ c.hex }}</div><div style="font:400 11px/15px Inter,sans-serif;color:#64748b;margin-top:2px">{{ c.use }}</div></div>
+          </div>
+        </sc-for>
+      </div>
+    </sc-for>
+  </div>
+</div>
+
+<div class="ds-card">
+  <div class="ds-hd"><div><div class="ds-t">Foundations — typography</div><div class="ds-s">One family: Inter, then the system sans stack. Quantities, money, SKUs and tabular dates use tabular numerals in the same family. Nothing below 12 px.</div></div></div>
+  <div class="ds-b">
+    <sc-for list="{{ typeScale }}" as="t" hint-placeholder-count="8">
+      <div style="display:grid;grid-template-columns:120px 190px minmax(0,1fr);gap:20px;align-items:baseline;padding:12px 0;border-bottom:1px solid #f1f5f9">
+        <span style="font:600 13px/19px Inter,sans-serif">{{ t.token }}</span>
+        <span style="font:500 12px/16px ui-monospace,Menlo,monospace;color:#475569">{{ t.spec }}</span>
+        <span style="font:{{ t.font }} Inter,sans-serif;font-variant-numeric:{{ t.num }};color:#0f172a">{{ t.sample }}</span>
+      </div>
+    </sc-for>
+    <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:20px">
+      <div style="border:1px solid #cbd5e1;border-radius:8px;padding:14px 16px"><div style="font:600 13px/19px Inter,sans-serif">Numbers</div><div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:4px">Quantities carry up to three decimals and their unit; money always carries the currency. Numeric table columns are right-aligned and tabular.</div><div style="font:500 14px/20px Inter,sans-serif;font-variant-numeric:tabular-nums;margin-top:8px">120.000 KG · LKR 691,700.00 · MEAT-001</div></div>
+      <div style="border:1px solid #cbd5e1;border-radius:8px;padding:14px 16px"><div style="font:600 13px/19px Inter,sans-serif">Voice</div><div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:4px">Plain operational English. No backend vocabulary in product UI — no movement type names, no operation references, no idempotency language, no raw codes.</div></div>
+      <div style="border:1px solid #cbd5e1;border-radius:8px;padding:14px 16px"><div style="font:600 13px/19px Inter,sans-serif">Sentence case</div><div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:4px">Titles, labels, buttons and menu items are sentence case. Uppercase is reserved for 10–12 px section eyebrows with letter-spacing.</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="ds-card">
+  <div class="ds-hd"><div><div class="ds-t">Foundations — spacing, grid, radius, elevation, focus</div><div class="ds-s">4 px base grid. One spacing scale, three radii plus full, three shadows, one focus ring.</div></div></div>
+  <div class="ds-b">
+    <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end">
+      <sc-for list="{{ spacing }}" as="s" hint-placeholder-count="10">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:6px"><span style="display:block;width:{{ s.px }};height:26px;background:#dbeafe;border:1px solid #1d4ed8;border-radius:3px"></span><span style="font:500 11px/15px ui-monospace,Menlo,monospace;color:#475569">{{ s.label }}</span></div>
+      </sc-for>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;margin-top:22px">
+      <div style="border:1px solid #cbd5e1;border-radius:8px;padding:14px 16px">
+        <div style="font:600 13px/19px Inter,sans-serif">Radius</div>
+        <div style="display:flex;gap:10px;margin-top:10px;align-items:flex-end">
+          <div style="text-align:center"><span style="display:block;width:44px;height:36px;background:#f1f5f9;border:1px solid #cbd5e1;border-radius:6px"></span><span style="font:500 11px Inter,sans-serif;color:#475569">6</span></div>
+          <div style="text-align:center"><span style="display:block;width:44px;height:36px;background:#f1f5f9;border:1px solid #cbd5e1;border-radius:8px"></span><span style="font:500 11px Inter,sans-serif;color:#475569">8</span></div>
+          <div style="text-align:center"><span style="display:block;width:44px;height:36px;background:#f1f5f9;border:1px solid #cbd5e1;border-radius:12px"></span><span style="font:500 11px Inter,sans-serif;color:#475569">12</span></div>
+          <div style="text-align:center"><span style="display:block;width:44px;height:36px;background:#f1f5f9;border:1px solid #cbd5e1;border-radius:9999px"></span><span style="font:500 11px Inter,sans-serif;color:#475569">full</span></div>
+        </div>
+      </div>
+      <div style="border:1px solid #cbd5e1;border-radius:8px;padding:14px 16px">
+        <div style="font:600 13px/19px Inter,sans-serif">Elevation</div>
+        <div style="display:flex;gap:12px;margin-top:12px">
+          <span style="display:block;width:52px;height:36px;background:#fff;border:1px solid #e2e8f0;border-radius:8px;box-shadow:0 1px 2px rgb(15 23 42 / .06)"></span>
+          <span style="display:block;width:52px;height:36px;background:#fff;border:1px solid #e2e8f0;border-radius:8px;box-shadow:0 8px 20px rgb(15 23 42 / .12)"></span>
+          <span style="display:block;width:52px;height:36px;background:#fff;border:1px solid #e2e8f0;border-radius:8px;box-shadow:0 20px 40px rgb(15 23 42 / .18)"></span>
+        </div>
+        <div style="font:400 11px/15px Inter,sans-serif;color:#64748b;margin-top:8px">card · dropdown · dialog</div>
+      </div>
+      <div style="border:1px solid #cbd5e1;border-radius:8px;padding:14px 16px">
+        <div style="font:600 13px/19px Inter,sans-serif">Focus ring</div>
+        <div style="margin-top:14px"><span style="display:inline-flex;height:40px;align-items:center;padding:0 16px;background:#fff;border:1px solid #64748b;border-radius:6px;font:600 14px Inter,sans-serif;box-shadow:0 0 0 2px #fff,0 0 0 4px #1d4ed8">Focused control</span></div>
+        <div style="font:400 11px/15px Inter,sans-serif;color:#64748b;margin-top:10px">Two layers so it reads on white and on blue. Never removed.</div>
+      </div>
+      <div style="border:1px solid #cbd5e1;border-radius:8px;padding:14px 16px">
+        <div style="font:600 13px/19px Inter,sans-serif">Density rule</div>
+        <div style="font:400 12px/17px Inter,sans-serif;color:#475569;margin-top:6px">Desktop operational tables and the movement ledger use 36 px rows with 14 px text. Forms, dialogs, mobile and every touch target stay at 40 px desktop and 44 px mobile minimum.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="ds-card">
+  <div class="ds-hd"><div><div class="ds-t">Shell, navigation and workspace identity</div><div class="ds-s">One shell for every authenticated screen. 64 px header, 256 px role-filtered sidebar, content capped at 1440 px. No global search anywhere in the product.</div></div></div>
+  <div class="ds-b">
+    <div style="border:1px solid #cbd5e1;border-radius:8px;overflow:hidden">
+      <div style="height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;background:#fff;border-bottom:1px solid #cbd5e1">
+        <div style="display:flex;align-items:center;gap:14px"><svg width="22" height="22" viewBox="0 0 24 24" fill="#1d4ed8"><g stroke="none"><rect x="3.2" y="2" width="17.6" height="4.4" rx="1.2"></rect><rect x="3.2" y="2" width="4.4" height="9.8" rx="1.2"></rect><rect x="3.2" y="9.6" width="17.6" height="4.4" rx="1.2"></rect><rect x="16.4" y="11.8" width="4.4" height="10.2" rx="1.2"></rect><rect x="3.2" y="17.6" width="17.6" height="4.4" rx="1.2"></rect></g></svg><span style="font:700 17px/1 Inter,sans-serif;letter-spacing:-.01em">Stockmok</span><span style="width:1px;height:26px;background:#e2e8f0"></span><span style="width:32px;height:32px;border-radius:9999px;background:#1d4ed8;color:#fff;font:700 11px Inter,sans-serif;display:inline-flex;align-items:center;justify-content:center">GO</span><span style="font:600 15px/20px Inter,sans-serif">Grand Ocean Hotel</span><span style="display:inline-flex;padding:3px 10px;border-radius:9999px;background:#eff6ff;color:#1e40af;font:600 12px/16px Inter,sans-serif">Owner</span></div>
+        <div style="display:flex;align-items:center;gap:12px"><span style="height:36px;display:inline-flex;align-items:center;padding:0 12px;border:1px solid #cbd5e1;border-radius:6px;font:500 13px Inter,sans-serif">Switch workspace ▾</span><span style="position:relative;width:40px;height:40px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="2" stroke-linecap="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.7 21a2 2 0 0 1-3.4 0"></path></svg><span style="position:absolute;top:2px;right:2px;min-width:16px;height:16px;padding:0 4px;border-radius:9999px;background:#991b1b;color:#fff;font:700 10px/16px Inter,sans-serif;text-align:center">3</span></span><span style="width:36px;height:36px;border-radius:9999px;background:#f1f5f9;border:1px solid #cbd5e1;color:#334155;font:600 12px Inter,sans-serif;display:inline-flex;align-items:center;justify-content:center">NP</span></div>
+      </div>
+      <div style="display:grid;grid-template-columns:256px minmax(0,1fr)">
+        <div style="background:#fff;border-right:1px solid #cbd5e1;padding:8px 0 16px">
+          <sc-for list="{{ navFull }}" as="s" hint-placeholder-count="6">
+            <div style="padding:12px 20px 4px;font:700 10px/13px Inter,sans-serif;letter-spacing:.1em;text-transform:uppercase;color:#64748b">{{ s.group }}</div>
+            <sc-for list="{{ s.items }}" as="n" hint-placeholder-count="4">
+              <div style="height:36px;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 12px;margin:2px 8px;border-radius:6px;background:{{ n.bg }}"><span style="display:flex;align-items:center;gap:10px"><span style="width:6px;height:6px;border-radius:9999px;background:{{ n.dot }}"></span><span style="font:{{ n.font }} Inter,sans-serif;color:{{ n.fg }}">{{ n.label }}</span></span><span style="font:500 10px/14px Inter,sans-serif;color:#94a3b8">{{ n.flag }}</span></div>
+            </sc-for>
+          </sc-for>
+        </div>
+        <div style="background:#f8fafc;padding:18px 20px;display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:16px;align-content:start">
+          <div style="display:flex;flex-direction:column;gap:16px">
+            <div style="background:#fff;border:1px solid #cbd5e1;border-radius:8px;padding:14px 16px"><div style="font:600 14px/20px Inter,sans-serif">Header contract</div><div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:5px">Always: mark, organisation monogram, untruncated organisation name, active-role badge, notification bell with unread count, user menu. Conditionally: workspace switcher. The organisation identity is not a link — it exists to prevent acting in the wrong workspace.</div></div>
+            <div style="background:#fff;border:1px solid #cbd5e1;border-radius:8px;padding:14px 16px"><div style="font:600 14px/20px Inter,sans-serif">Sidebar contract</div><div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:5px">Sixteen canonical destinations in frozen order, filtered by assigned role. Network items (marked B) appear only when the connected-business release is enabled; direct access otherwise resolves to Not found, which is distinct from Permission denied.</div></div>
+            <div style="background:#fff;border:1px solid #cbd5e1;border-radius:8px;padding:14px 16px"><div style="font:600 14px/20px Inter,sans-serif">Role never grants access</div><div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:5px">A requested role at sign-in is a preference only. Authorisation always comes from the assigned membership role. Unauthorised actions are hidden rather than disabled, except where hiding would make the screen incomprehensible.</div></div>
+            <div style="background:#fff;border:1px solid #cbd5e1;border-radius:8px;padding:14px 16px"><div style="font:600 14px/20px Inter,sans-serif">Search is always local</div><div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:5px">Search exists only inside a FilterBar and only over the current list. There is no global search field, no command palette and no cross-tenant lookup.</div></div>
+            <div style="background:#fff;border:1px solid #cbd5e1;border-radius:8px;padding:14px 16px"><div style="font:600 14px/20px Inter,sans-serif">Breadcrumb contract</div><div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:5px">One breadcrumb per detail screen, reflecting the real route hierarchy — never an invented parent. The current page is the last crumb and is not a link.</div></div>
+            <div style="background:#fff;border:1px solid #cbd5e1;border-radius:8px;padding:14px 16px"><div style="font:600 14px/20px Inter,sans-serif">Switching workspace</div><div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:5px">Choosing another workspace revalidates membership and role before anything renders, and clears the previous tenant's cached data. You never see one organisation's figures under another's name.</div></div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div style="font:600 12px/16px Inter,sans-serif;color:#475569">Below 1024 px · slide-over</div>
+            <div style="background:#fff;border:1px solid #cbd5e1;border-radius:8px;overflow:hidden;flex:1">
+              <div style="height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 12px;border-bottom:1px solid #e2e8f0"><span style="display:flex;align-items:center;gap:8px"><span style="width:32px;height:32px;border-radius:9999px;background:#1d4ed8;color:#fff;font:700 11px Inter,sans-serif;display:inline-flex;align-items:center;justify-content:center">GO</span><span style="font:600 13px/18px Inter,sans-serif">Grand Ocean Hotel</span></span><span style="width:44px;height:44px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;font:500 17px Inter,sans-serif;color:#475569">✕</span></div>
+              <div style="padding:8px 0">
+                <div style="padding:8px 16px 4px;font:700 10px/13px Inter,sans-serif;letter-spacing:.1em;text-transform:uppercase;color:#64748b">Overview</div>
+                <div style="height:44px;display:flex;align-items:center;padding:0 16px;background:#eff6ff;font:600 15px Inter,sans-serif;color:#1e40af">Dashboard</div>
+                <div style="padding:10px 16px 4px;font:700 10px/13px Inter,sans-serif;letter-spacing:.1em;text-transform:uppercase;color:#64748b">Inventory</div>
+                <div style="height:44px;display:flex;align-items:center;padding:0 16px;font:500 15px Inter,sans-serif">Products</div>
+                <div style="height:44px;display:flex;align-items:center;padding:0 16px;font:500 15px Inter,sans-serif">Stock Movements</div>
+                <div style="padding:10px 16px 4px;font:700 10px/13px Inter,sans-serif;letter-spacing:.1em;text-transform:uppercase;color:#64748b">Procurement</div>
+                <div style="height:44px;display:flex;align-items:center;padding:0 16px;font:500 15px Inter,sans-serif">Receiving</div>
+              </div>
+              <div style="padding:12px 16px;border-top:1px solid #e2e8f0;font:400 12px/17px Inter,sans-serif;color:#475569">Focus-trapped, Escape closes, 44 px rows, role-filtered exactly as the desktop sidebar. Only the destinations this role can reach are listed.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="ds-card">
+  <div class="ds-hd"><div><div class="ds-t">Private versus connected grammar</div><div class="ds-s">The one rule that shapes every screen: a private surface is neutral and complete; a connected surface adds the counterparty, dual units and provenance — and never the counterparty's stock.</div></div></div>
+  <div class="ds-b">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div style="border:1px solid #cbd5e1;border-radius:8px;overflow:hidden">
+        <div style="padding:12px 16px;background:#f8fafc;border-bottom:1px solid #e2e8f0;display:flex;align-items:center;justify-content:space-between"><span style="font:600 15px/21px Inter,sans-serif">Private</span><span style="display:inline-flex;padding:2px 9px;border-radius:9999px;background:#f1f5f9;color:#334155;font:600 12px/18px Inter,sans-serif">Private</span></div>
+        <div style="padding:14px 16px;font:400 14px/21px Inter,sans-serif;color:#475569">No counterparty exists, so no counterparty chrome appears. Slate badge, no link icon, no handle, single unit, actor named without an organisation prefix. A private screen never explains the connected model or apologises for its absence.</div>
+        <div style="padding:0 16px 16px"><div style="border:1px solid #e2e8f0;border-radius:8px;overflow:hidden"><div style="display:grid;grid-template-columns:minmax(0,1fr) 110px 110px;height:36px;align-items:center;padding:0 14px;background:#f1f5f9;font:600 12px Inter,sans-serif;color:#475569"><span>Movement</span><span style="text-align:right">Quantity</span><span style="text-align:right">Balance</span></div><div style="display:grid;grid-template-columns:minmax(0,1fr) 110px 110px;height:36px;align-items:center;padding:0 14px;font:500 14px Inter,sans-serif;font-variant-numeric:tabular-nums"><span>Adjustment in — recount</span><span style="text-align:right;color:#166534">+2.000</span><span style="text-align:right">20.000</span></div></div></div>
+      </div>
+      <div style="border:1px solid #cbd5e1;border-radius:8px;overflow:hidden">
+        <div style="padding:12px 16px;background:#f8fafc;border-bottom:1px solid #e2e8f0;display:flex;align-items:center;justify-content:space-between"><span style="font:600 15px/21px Inter,sans-serif">Connected</span><span style="display:inline-flex;align-items:center;gap:5px;padding:2px 9px;border-radius:9999px;background:#eff6ff;color:#1e40af;font:600 12px/18px Inter,sans-serif"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#1e40af" stroke-width="2.4" stroke-linecap="round"><path d="M9.5 14.5 14.5 9.5"></path><path d="M8 12H6a3.5 3.5 0 1 1 0-7h2"></path><path d="M16 12h2a3.5 3.5 0 1 1 0 7h-2"></path></svg>Connected</span></div>
+        <div style="padding:14px 16px;font:400 14px/21px Inter,sans-serif;color:#475569">Blue subtle badge with link icon, organisation monogram and @handle, their unit beside your base unit, the conversion shown, and every event attributed to the organisation that caused it.</div>
+        <div style="padding:0 16px 16px"><div style="border:1px solid #e2e8f0;border-radius:8px;overflow:hidden"><div style="display:grid;grid-template-columns:minmax(0,1fr) 1px minmax(0,1fr);align-items:stretch"><div style="padding:11px 14px;background:#f8fafc"><div style="font:500 12px/16px Inter,sans-serif;color:#475569">Their item · PACK</div><div style="font:600 14px/20px Inter,sans-serif">10 PACK ordered</div></div><div style="background:#cbd5e1"></div><div style="padding:11px 14px"><div style="font:500 12px/16px Inter,sans-serif;color:#475569">Your product · KG</div><div style="font:600 14px/20px Inter,sans-serif;font-variant-numeric:tabular-nums">= 50.000 KG</div></div></div><div style="padding:9px 14px;border-top:1px solid #e2e8f0;font:500 12px/16px Inter,sans-serif;color:#64748b">Conversion 1 PACK = 5 KG · verified by you</div></div></div>
+      </div>
+    </div>
+    <div style="margin-top:16px;border:1px solid #991b1b;border-radius:8px;overflow:hidden">
+      <div style="padding:12px 16px;background:#fee2e2;font:600 14px/20px Inter,sans-serif;color:#991b1b">Never, on any screen or export</div>
+      <div style="padding:12px 16px;font:400 14px/21px Inter,sans-serif">A counterparty's stock balances, costs, warehouses, members, audit trail or internal identifiers. A connected surface shows only the shared order, its lines, its events, and the catalog items the counterparty chose to publish.</div>
+    </div>
+  </div>
+</div>
+
+<div class="ds-card">
+  <div class="ds-hd"><div><div class="ds-t">Component inventory — 25 of 25</div><div class="ds-s">The <span style="font-family:ui-monospace,Menlo,monospace">COMP-###</span> namespace is closed. A twenty-sixth component is not created; it is composed from these.</div></div><span style="font:600 12px/16px Inter,sans-serif;color:#1e40af;background:#eff6ff;padding:4px 10px;border-radius:9999px">Closed set</span></div>
+  <div class="ds-b">
+
+    <div style="font:700 10px/13px Inter,sans-serif;letter-spacing:.12em;text-transform:uppercase;color:#64748b;margin:0 0 10px">Actions</div>
+    <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-bottom:24px">
+      <div class="ds-cc"><div class="ds-ch"><span class="ds-cn">Button</span><span class="ds-cid">COMP-001</span></div>
+        <div class="ds-cs">
+          <span style="height:40px;display:inline-flex;align-items:center;justify-content:center;padding:0 16px;border-radius:6px;font:600 14px Inter,sans-serif;background:#1d4ed8;color:#fff">Primary</span>
+          <span style="height:40px;display:inline-flex;align-items:center;justify-content:center;padding:0 16px;border-radius:6px;font:600 14px Inter,sans-serif;background:#fff;color:#0f172a;border:1px solid #64748b">Secondary</span>
+          <span style="height:40px;display:inline-flex;align-items:center;justify-content:center;padding:0 16px;border-radius:6px;font:600 14px Inter,sans-serif;color:#1d4ed8">Ghost</span>
+          <span style="height:40px;display:inline-flex;align-items:center;justify-content:center;padding:0 16px;border-radius:6px;font:600 14px Inter,sans-serif;background:#b91c1c;color:#fff">Delete</span>
+          <span style="height:40px;display:inline-flex;align-items:center;justify-content:center;padding:0 16px;border-radius:6px;font:600 14px Inter,sans-serif;background:#1d4ed8;color:#fff;box-shadow:0 0 0 2px #fff,0 0 0 4px #1d4ed8">Focused</span>
+          <span style="height:40px;display:inline-flex;align-items:center;justify-content:center;padding:0 16px;border-radius:6px;font:600 14px Inter,sans-serif;background:#f1f5f9;color:#94a3b8;border:1px solid #e2e8f0">Disabled</span>
+          <span style="height:40px;display:inline-flex;align-items:center;justify-content:center;padding:0 16px;border-radius:6px;font:600 14px Inter,sans-serif;background:#1e40af;color:#fff">Saving…</span>
+        </div>
+        <div class="ds-cf"><strong style="font-weight:600;color:#0f172a">States.</strong> primary · secondary · ghost · danger × default, hover, focus, disabled, loading<br><strong style="font-weight:600;color:#0f172a">Rule.</strong> 40 px desktop, 44 px mobile. Loading keeps its width and blocks a second submit.</div>
+      </div>
+      <div class="ds-cc"><div class="ds-ch"><span class="ds-cn">IconButton</span><span class="ds-cid">COMP-002</span></div>
+        <div class="ds-cs">
+          <span style="width:40px;height:40px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;border:1px solid #64748b;background:#fff;color:#0f172a"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg></span>
+          <span style="width:40px;height:40px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;border:1px solid #64748b;background:#fff;color:#0f172a"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7.5 18.5 3 20l1.5-4.5z"></path></svg></span>
+          <span style="width:40px;height:40px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;border:1px solid #64748b;background:#fff;color:#0f172a"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="5" cy="12" r="1"></circle><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle></svg></span>
+          <span style="width:40px;height:40px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;border:1px solid #b91c1c;color:#b91c1c;background:#fff"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"></path><path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"></path><path d="M6 7v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7"></path><path d="M10 11v6M14 11v6"></path></svg></span>
+          <span style="width:40px;height:40px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;border:1px solid #64748b;background:#fff;color:#0f172a;box-shadow:0 0 0 2px #fff,0 0 0 4px #1d4ed8"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"></path><path d="m7 10 5 5 5-5"></path><path d="M4 20h16"></path></svg></span>
+        </div>
+        <div class="ds-cf"><strong style="font-weight:600;color:#0f172a">States.</strong> same four variants and five states<br><strong style="font-weight:600;color:#0f172a">Rule.</strong> Always has an accessible name; a tooltip appears when the meaning is not visible.</div>
+      </div>
+      <div class="ds-cc"><div class="ds-ch"><span class="ds-cn">Pagination</span><span class="ds-cid">COMP-013</span></div>
+        <div class="ds-cs" style="justify-content:space-between">
+          <span style="font:400 14px Inter,sans-serif;color:#475569">Showing 1–25 of 61</span>
+          <span style="display:flex;gap:8px"><span style="height:40px;padding:0 14px;border:1px solid #cbd5e1;border-radius:6px;display:inline-flex;align-items:center;font:500 14px Inter,sans-serif;color:#94a3b8">Previous</span><span style="height:40px;padding:0 14px;border:1px solid #64748b;border-radius:6px;display:inline-flex;align-items:center;font:600 14px Inter,sans-serif">Next</span></span>
+        </div>
+        <div class="ds-cf"><strong style="font-weight:600;color:#0f172a">States.</strong> previous / next · range label · first and last disabled · loading<br><strong style="font-weight:600;color:#0f172a">Rule.</strong> Cursor paging only — no page numbers, no infinite scroll. 25 rows per request.</div>
+      </div>
+    </div>
+
+    <div style="font:700 10px/13px Inter,sans-serif;letter-spacing:.12em;text-transform:uppercase;color:#64748b;margin:0 0 10px">Forms</div>
+    <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-bottom:24px">
+      <div class="ds-cc"><div class="ds-ch"><span class="ds-cn">Input</span><span class="ds-cid">COMP-003</span></div>
+        <div style="padding:14px;flex:1;display:flex;flex-direction:column;gap:14px">
+          <div style="display:flex;flex-direction:column;gap:6px"><label style="font:600 14px/20px Inter,sans-serif">Quantity</label><div style="height:40px;border:1px solid #64748b;border-radius:8px;display:flex;align-items:center;justify-content:space-between;padding:0 12px;font:400 15px Inter,sans-serif;font-variant-numeric:tabular-nums">120.000<span style="color:#475569">KG</span></div></div>
+          <div style="display:flex;flex-direction:column;gap:6px"><label style="font:600 14px/20px Inter,sans-serif">SKU</label><div style="height:40px;border:1px solid #991b1b;box-shadow:0 0 0 1px #991b1b;border-radius:8px;display:flex;align-items:center;padding:0 12px;font:400 15px Inter,sans-serif">MEAT-00!</div><div style="font:500 12px/16px Inter,sans-serif;color:#991b1b">Use letters, numbers and hyphens only.</div></div>
+        </div>
+        <div class="ds-cf"><strong style="font-weight:600;color:#0f172a">States.</strong> default · hover · focus · error · disabled · prefix and suffix<br><strong style="font-weight:600;color:#0f172a">Rule.</strong> Unit and currency are readable text, not decoration. Error boundary and message always appear together.</div>
+      </div>
+      <div class="ds-cc"><div class="ds-ch"><span class="ds-cn">Select</span><span class="ds-cid">COMP-004</span></div>
+        <div style="padding:14px;flex:1;display:flex;flex-direction:column;gap:12px">
+          <div style="display:flex;flex-direction:column;gap:6px"><label style="font:600 14px/20px Inter,sans-serif">Warehouse</label><div style="height:40px;border:1px solid #64748b;border-radius:8px;display:flex;align-items:center;justify-content:space-between;padding:0 12px;font:400 15px Inter,sans-serif">Cold Room<span style="color:#64748b">▾</span></div></div>
+          <div style="border:1px solid #cbd5e1;border-radius:8px;box-shadow:0 8px 20px rgb(15 23 42 / .12);overflow:hidden"><div style="padding:9px 12px;background:#eff6ff;color:#1e40af;font:600 14px Inter,sans-serif">Cold Room</div><div style="padding:9px 12px;font:400 14px Inter,sans-serif">Main Store</div></div>
+        </div>
+        <div class="ds-cf"><strong style="font-weight:600;color:#0f172a">States.</strong> default · open · focus · error · disabled<br><strong style="font-weight:600;color:#0f172a">Rule.</strong> Full keyboard navigation; the selected value and its label are both announced.</div>
+      </div>
+      <div class="ds-cc"><div class="ds-ch"><span class="ds-cn">Textarea</span><span class="ds-cid">COMP-005</span></div>
+        <div style="padding:14px;flex:1;display:flex;flex-direction:column;gap:6px">
+          <label style="font:600 14px/20px Inter,sans-serif">Note (optional)</label>
+          <div style="height:72px;border:1px solid #64748b;border-radius:8px;padding:10px 12px;font:400 15px Inter,sans-serif;color:#64748b">Recount after stocktake</div>
+          <div style="font:400 12px/16px Inter,sans-serif;color:#475569">Up to 280 characters.</div>
+        </div>
+        <div class="ds-cf"><strong style="font-weight:600;color:#0f172a">States.</strong> default · focus · error · disabled<br><strong style="font-weight:600;color:#0f172a">Rule.</strong> Vertical resize only; character guidance shown wherever length is constrained.</div>
+      </div>
+      <div class="ds-cc"><div class="ds-ch"><span class="ds-cn">Checkbox / Switch</span><span class="ds-cid">COMP-006</span></div>
+        <div style="padding:14px;flex:1;display:flex;flex-direction:column;gap:14px">
+          <div style="display:flex;flex-wrap:wrap;gap:18px;align-items:center">
+            <span style="display:inline-flex;align-items:center;gap:9px;font:400 14px Inter,sans-serif"><span style="width:20px;height:20px;border-radius:4px;background:#1d4ed8;color:#fff;display:inline-flex;align-items:center;justify-content:center;font:700 12px Inter,sans-serif">✓</span>Same physical product</span>
+            <span style="display:inline-flex;align-items:center;gap:9px;font:400 14px Inter,sans-serif"><span style="width:20px;height:20px;border-radius:4px;border:1px solid #64748b"></span>Unchecked</span>
+          </div>
+          <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center">
+            <span style="width:44px;height:24px;border-radius:9999px;background:#1d4ed8;display:inline-flex;align-items:center;justify-content:flex-end;padding:0 3px"><span style="width:18px;height:18px;border-radius:9999px;background:#fff"></span></span><span style="font:400 14px Inter,sans-serif">On</span>
+            <span style="width:44px;height:24px;border-radius:9999px;background:#cbd5e1;display:inline-flex;align-items:center;padding:0 3px"><span style="width:18px;height:18px;border-radius:9999px;background:#fff"></span></span><span style="font:400 14px Inter,sans-serif">Off</span>
+          </div>
+        </div>
+        <div class="ds-cf"><strong style="font-weight:600;color:#0f172a">States.</strong> on · off · hover · focus · disabled<br><strong style="font-weight:600;color:#0f172a">Rule.</strong> Checkbox for selection and consent; switch only for a setting that applies immediately. State is never colour alone.</div>
+      </div>
+      <div class="ds-cc"><div class="ds-ch"><span class="ds-cn">Field wrapper</span><span class="ds-cid">COMP-007</span></div>
+        <div style="padding:14px;flex:1;display:flex;flex-direction:column;gap:6px">
+          <div style="font:600 14px/20px Inter,sans-serif">Conversion factor <span style="color:#991b1b">*</span></div>
+          <div style="font:400 12px/16px Inter,sans-serif;color:#475569">How many of your base units are in one of their order units.</div>
+          <div style="height:40px;border:1px solid #991b1b;border-radius:8px;display:flex;align-items:center;padding:0 12px;font:400 15px Inter,sans-serif">0</div>
+          <div style="font:500 12px/16px Inter,sans-serif;color:#991b1b">Enter a number greater than zero.</div>
+        </div>
+        <div class="ds-cf"><strong style="font-weight:600;color:#0f172a">States.</strong> label · hint · error · required marker<br><strong style="font-weight:600;color:#0f172a">Rule.</strong> The label is always visible. Hint precedes error, both bound by aria-describedby; required status is stated in text.</div>
+      </div>
+      <div class="ds-cc"><div class="ds-ch"><span class="ds-cn">FilterBar</span><span class="ds-cid">COMP-024</span></div>
+        <div style="padding:14px;flex:1;display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;gap:8px;align-items:center"><span style="height:40px;flex:1;border:1px solid #64748b;border-radius:8px;display:inline-flex;align-items:center;padding:0 12px;font:400 14px Inter,sans-serif;color:#64748b">Search this list</span><span style="height:40px;display:inline-flex;align-items:center;padding:0 12px;border:1px solid #cbd5e1;border-radius:6px;font:500 14px Inter,sans-serif">Category ▾</span></div>
+          <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center"><span style="display:inline-flex;padding:2px 9px;border-radius:9999px;background:#eff6ff;color:#1e40af;font:600 12px/18px Inter,sans-serif">Meat ✕</span><span style="display:inline-flex;padding:2px 9px;border-radius:9999px;background:#eff6ff;color:#1e40af;font:600 12px/18px Inter,sans-serif">Connected ✕</span><span style="font:600 14px Inter,sans-serif;color:#1d4ed8">Clear all</span></div>
+        </div>
+        <div class="ds-cf"><strong style="font-weight:600;color:#0f172a">States.</strong> search · dropdown filters · active chips · clear all · collapsed mobile<br><strong style="font-weight:600;color:#0f172a">Rule.</strong> Search is scoped to the current list. Active filters appear as removable chips; the query persists in the URL.</div>
+      </div>
+    </div>
+
+    <div style="font:700 10px/13px Inter,sans-serif;letter-spacing:.12em;text-transform:uppercase;color:#64748b;margin:0 0 10px">Containers</div>
+    <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-bottom:24px">
+      <div class="ds-cc"><div class="ds-ch"><span class="ds-cn">Card</span><span class="ds-cid">COMP-008</span></div>
+        <div style="padding:14px;flex:1">
+          <div style="border:1px solid #cbd5e1;border-radius:8px;overflow:hidden"><div style="padding:10px 14px;border-bottom:1px solid #e2e8f0;font:600 14px Inter,sans-serif">Supply</div><div style="padding:12px 14px;font:400 14px/20px Inter,sans-serif;color:#475569">White surface, 1 px border, radius 8. Shadow only where elevation carries meaning.</div><div style="padding:10px 14px;border-top:1px solid #e2e8f0;font:600 14px Inter,sans-serif;color:#1d4ed8">View mapping</div></div>
+        </div>
+        <div class="ds-cf"><strong style="font-weight:600;color:#0f172a">States.</strong> plain · header · footer action · interactive focus<br><strong style="font-weight:600;color:#0f172a">Rule.</strong> White surface, 1 px border. Shadow only where elevation means something. One clear target when interactive.</div>
+      </div>
+      <div class="ds-cc"><div class="ds-ch"><span class="ds-cn">KPI card</span><span class="ds-cid">COMP-009</span></div>
+        <div style="padding:14px;flex:1;display:grid;grid-template-columns:1fr 1fr;gap:10px;align-content:start">
+          <div style="border:1px solid #cbd5e1;border-radius:8px;padding:12px 14px"><div style="font:500 12px/16px Inter,sans-serif;color:#475569">Inventory value</div><div style="font:700 20px/28px Inter,sans-serif;font-variant-numeric:tabular-nums">LKR 691,700.00</div><div style="font:500 12px/16px Inter,sans-serif;color:#64748b">Across 2 warehouses</div></div>
+          <div style="border:1px solid #cbd5e1;border-radius:8px;padding:12px 14px"><div style="font:500 12px/16px Inter,sans-serif;color:#475569">Low stock</div><div style="height:26px;width:56px;background:#f1f5f9;border-radius:4px;margin-top:4px"></div><div style="font:500 12px/16px Inter,sans-serif;color:#64748b;margin-top:4px">Loading</div></div>
+        </div>
+        <div class="ds-cf"><strong style="font-weight:600;color:#0f172a">States.</strong> value · label · context · loading · error · clickable<br><strong style="font-weight:600;color:#0f172a">Rule.</strong> Only the five frozen measures. Clicking goes to the exact filtered list, never a vague destination.</div>
+      </div>
+      <div class="ds-cc"><div class="ds-ch"><span class="ds-cn">PageHeader</span><span class="ds-cid">COMP-025</span></div>
+        <div style="padding:14px;flex:1">
+          <div style="font:500 12px/16px Inter,sans-serif;color:#64748b">Inventory / Products</div>
+          <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-top:2px;flex-wrap:wrap">
+            <div><div style="font:700 24px/32px Inter,sans-serif;letter-spacing:-.02em">Products</div><div style="font:400 14px/20px Inter,sans-serif;color:#475569">12 products across 2 warehouses</div></div>
+            <div style="display:flex;gap:8px"><span style="height:40px;display:inline-flex;align-items:center;padding:0 16px;border-radius:6px;font:600 14px Inter,sans-serif;background:#fff;color:#0f172a;border:1px solid #64748b">Export CSV</span><span style="height:40px;display:inline-flex;align-items:center;padding:0 16px;border-radius:6px;font:600 14px Inter,sans-serif;background:#1d4ed8;color:#fff">New product</span></div>
+          </div>
+        </div>
+        <div class="ds-cf"><strong style="font-weight:600;color:#0f172a">States.</strong> title · subtitle · breadcrumb · primary and secondary actions · no-action<br><strong style="font-weight:600;color:#0f172a">Rule.</strong> One per screen. Action visibility follows the assigned role; the breadcrumb reflects the real hierarchy.</div>
+      </div>
+    </div>
+
+    <div style="font:700 10px/13px Inter,sans-serif;letter-spacing:.12em;text-transform:uppercase;color:#64748b;margin:0 0 10px">Status and identity</div>
+    <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-bottom:24px">
+      <div class="ds-cc"><div class="ds-ch"><span class="ds-cn">StatusPill</span><span class="ds-cid">COMP-010</span></div>
+        <div style="padding:14px;flex:1;display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;flex-wrap:wrap;gap:8px"><span style="display:inline-flex;padding:2px 9px;border-radius:9999px;background:#dcfce7;color:#166534;font:600 12px/18px Inter,sans-serif">✓ In stock</span><span style="display:inline-flex;padding:2px 9px;border-radius:9999px;background:#fef3c7;color:#854d0e;font:600 12px/18px Inter,sans-serif">▲ Low stock</span><span style="display:inline-flex;padding:2px 9px;border-radius:9999px;background:#fee2e2;color:#991b1b;font:600 12px/18px Inter,sans-serif">✕ Out of stock</span></div>
+          <div style="display:flex;flex-wrap:wrap;gap:8px"><span style="display:inline-flex;padding:2px 9px;border-radius:9999px;background:#f1f5f9;color:#334155;font:600 12px/18px Inter,sans-serif">Draft</span><span style="display:inline-flex;padding:2px 9px;border-radius:9999px;background:#fef3c7;color:#854d0e;font:600 12px/18px Inter,sans-serif">Ordered</span><span style="display:inline-flex;padding:2px 9px;border-radius:9999px;background:#dbeafe;color:#1e40af;font:600 12px/18px Inter,sans-serif">◑ Partially received</span><span style="display:inline-flex;padding:2px 9px;border-radius:9999px;background:#dcfce7;color:#166534;font:600 12px/18px Inter,sans-serif">✓ Received</span><span style="display:inline-flex;padding:2px 9px;border-radius:9999px;background:#fee2e2;color:#991b1b;font:600 12px/18px Inter,sans-serif">✕ Cancelled</span></div>
+        </div>
+        <div class="ds-cf"><strong style="font-weight:600;color:#0f172a">States.</strong> three stock states · five purchase-order states<br><strong style="font-weight:600;color:#0f172a">Rule.</strong> Icon plus exact wording plus the frozen token pair. Readable in greyscale; never colour alone.</div>
+      </div>
+      <div class="ds-cc"><div class="ds-ch"><span class="ds-cn">Badge</span><span class="ds-cid">COMP-011</span></div>
+        <div class="ds-cs">
+          <span style="display:inline-flex;padding:2px 9px;border-radius:9999px;background:#f1f5f9;color:#334155;font:600 12px/18px Inter,sans-serif">Private</span>
+          <span style="display:inline-flex;align-items:center;gap:5px;padding:2px 9px;border-radius:9999px;background:#eff6ff;color:#1e40af;font:600 12px/18px Inter,sans-serif"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#1e40af" stroke-width="2.4" stroke-linecap="round"><path d="M9.5 14.5 14.5 9.5"></path><path d="M8 12H6a3.5 3.5 0 1 1 0-7h2"></path><path d="M16 12h2a3.5 3.5 0 1 1 0 7h-2"></path></svg>Connected</span>
+          <span style="display:inline-flex;padding:2px 9px;border-radius:9999px;background:#eff6ff;color:#1e40af;font:600 12px/18px Inter,sans-serif">Owner</span>
+          <span style="display:inline-flex;padding:2px 9px;border-radius:9999px;background:#f1f5f9;color:#334155;font:600 12px/18px Inter,sans-serif">Storekeeper</span>
+          <span style="display:inline-flex;padding:2px 9px;border-radius:9999px;background:#991b1b;color:#fff;font:600 12px/18px Inter,sans-serif">3</span>
+        </div>
+        <div class="ds-cf"><strong style="font-weight:600;color:#0f172a">States.</strong> neutral · count · role · Private · Connected<br><strong style="font-weight:600;color:#0f172a">Rule.</strong> Informational, never an action. Private is slate and link-free; Connected is blue subtle with the link icon.</div>
+      </div>
+      <div class="ds-cc"><div class="ds-ch"><span class="ds-cn">Monogram</span><span class="ds-cid">COMP-021</span></div>
+        <div class="ds-cs" style="gap:12px">
+          <span style="width:24px;height:24px;border-radius:9999px;background:#1d4ed8;color:#fff;display:inline-flex;align-items:center;justify-content:center;font:700 9px Inter,sans-serif">GO</span>
+          <span style="width:32px;height:32px;border-radius:9999px;background:#1d4ed8;color:#fff;display:inline-flex;align-items:center;justify-content:center;font:700 11px Inter,sans-serif">GO</span>
+          <span style="width:48px;height:48px;border-radius:9999px;background:#1d4ed8;color:#fff;display:inline-flex;align-items:center;justify-content:center;font:700 16px Inter,sans-serif">GO</span>
+          <span style="width:48px;height:48px;border-radius:9999px;background:#f1f5f9;border:1px solid #cbd5e1;color:#334155;display:inline-flex;align-items:center;justify-content:center;font:700 16px Inter,sans-serif">FF</span>
+          <span style="width:48px;height:48px;border-radius:9999px;background:#f1f5f9;border:1px solid #cbd5e1;color:#334155;display:inline-flex;align-items:center;justify-content:center;font:600 13px Inter,sans-serif">NP</span>
+        </div>
+        <div class="ds-cf"><strong style="font-weight:600;color:#0f172a">States.</strong> 24 · 32 · 48 px · generated initials · image fallback<br><strong style="font-weight:600;color:#0f172a">Rule.</strong> Two initials on the organisation's deterministic colour. If an image fails it returns to initials. No upload UI.</div>
+      </div>
+    </div>
+
+    <div style="font:700 10px/13px Inter,sans-serif;letter-spacing:.12em;text-transform:uppercase;color:#64748b;margin:0 0 10px">Data</div>
+    <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-bottom:24px">
+      <div class="ds-cc"><div class="ds-ch"><span class="ds-cn">DataTable</span><span class="ds-cid">COMP-012</span></div>
+        <div style="padding:14px;flex:1">
+          <div style="border:1px solid #cbd5e1;border-radius:8px;overflow:hidden">
+            <div style="display:grid;grid-template-columns:minmax(0,1fr) 92px 76px;height:36px;align-items:center;padding:0 12px;background:#f1f5f9;font:600 12px Inter,sans-serif;color:#475569"><span>Product ▲</span><span style="text-align:right">On hand</span><span style="text-align:right">Status</span></div>
+            <div style="display:grid;grid-template-columns:minmax(0,1fr) 92px 76px;height:36px;align-items:center;padding:0 12px;border-bottom:1px solid #f1f5f9;font:500 14px Inter,sans-serif;font-variant-numeric:tabular-nums"><span>Chicken Breast</span><span style="text-align:right">120.000</span><span style="text-align:right"><span style="display:inline-flex;padding:2px 9px;border-radius:9999px;background:#dcfce7;color:#166534;font:600 12px/18px Inter,sans-serif">✓</span></span></div>
+            <div style="display:grid;grid-template-columns:minmax(0,1fr) 92px 76px;height:36px;align-items:center;padding:0 12px;background:#eff6ff;font:500 14px Inter,sans-serif;font-variant-numeric:tabular-nums"><span>Butter Block</span><span style="text-align:right">8.000</span><span style="text-align:right"><span style="display:inline-flex;padding:2px 9px;border-radius:9999px;background:#fef3c7;color:#854d0e;font:600 12px/18px Inter,sans-serif">▲</span></span></div>
+          </div>
+        </div>
+        <div class="ds-cf"><strong style="font-weight:600;color:#0f172a">States.</strong> header · row · hover · selected · sortable header · sticky header · empty · loading · mobile card<br><strong style="font-weight:600;color:#0f172a">Rule.</strong> Real table semantics; sorting only on indexed columns. 36 px rows on desktop; below 768 px each row becomes a card that repeats every field label.</div>
+      </div>
+      <div class="ds-cc"><div class="ds-ch"><span class="ds-cn">Tabs</span><span class="ds-cid">COMP-014</span></div>
+        <div style="padding:14px;flex:1">
+          <div style="display:flex;gap:20px;border-bottom:1px solid #e2e8f0">
+            <span style="height:42px;display:inline-flex;align-items:center;gap:6px;font:600 14px Inter,sans-serif;color:#1d4ed8;box-shadow:inset 0 -2px 0 #1d4ed8">Movements <span style="display:inline-flex;padding:1px 7px;border-radius:9999px;background:#eff6ff;font:600 12px/16px Inter,sans-serif">6</span></span>
+            <span style="height:42px;display:inline-flex;align-items:center;font:500 14px Inter,sans-serif;color:#475569">Warehouses</span>
+            <span style="height:42px;display:inline-flex;align-items:center;font:500 14px Inter,sans-serif;color:#94a3b8">Reports</span>
+          </div>
+        </div>
+        <div class="ds-cf"><strong style="font-weight:600;color:#0f172a">States.</strong> default · active · focus · disabled · count badge<br><strong style="font-weight:600;color:#0f172a">Rule.</strong> Arrow-key navigation. Active state uses weight and an underline, not colour alone. Denied tabs are hidden by role, not greyed as decoration.</div>
+      </div>
+      <div class="ds-cc"><div class="ds-ch"><span class="ds-cn">Timeline</span><span class="ds-cid">COMP-022</span></div>
+        <div style="padding:14px;flex:1;display:flex;flex-direction:column;gap:12px">
+          <div style="display:grid;grid-template-columns:28px minmax(0,1fr);gap:10px;align-items:flex-start"><span style="width:28px;height:28px;border-radius:9999px;background:#f1f5f9;border:1px solid #cbd5e1;color:#334155;display:inline-flex;align-items:center;justify-content:center;font:700 10px Inter,sans-serif">FF</span><div><div style="font:600 13px/19px Inter,sans-serif">Shipped <span style="font-weight:400;color:#475569">· Fresh Foods Ltd</span></div><div style="font:400 13px/19px Inter,sans-serif;color:#475569">10 PACK · 13 Aug 2026, 09:12</div></div></div>
+          <div style="display:grid;grid-template-columns:28px minmax(0,1fr);gap:10px;align-items:flex-start"><span style="width:28px;height:28px;border-radius:9999px;background:#1d4ed8;color:#fff;display:inline-flex;align-items:center;justify-content:center;font:700 10px Inter,sans-serif">GO</span><div><div style="font:600 13px/19px Inter,sans-serif">Received <span style="font-weight:400;color:#475569">· Nimal, Storekeeper</span></div><div style="font:400 13px/19px Inter,sans-serif;color:#475569">2 PACK into Cold Room · 13 Aug 2026, 14:30</div></div></div>
+        </div>
+        <div class="ds-cf"><strong style="font-weight:600;color:#0f172a">States.</strong> actor · organisation · role badge · timestamp · transition · note<br><strong style="font-weight:600;color:#0f172a">Rule.</strong> Chronological and immutable. Connected events name the buyer or supplier organisation explicitly.</div>
+      </div>
+    </div>
+
+    <div style="font:700 10px/13px Inter,sans-serif;letter-spacing:.12em;text-transform:uppercase;color:#64748b;margin:0 0 10px">Overlays</div>
+    <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-bottom:24px">
+      <div class="ds-cc"><div class="ds-ch"><span class="ds-cn">Modal</span><span class="ds-cid">COMP-015</span></div>
+        <div style="padding:14px;flex:1">
+          <div style="border:1px solid #cbd5e1;border-radius:12px;overflow:hidden;box-shadow:0 20px 40px rgb(15 23 42 / .18)">
+            <div style="padding:12px 16px;border-bottom:1px solid #e2e8f0;display:flex;justify-content:space-between;align-items:center"><span style="font:600 16px Inter,sans-serif">Adjust stock</span><span style="color:#475569;font:500 16px Inter,sans-serif">✕</span></div>
+            <div style="padding:14px 16px;font:400 14px/20px Inter,sans-serif;color:#475569">Focus is trapped, Escape closes, and focus returns to the control that opened it.</div>
+            <div style="padding:12px 16px;border-top:1px solid #e2e8f0;display:flex;gap:8px;justify-content:flex-end"><span style="height:40px;display:inline-flex;align-items:center;padding:0 16px;border-radius:6px;font:600 14px Inter,sans-serif;background:#fff;border:1px solid #64748b">Cancel</span><span style="height:40px;display:inline-flex;align-items:center;padding:0 16px;border-radius:6px;font:600 14px Inter,sans-serif;background:#1d4ed8;color:#fff">Save</span></div>
+          </div>
+        </div>
+        <div class="ds-cf"><strong style="font-weight:600;color:#0f172a">States.</strong> small · medium · large · mobile full-height sheet<br><strong style="font-weight:600;color:#0f172a">Rule.</strong> Labelled title and body, visible close, focus trap, Escape, focus returned to the trigger. One dialog at a time.</div>
+      </div>
+      <div class="ds-cc"><div class="ds-ch"><span class="ds-cn">ConfirmDialog</span><span class="ds-cid">COMP-016</span></div>
+        <div style="padding:14px;flex:1">
+          <div style="border:1px solid #cbd5e1;border-radius:12px;overflow:hidden;box-shadow:0 20px 40px rgb(15 23 42 / .18)">
+            <div style="padding:14px 16px"><div style="font:600 16px/24px Inter,sans-serif">Archive Chicken Breast?</div><div style="font:400 14px/20px Inter,sans-serif;color:#475569;margin-top:4px">Its 120.000 KG balance and full movement history stay on record. You can restore it later.</div></div>
+            <div style="padding:12px 16px;border-top:1px solid #e2e8f0;display:flex;gap:8px;justify-content:flex-end"><span style="height:40px;display:inline-flex;align-items:center;padding:0 16px;border-radius:6px;font:600 14px Inter,sans-serif;background:#fff;border:1px solid #64748b;box-shadow:0 0 0 2px #fff,0 0 0 4px #1d4ed8">Cancel</span><span style="height:40px;display:inline-flex;align-items:center;padding:0 16px;border-radius:6px;font:600 14px Inter,sans-serif;background:#b91c1c;color:#fff">Archive</span></div>
+          </div>
+        </div>
+        <div class="ds-cf"><strong style="font-weight:600;color:#0f172a">States.</strong> neutral · destructive · submitting · error<br><strong style="font-weight:600;color:#0f172a">Rule.</strong> Names the object and the consequence. For destructive actions Cancel takes initial focus.</div>
+      </div>
+      <div class="ds-cc"><div class="ds-ch"><span class="ds-cn">Toast</span><span class="ds-cid">COMP-017</span></div>
+        <div style="padding:14px;flex:1;display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;gap:10px;padding:12px;border:1px solid #cbd5e1;border-radius:8px;box-shadow:0 8px 20px rgb(15 23 42 / .12)"><span style="width:20px;height:20px;border-radius:9999px;background:#166534;color:#fff;display:inline-flex;align-items:center;justify-content:center;font:700 12px Inter,sans-serif;flex:none">✓</span><span style="font:500 13px/19px Inter,sans-serif">Received 2 PACK. Cold Room is now 120.000 KG.</span></div>
+          <div style="display:flex;gap:10px;padding:12px;border:1px solid #cbd5e1;border-radius:8px;box-shadow:0 8px 20px rgb(15 23 42 / .12)"><span style="width:20px;height:20px;border-radius:9999px;background:#991b1b;color:#fff;display:inline-flex;align-items:center;justify-content:center;font:700 12px Inter,sans-serif;flex:none">!</span><span style="font:500 13px/19px Inter,sans-serif">That receipt did not go through. Nothing changed.</span></div>
+        </div>
+        <div class="ds-cf"><strong style="font-weight:600;color:#0f172a">States.</strong> success · error · info<br><strong style="font-weight:600;color:#0f172a">Rule.</strong> 150 ms fade in a polite live region. It supplements the refreshed data and is never the only evidence of success.</div>
+      </div>
+    </div>
+
+    <div style="font:700 10px/13px Inter,sans-serif;letter-spacing:.12em;text-transform:uppercase;color:#64748b;margin:0 0 10px">Lifecycle and flow</div>
+    <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px">
+      <div class="ds-cc"><div class="ds-ch"><span class="ds-cn">EmptyState</span><span class="ds-cid">COMP-018</span></div>
+        <div style="padding:14px;flex:1;text-align:center">
+          <span style="width:44px;height:44px;border-radius:9999px;background:#eff6ff;display:inline-flex;align-items:center;justify-content:center;color:#1d4ed8"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg></span>
+          <div style="font:600 15px/22px Inter,sans-serif;margin-top:10px">No connected businesses yet</div>
+          <div style="font:400 14px/20px Inter,sans-serif;color:#475569;margin-top:3px">Invite a supplier by their exact handle to order and receive together.</div>
+          <div style="margin-top:12px"><span style="height:40px;display:inline-flex;align-items:center;padding:0 16px;border-radius:6px;font:600 14px Inter,sans-serif;background:#1d4ed8;color:#fff">Invite a business</span></div>
+        </div>
+        <div class="ds-cf"><strong style="font-weight:600;color:#0f172a">States.</strong> icon · headline · body · primary action · no-action<br><strong style="font-weight:600;color:#0f172a">Rule.</strong> One sentence and one honest next step. Private and connected copy stay distinct.</div>
+      </div>
+      <div class="ds-cc"><div class="ds-ch"><span class="ds-cn">ErrorState</span><span class="ds-cid">COMP-019</span></div>
+        <div style="padding:14px;flex:1;display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;gap:10px;padding:12px;background:#fee2e2;border-radius:8px"><span style="width:20px;height:20px;border-radius:9999px;background:#991b1b;color:#fff;display:inline-flex;align-items:center;justify-content:center;font:700 12px Inter,sans-serif;flex:none">!</span><div><div style="font:600 13px/19px Inter,sans-serif;color:#991b1b">We could not reach your workspace</div><div style="font:400 13px/19px Inter,sans-serif">Your entries are still here. Try again in a moment.</div></div></div>
+          <div style="font:500 13px/19px Inter,sans-serif;color:#991b1b">Inline: Enter a quantity of 2 PACK or fewer.</div>
+        </div>
+        <div class="ds-cf"><strong style="font-weight:600;color:#0f172a">States.</strong> inline · panel · retry · no-retry<br><strong style="font-weight:600;color:#0f172a">Rule.</strong> Plain language, no raw codes, focusable retry, and the user's input is kept.</div>
+      </div>
+      <div class="ds-cc"><div class="ds-ch"><span class="ds-cn">Skeleton</span><span class="ds-cid">COMP-020</span></div>
+        <div style="padding:14px;flex:1;display:flex;flex-direction:column;gap:10px">
+          <span style="display:block;height:12px;width:60%;background:#f1f5f9;border-radius:4px"></span>
+          <span style="display:block;height:12px;width:88%;background:#f1f5f9;border-radius:4px"></span>
+          <div style="display:grid;grid-template-columns:minmax(0,1fr) 60px 60px;gap:8px"><span style="height:36px;background:#f1f5f9;border-radius:4px"></span><span style="height:36px;background:#f1f5f9;border-radius:4px"></span><span style="height:36px;background:#f1f5f9;border-radius:4px"></span></div>
+        </div>
+        <div class="ds-cf"><strong style="font-weight:600;color:#0f172a">States.</strong> text line · card · table row<br><strong style="font-weight:600;color:#0f172a">Rule.</strong> Matches the final geometry, is non-interactive and is hidden from assistive technology. No blank-page spinner.</div>
+      </div>
+      <div class="ds-cc"><div class="ds-ch"><span class="ds-cn">Stepper</span><span class="ds-cid">COMP-023</span></div>
+        <div style="padding:14px;flex:1">
+          <div style="display:flex;flex-direction:column;border:1px solid #cbd5e1;border-radius:8px;overflow:hidden">
+            <div style="padding:10px 12px;border-bottom:1px solid #e2e8f0;font:600 13px Inter,sans-serif;color:#166534">✓ Look up</div>
+            <div style="padding:10px 12px;border-bottom:1px solid #e2e8f0;background:#eff6ff;font:600 13px Inter,sans-serif;color:#1e40af">2 Confirm</div>
+            <div style="padding:10px 12px;border-bottom:1px solid #e2e8f0;font:500 13px Inter,sans-serif;color:#64748b">3 Convert</div>
+            <div style="padding:10px 12px;font:500 13px Inter,sans-serif;color:#64748b">4 Review</div>
+          </div>
+        </div>
+        <div class="ds-cf"><strong style="font-weight:600;color:#0f172a">States.</strong> 4-step and 5-step × completed, current, upcoming, error<br><strong style="font-weight:600;color:#0f172a">Rule.</strong> The current step is announced and labels stay visible. Mobile uses a compact vertical summary, never bare dots.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="ds-card">
+  <div class="ds-hd"><div><div class="ds-t">State grammar</div><div class="ds-s">Every data surface composes the same five conditions, in the same voice. Loading matches final geometry; empty gives one honest next step; error is plain and retains input; permission denial and success are never ambiguous.</div></div></div>
+  <div class="ds-b">
+    <div style="display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:16px">
+      <div style="border:1px solid #cbd5e1;border-radius:8px;overflow:hidden"><div style="padding:10px 14px;background:#f8fafc;border-bottom:1px solid #e2e8f0;font:600 13px Inter,sans-serif">Loading</div><div style="padding:14px"><span style="display:block;height:12px;width:70%;background:#f1f5f9;border-radius:4px"></span><span style="display:block;height:12px;width:92%;background:#f1f5f9;border-radius:4px;margin-top:10px"></span><span style="display:block;height:12px;width:54%;background:#f1f5f9;border-radius:4px;margin-top:10px"></span><span style="display:block;height:12px;width:84%;background:#f1f5f9;border-radius:4px;margin-top:10px"></span></div><div class="ds-cf">Skeleton in the final geometry. Never a blank page with a spinner; hidden from assistive technology.</div></div>
+      <div style="border:1px solid #cbd5e1;border-radius:8px;overflow:hidden"><div style="padding:10px 14px;background:#f8fafc;border-bottom:1px solid #e2e8f0;font:600 13px Inter,sans-serif">Empty</div><div style="padding:18px 14px;text-align:center"><span style="width:44px;height:44px;border-radius:9999px;background:#eff6ff;display:inline-flex;align-items:center;justify-content:center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1d4ed8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7.5 12 3l9 4.5v9L12 21l-9-4.5z"></path><path d="M3 7.5 12 12l9-4.5M12 12v9"></path></svg></span><div style="font:600 14px/20px Inter,sans-serif;margin-top:10px">No products yet</div><div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:3px">Add one and Stockmok starts building its balance.</div><span style="display:inline-flex;height:40px;align-items:center;padding:0 16px;background:#1d4ed8;color:#fff;border-radius:6px;font:600 14px Inter,sans-serif;margin-top:12px">New product</span></div><div class="ds-cf">One sentence, one honest next step. Private and connected copy stay distinct.</div></div>
+      <div style="border:1px solid #cbd5e1;border-radius:8px;overflow:hidden"><div style="padding:10px 14px;background:#f8fafc;border-bottom:1px solid #e2e8f0;font:600 13px Inter,sans-serif">Error</div><div style="padding:14px"><div style="display:flex;gap:10px;padding:12px;background:#fee2e2;border-radius:8px"><span style="width:20px;height:20px;border-radius:9999px;background:#991b1b;color:#fff;font:700 12px Inter,sans-serif;display:inline-flex;align-items:center;justify-content:center;flex:none">!</span><div><div style="font:600 13px/19px Inter,sans-serif;color:#991b1b">We could not load your products</div><div style="font:400 13px/19px Inter,sans-serif;margin-top:2px">Check your connection and try again. Nothing you entered was lost.</div></div></div><span style="display:inline-flex;height:40px;align-items:center;padding:0 16px;border:1px solid #64748b;border-radius:6px;font:600 14px Inter,sans-serif;margin-top:12px">Try again</span></div><div class="ds-cf">Plain language, no raw codes, focusable retry, user input preserved.</div></div>
+      <div style="border:1px solid #cbd5e1;border-radius:8px;overflow:hidden"><div style="padding:10px 14px;background:#f8fafc;border-bottom:1px solid #e2e8f0;font:600 13px Inter,sans-serif">Permission denied</div><div style="padding:18px 14px;text-align:center"><span style="width:44px;height:44px;border-radius:9999px;background:#f1f5f9;display:inline-flex;align-items:center;justify-content:center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="1.8" stroke-linecap="round"><rect x="4" y="10.5" width="16" height="10" rx="2"></rect><path d="M8 10.5V7a4 4 0 0 1 8 0v3.5"></path></svg></span><div style="font:600 14px/20px Inter,sans-serif;margin-top:10px">Your role cannot open this</div><div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:3px">You are signed in as Storekeeper. Ask an Owner if you need access.</div></div><div class="ds-cf">Distinct from Not found. Names the current role; never reveals what the page contains.</div></div>
+      <div style="border:1px solid #cbd5e1;border-radius:8px;overflow:hidden"><div style="padding:10px 14px;background:#f8fafc;border-bottom:1px solid #e2e8f0;font:600 13px Inter,sans-serif">Success</div><div style="padding:14px"><div style="display:flex;gap:10px;padding:12px;background:#fff;border:1px solid #cbd5e1;border-radius:8px;box-shadow:0 8px 20px rgb(15 23 42 / .12)"><span style="width:20px;height:20px;border-radius:9999px;background:#166534;color:#fff;font:700 12px Inter,sans-serif;display:inline-flex;align-items:center;justify-content:center;flex:none">✓</span><div style="font:500 13px/19px Inter,sans-serif">Received 2 PACK. Cold Room is now 120.000 KG.</div></div><div style="font:400 12px/17px Inter,sans-serif;color:#475569;margin-top:10px">The table behind the toast already shows the new balance.</div></div><div class="ds-cf">The toast supplements refreshed data; it is never the only evidence that something worked.</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="ds-card">
+  <div class="ds-hd"><div><div class="ds-t">Responsive rules</div><div class="ds-s">Four design viewports, one behaviour contract. Content is capped at 1440 px; beyond that the extra space stays neutral rather than stretching columns.</div></div></div>
+  <div class="ds-b">
+    <div style="display:grid;grid-template-columns:120px repeat(4,minmax(0,1fr));border-bottom:1px solid #cbd5e1">
+      <div style="padding:12px 0"></div>
+      <sc-for list="{{ viewports }}" as="v" hint-placeholder-count="4">
+        <div style="padding:12px 16px;border-left:1px solid #e2e8f0"><div style="font:700 16px/22px Inter,sans-serif">{{ v.w }}</div><div style="font:500 12px/16px Inter,sans-serif;color:#64748b">{{ v.name }}</div></div>
+      </sc-for>
+    </div>
+    <sc-for list="{{ responsive }}" as="r" hint-placeholder-count="6">
+      <div style="display:grid;grid-template-columns:120px repeat(4,minmax(0,1fr));border-bottom:1px solid #f1f5f9;background:{{ r.bg }}">
+        <div style="padding:12px 0"><div style="font:600 13px/19px Inter,sans-serif">{{ r.label }}</div></div>
+        <div style="padding:12px 16px;border-left:1px solid #e2e8f0;font:400 13px/19px Inter,sans-serif">{{ r.a }}</div>
+        <div style="padding:12px 16px;border-left:1px solid #e2e8f0;font:400 13px/19px Inter,sans-serif">{{ r.b }}</div>
+        <div style="padding:12px 16px;border-left:1px solid #e2e8f0;font:400 13px/19px Inter,sans-serif">{{ r.c }}</div>
+        <div style="padding:12px 16px;border-left:1px solid #e2e8f0;font:400 13px/19px Inter,sans-serif">{{ r.d }}</div>
+      </div>
+    </sc-for>
+  </div>
+</div>
+
+<div class="ds-card">
+  <div class="ds-hd"><div><div class="ds-t">Accessibility and interaction contract</div><div class="ds-s">Non-negotiable. Every one of these is testable against a built screen.</div></div><span style="font:600 12px/16px Inter,sans-serif;color:#166534;background:#dcfce7;padding:4px 10px;border-radius:9999px">WCAG 2.1 AA</span></div>
+  <div class="ds-b">
+    <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px">
+      <sc-for list="{{ a11y }}" as="x" hint-placeholder-count="9">
+        <div style="border:1px solid #cbd5e1;border-radius:8px;padding:14px 16px"><div style="font:600 14px/20px Inter,sans-serif">{{ x.title }}</div><div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:4px">{{ x.body }}</div></div>
+      </sc-for>
+    </div>
+  </div>
+</div>
+
+<div class="ds-card">
+  <div class="ds-hd"><div><div class="ds-t">Freeze checks</div><div class="ds-s">The state of the system as handed to the owner for Gate 4 approval.</div></div></div>
+  <div class="ds-b">
+    <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 32px">
+      <sc-for list="{{ freeze }}" as="f" hint-placeholder-count="12">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;padding:11px 0;border-bottom:1px solid #f1f5f9"><span style="font:500 14px/20px Inter,sans-serif">{{ f.check }}</span><span style="display:inline-flex;padding:2px 10px;border-radius:9999px;background:{{ f.bg }};color:{{ f.fg }};font:600 12px/18px Inter,sans-serif;white-space:nowrap">{{ f.result }}</span></div>
+      </sc-for>
+    </div>
+  </div>
+</div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1520}}">
+class Component extends DCLogic {
+  renderVals() {
+
+    const colorGroups = [
+      { name: "Brand", items: [
+        ["primary", "#1D4ED8", "Primary controls · 6.70:1 on white"],
+        ["primary-hover", "#1E40AF", "Hover and pressed · 8.72:1"],
+        ["primary-subtle", "#EFF6FF", "Selected rows, Connected badge"],
+        ["primary-contrast", "#FFFFFF", "Text on primary"]
+      ]},
+      { name: "Neutral", items: [
+        ["bg", "#F8FAFC", "Application canvas"],
+        ["surface", "#FFFFFF", "Cards, tables, forms"],
+        ["surface-subtle", "#F1F5F9", "Table header, inset regions"],
+        ["border", "#CBD5E1", "Structural separators only"],
+        ["border-strong", "#64748B", "Meaningful control boundary · 4.76:1"],
+        ["text", "#0F172A", "Primary text · 17.85:1"],
+        ["text-muted", "#475569", "Secondary text · 7.58:1"],
+        ["text-subtle", "#64748B", "Captions · 4.76:1"]
+      ]},
+      { name: "Status", items: [
+        ["success", "#166534", "In stock, Received · 6.49:1"],
+        ["success-subtle", "#DCFCE7", "Success background"],
+        ["warning", "#854D0E", "Low stock, Ordered · 6.15:1"],
+        ["warning-subtle", "#FEF3C7", "Warning background"],
+        ["danger", "#991B1B", "Out of stock, Cancelled · 6.80:1"],
+        ["danger-subtle", "#FEE2E2", "Danger background"],
+        ["info", "#1E40AF", "Partially received · 7.15:1"],
+        ["info-subtle", "#DBEAFE", "Information background"]
+      ]}
+    ].map(g => ({ name: g.name, items: g.items.map(i => ({ token: i[0], hex: i[1], use: i[2] })) }));
+
+    const typeScale = [
+      ["display", "36 / 44 · 700", "700 36px/44px", "Public home hero", "normal"],
+      ["h1", "30 / 38 · 700 · mobile 24/32", "700 30px/38px", "Products", "normal"],
+      ["h2", "24 / 32 · 650 · mobile 20/28", "650 24px/32px", "Needs attention", "normal"],
+      ["h3", "18 / 26 · 600", "600 18px/26px", "Verified mapping", "normal"],
+      ["body", "16 / 24 · 400", "400 16px/24px", "Receiving 2 PACK adds 10 KG to Cold Room.", "normal"],
+      ["body-sm", "14 / 20 · 400", "400 14px/20px", "Tables, secondary controls and helper copy.", "normal"],
+      ["caption", "12 / 16 · 500", "500 12px/16px", "Confirmed by Nohan on 09 Aug 2026", "normal"],
+      ["mono-num", "14 / 20 · 500 · tabular", "500 14px/20px", "120.000 KG · LKR 691,700.00 · CPO-2026-003", "tabular-nums"]
+    ].map(t => ({ token: t[0], spec: t[1], font: t[2], sample: t[3], num: t[4] }));
+
+    const spacing = [4, 8, 12, 16, 20, 24, 32, 40, 48, 64].map(n => ({ px: n + "px", label: n }));
+
+    const viewports = [
+      ["390", "Mobile · required"], ["768", "Tablet"], ["1280", "Desktop · primary"], ["1920", "Wide"]
+    ].map(v => ({ w: v[0] + " px", name: v[1] }));
+
+    const responsive = [
+      ["Shell", "64 px header; sidebar becomes a focus-trapped slide-over; monogram, full organisation name and bell stay", "Compact sidebar or drawer by screen density", "256 px expanded sidebar, or 72 px collapsed with tooltips", "Same shell; content capped at 1440 px and the surplus stays neutral"],
+      ["Gutters", "16 px gutter, single column, 16 px vertical rhythm", "24 px gutter, one or two columns", "32 px gutter, up to a 12-column dashboard", "40 px breathing room around the capped content"],
+      ["Tables", "Every row becomes a card that repeats each field label", "Bounded scroll inside the table region where cards are not required", "36 px rows, sticky header, sortable indexed columns", "Column widths stay readable rather than stretching"],
+      ["Forms", "Single column; controls and primary actions at least 44 px", "Maximum 640 px wide", "Paired fields where genuinely related; 40 px controls", "Form width unchanged — extra space is not filled"],
+      ["Dialogs", "Full-height sheet", "Centred modal", "Centred modal, small / medium / large", "Centred modal, unchanged"],
+      ["Targets", "44 × 44 px minimum, 8 px apart where safe and destructive actions sit together", "44 × 44 px minimum", "40 px minimum for pointer input", "40 px minimum for pointer input"]
+    ].map((r, i) => ({ label: r[0], a: r[1], b: r[2], c: r[3], d: r[4], bg: i % 2 ? "#fbfcfd" : "#ffffff" }));
+
+    const a11y = [
+      ["Contrast", "Normal text at least 4.5:1, large text at least 3:1. Every frozen text and status pair is recorded above and exceeds 4.5:1."],
+      ["Focus", "The two-layer ring is never removed. Every interactive element has a logical tab stop and a visible focus state."],
+      ["Colour independence", "Stock and purchase-order status each carry a unique icon and full wording, so they survive greyscale. Colour is always redundant."],
+      ["Boundaries", "Meaningful control edges use border-strong or a state treatment. The structural border is decorative and never the sole cue."],
+      ["Targets", "44 × 44 px on mobile with 8 px separation where a destructive and a safe action are adjacent; 40 px for pointer input."],
+      ["Dialogs", "Focus trapped, title and description identified, an obvious close path, a safe initial focus, and focus returned to the trigger."],
+      ["Forms", "Labels never live in placeholders. After a failed submit, focus moves to the first invalid field and the error is announced. Server errors never erase valid input."],
+      ["Motion", "Only 150 ms opacity fades on dialogs, dropdowns and toasts. Disabling animation removes no information, so no reduced-motion alternative is needed."],
+      ["Tables and charts", "Real th semantics, keyboard-reachable row actions, and every chart accompanied by a text or table equivalent."]
+    ].map(x => ({ title: x[0], body: x[1] }));
+
+    const ok = { bg: "#dcfce7", fg: "#166534" };
+    const freeze = [
+      ["Base territory", "C · Connected Operations", ok],
+      ["Density inherited from A", "Desktop tables and ledger · 36 px", ok],
+      ["Warmth inherited from B", "Auth, first-run and empty states", ok],
+      ["Page-layout families", "5 / 5 · no sixth family", ok],
+      ["Primitive components", "25 / 25 · namespace closed", ok],
+      ["Token groups", "Colour, type, spacing, radius, shadow, focus, layout, motion", ok],
+      ["Auth contract", "Google restored · role is a preference only", ok],
+      ["Canonical navigation", "16 frozen destinations, role-filtered", ok],
+      ["Global search", "Absent · list-scoped search only", ok],
+      ["Counterparty stock disclosure", "None on any surface or export", ok],
+      ["Backend vocabulary in product UI", "None", ok],
+      ["Design viewports", "390 · 768 · 1280 · 1920", ok],
+      ["Mobile target baseline", "44 × 44 px", ok],
+      ["Dark theme, gradients, decorative motion", "Excluded", ok],
+      ["Production code changed", "No — design authority only", ok]
+    ].map(f => ({ check: f[0], result: f[1], bg: f[2].bg, fg: f[2].fg }));
+
+    const G = [
+      ["Overview", [["Dashboard", ""]]],
+      ["Inventory", [["Products", ""], ["Categories", ""], ["Warehouses", ""], ["Stock Movements", ""]]],
+      ["Procurement", [["Purchase Orders", ""], ["Receiving", ""], ["Suppliers", ""], ["Buyers", ""]]],
+      ["Network", [["Connected Businesses", "flag"], ["Partner Catalog", "flag"], ["Product Mappings", "flag"]]],
+      ["Insight", [["Reports", ""], ["Notifications", ""]]],
+      ["Workspace", [["Team", ""], ["Settings", ""]]]
+    ];
+    const navFull = G.map(g => ({
+      group: g[0],
+      items: g[1].map(it => {
+        const on = it[0] === "Dashboard";
+        return { label: it[0], flag: it[1] ? "B" : "", bg: on ? "#eff6ff" : "transparent", fg: on ? "#1e40af" : "#334155", dot: on ? "#1d4ed8" : "#cbd5e1", font: on ? "600 14px/20px" : "500 14px/20px" };
+      })
+    }));
+
+    return { colorGroups, typeScale, spacing, viewports, responsive, a11y, freeze, navFull };
+  }
+}
+</script>
+</body>
+</html>

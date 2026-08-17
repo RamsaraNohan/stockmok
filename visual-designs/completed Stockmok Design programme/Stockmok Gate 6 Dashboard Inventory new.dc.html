@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics><meta name="design_doc_mode" content="canvas"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"><style>body{margin:0;background:#e8ecf1;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;color:#0f172a}a{color:#1d4ed8}a:hover{color:#1e40af}.dv-turn{padding:40px 44px 32px;border-bottom:1px solid rgba(15,23,42,.08);scroll-margin-top:16px}.dv-thd{display:flex;align-items:baseline;gap:10px;margin:0 0 20px}.dv-tid{font:600 10px ui-monospace,Menlo,monospace;padding:3px 7px;background:#0f172a;color:#fff;border-radius:4px;text-decoration:none}.dv-tname{font:600 13px/1.2 Inter,system-ui,sans-serif}.dv-opts{display:flex;flex-wrap:wrap;gap:36px;align-items:flex-start}.dv-opt{flex:none;display:flex;flex-direction:column;gap:9px;scroll-margin-top:16px;max-width:1320px}.dv-oid{font:600 10.5px ui-monospace,Menlo,monospace;padding:3px 7px;background:rgba(15,23,42,.08);color:#0f172a;border-radius:5px;text-decoration:none}.dv-olabel{display:flex;align-items:baseline;gap:8px;font:400 11px/1.3 Inter,system-ui,sans-serif;color:rgba(15,23,42,.55)}.dv-card{max-width:100%;background:#fff;border:1px solid rgba(15,23,42,.12);border-radius:12px;box-shadow:0 1px 3px rgb(15 23 42 / .07);overflow:hidden}.dv-opt:target .dv-oid{background:#1d4ed8;color:#fff}.dv-cap{margin:0;max-width:1320px;font:400 12px/17px Inter,system-ui,sans-serif;color:#475569}.eyb{font:700 12px/16px Inter,sans-serif;letter-spacing:.1em;text-transform:uppercase;color:#64748b;padding-bottom:10px;border-bottom:1px solid #cbd5e1}.tnum{font-variant-numeric:tabular-nums}.g6r{display:grid;align-items:center;height:36px;padding:0 16px;border-top:1px solid #f1f5f9;font:500 14px Inter,sans-serif}.g6h{display:grid;align-items:center;height:36px;padding:0 16px;background:#f1f5f9;font:600 12px Inter,sans-serif;color:#475569}.sect{font:700 12px/16px Inter,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#64748b;padding:12px 20px 4px}.nav{height:36px;display:flex;align-items:center;gap:10px;padding:0 12px;margin:2px 8px;border-radius:6px;font:500 14px/20px Inter,sans-serif;color:#334155}.dot{width:6px;height:6px;border-radius:9999px;background:#cbd5e1;flex:none}.kpi{border:1px solid #cbd5e1;border-radius:8px;background:#fff;padding:14px 16px 16px}.kpil{font:500 13px/19px Inter,sans-serif;color:#475569}.kpiv{font:700 26px/34px Inter,sans-serif;letter-spacing:-.01em;font-variant-numeric:tabular-nums;margin-top:2px}.kpim{font:500 12px/17px Inter,sans-serif;color:#64748b;margin-top:4px}.btnp{box-sizing:border-box;height:40px;display:inline-flex;align-items:center;padding:0 16px;border-radius:6px;font:600 14px Inter,sans-serif;background:#1d4ed8;color:#fff}.btns{box-sizing:border-box;height:40px;display:inline-flex;align-items:center;padding:0 16px;border-radius:6px;font:600 14px Inter,sans-serif;border:1px solid #64748b;background:#fff;color:#0f172a}.pill{display:inline-flex;padding:2px 9px;border-radius:9999px;font:600 12px/18px Inter,sans-serif}.fld{box-sizing:border-box;height:40px;border:1px solid #64748b;border-radius:6px;display:flex;align-items:center;justify-content:space-between;padding:0 12px;font:400 14px Inter,sans-serif;background:#fff}.lbl{display:block;font:600 13px/19px Inter,sans-serif;margin-bottom:5px}.hint{font:400 12px/17px Inter,sans-serif;color:#64748b;margin-top:5px}.pg{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-top:1px solid #e2e8f0;font:500 13px Inter,sans-serif;color:#475569}.pgb{min-width:32px;height:32px;display:inline-flex;align-items:center;justify-content:center;border:1px solid #cbd5e1;border-radius:6px;font:600 13px Inter,sans-serif;background:#fff;padding:0 8px}.mk{width:22px;height:22px;flex:none}</style></helmet>
+
+<section class="dv-turn" id="t6">
+<div class="dv-thd"><a class="dv-tid" href="#t6">6</a><span class="dv-tname">Gate 6 — Dashboard and Inventory · frozen system · canonical seed data · 25/25 components</span></div>
+<div class="dv-opts">
+
+<div class="dv-opt" id="6a" data-screen-label="G6 coverage key">
+<div class="dv-olabel"><a class="dv-oid" href="#6a">6a</a>What Gate 6 covers, and the figures it is held to</div>
+<div class="dv-card" style="width:1320px">
+  <div style="padding:22px 24px">
+    <div style="display:grid;grid-template-columns:repeat(5,minmax(0,1fr));border:1px solid #cbd5e1;border-radius:8px;overflow:hidden">
+      <div style="padding:12px 15px;border-right:1px solid #e2e8f0;background:#f8fafc"><div style="font:600 13px/19px Inter,sans-serif">Dashboard</div><div style="font:400 12px/17px Inter,sans-serif;color:#475569;margin-top:2px">Five KPIs, Needs attention, one approved chart with a table alternative</div><div style="font:600 12px/17px Inter,sans-serif;margin-top:4px"><a href="#6b">6b</a> <a href="#6c">6c</a></div></div>
+      <div style="padding:12px 15px;border-right:1px solid #e2e8f0;background:#f8fafc"><div style="font:600 13px/19px Inter,sans-serif">Products</div><div style="font:400 12px/17px Inter,sans-serif;color:#475569;margin-top:2px">List, create and edit, detail with tabs and ledger, archive</div><div style="font:600 12px/17px Inter,sans-serif;margin-top:4px"><a href="#6d">6d</a> <a href="#6e">6e</a> <a href="#6f">6f</a></div></div>
+      <div style="padding:12px 15px;border-right:1px solid #e2e8f0;background:#f8fafc"><div style="font:600 13px/19px Inter,sans-serif">Structure</div><div style="font:400 12px/17px Inter,sans-serif;color:#475569;margin-top:2px">Categories and warehouses, with archive rules</div><div style="font:600 12px/17px Inter,sans-serif;margin-top:4px"><a href="#6g">6g</a> <a href="#6j">6j</a></div></div>
+      <div style="padding:12px 15px;border-right:1px solid #e2e8f0;background:#f8fafc"><div style="font:600 13px/19px Inter,sans-serif">Stock operations</div><div style="font:400 12px/17px Inter,sans-serif;color:#475569;margin-top:2px">Movement history, opening balance, adjustment, transfer</div><div style="font:600 12px/17px Inter,sans-serif;margin-top:4px"><a href="#6h">6h</a> <a href="#6i">6i</a></div></div>
+      <div style="padding:12px 15px;background:#f8fafc"><div style="font:600 13px/19px Inter,sans-serif">Inventory views</div><div style="font:400 12px/17px Inter,sans-serif;color:#475569;margin-top:2px">Low and out of stock, the two authorised reports, 390 px</div><div style="font:600 12px/17px Inter,sans-serif;margin-top:4px"><a href="#6k">6k</a> <a href="#6l">6l</a> <a href="#6m">6m</a></div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:minmax(0,1.95fr) minmax(0,1fr) minmax(0,1fr);gap:14px;margin-top:16px">
+      <div style="border:1px solid #cbd5e1;border-radius:8px;overflow:hidden">
+        <div style="padding:11px 14px;background:#f8fafc;border-bottom:1px solid #e2e8f0;font:600 13px Inter,sans-serif">The canonical twelve — used exactly, on every board</div>
+        <div class="g6h" style="grid-template-columns:78px minmax(0,1fr) 88px 48px 82px 92px;padding:0 12px;column-gap:8px"><span>SKU</span><span>Product</span><span>Category</span><span>Unit</span><span style="text-align:right">On hand</span><span style="text-align:right">Value</span></div>
+        <div class="g6r" style="grid-template-columns:78px minmax(0,1fr) 88px 48px 82px 92px;border-top-color:#e2e8f0;height:30px;font-size:13px;padding:0 12px;column-gap:8px"><span class="tnum" style="color:#475569">MEAT-001</span><span style="font-weight:600">Chicken Breast</span><span style="color:#475569">Meat</span><span style="color:#475569">KG</span><span class="tnum" style="text-align:right">120.000</span><span class="tnum" style="text-align:right">150,000.00</span></div>
+        <div class="g6r" style="grid-template-columns:78px minmax(0,1fr) 88px 48px 82px 92px;height:30px;font-size:13px;padding:0 12px;column-gap:8px"><span class="tnum" style="color:#475569">MEAT-002</span><span style="font-weight:600">Beef Mince</span><span style="color:#475569">Meat</span><span style="color:#475569">KG</span><span class="tnum" style="text-align:right">40.000</span><span class="tnum" style="text-align:right">84,000.00</span></div>
+        <div class="g6r" style="grid-template-columns:78px minmax(0,1fr) 88px 48px 82px 92px;height:30px;font-size:13px;padding:0 12px;column-gap:8px"><span class="tnum" style="color:#475569">MEAT-003</span><span style="font-weight:600">Fish Fillet</span><span style="color:#475569">Meat</span><span style="color:#475569">KG</span><span class="tnum" style="text-align:right">10.000</span><span class="tnum" style="text-align:right">18,500.00</span></div>
+        <div class="g6r" style="grid-template-columns:78px minmax(0,1fr) 88px 48px 82px 92px;height:30px;font-size:13px;padding:0 12px;column-gap:8px"><span class="tnum" style="color:#475569">DAIR-001</span><span style="font-weight:600">Fresh Milk</span><span style="color:#475569">Dairy</span><span style="color:#475569">L</span><span class="tnum" style="text-align:right">120.000</span><span class="tnum" style="text-align:right">45,600.00</span></div>
+        <div class="g6r" style="grid-template-columns:78px minmax(0,1fr) 88px 48px 82px 92px;height:30px;font-size:13px;padding:0 12px;column-gap:8px"><span class="tnum" style="color:#475569">DAIR-002</span><span style="font-weight:600">Butter Block</span><span style="color:#475569">Dairy</span><span style="color:#475569">KG</span><span class="tnum" style="text-align:right">8.000</span><span class="tnum" style="text-align:right">20,800.00</span></div>
+        <div class="g6r" style="grid-template-columns:78px minmax(0,1fr) 88px 48px 82px 92px;height:30px;font-size:13px;padding:0 12px;column-gap:8px"><span class="tnum" style="color:#475569">DAIR-003</span><span style="font-weight:600">Cheddar Cheese</span><span style="color:#475569">Dairy</span><span style="color:#475569">KG</span><span class="tnum" style="text-align:right">25.000</span><span class="tnum" style="text-align:right">80,000.00</span></div>
+        <div class="g6r" style="grid-template-columns:78px minmax(0,1fr) 88px 48px 82px 92px;height:30px;font-size:13px;padding:0 12px;column-gap:8px"><span class="tnum" style="color:#475569">DRY-001</span><span style="font-weight:600">Basmati Rice</span><span style="color:#475569">Dry Goods</span><span style="color:#475569">KG</span><span class="tnum" style="text-align:right">250.000</span><span class="tnum" style="text-align:right">105,000.00</span></div>
+        <div class="g6r" style="grid-template-columns:78px minmax(0,1fr) 88px 48px 82px 92px;height:30px;font-size:13px;padding:0 12px;column-gap:8px"><span class="tnum" style="color:#475569">DRY-002</span><span style="font-weight:600">Wheat Flour</span><span style="color:#475569">Dry Goods</span><span style="color:#475569">KG</span><span class="tnum" style="text-align:right">60.000</span><span class="tnum" style="text-align:right">12,600.00</span></div>
+        <div class="g6r" style="grid-template-columns:78px minmax(0,1fr) 88px 48px 82px 92px;height:30px;font-size:13px;padding:0 12px;column-gap:8px"><span class="tnum" style="color:#475569">DRY-003</span><span style="font-weight:600">Sugar</span><span style="color:#475569">Dry Goods</span><span style="color:#475569">KG</span><span class="tnum" style="text-align:right">300.000</span><span class="tnum" style="text-align:right">78,000.00</span></div>
+        <div class="g6r" style="grid-template-columns:78px minmax(0,1fr) 88px 48px 82px 92px;height:30px;font-size:13px;padding:0 12px;column-gap:8px"><span class="tnum" style="color:#475569">DRY-004</span><span style="font-weight:600">Cooking Oil</span><span style="color:#475569">Dry Goods</span><span style="color:#475569">L</span><span class="tnum" style="text-align:right">0.000</span><span class="tnum" style="text-align:right">0.00</span></div>
+        <div class="g6r" style="grid-template-columns:78px minmax(0,1fr) 88px 48px 82px 92px;height:30px;font-size:13px;padding:0 12px;column-gap:8px"><span class="tnum" style="color:#475569">BEV-001</span><span style="font-weight:600">Bottled Water 1L</span><span style="color:#475569">Beverages</span><span style="color:#475569">EACH</span><span class="tnum" style="text-align:right">600.000</span><span class="tnum" style="text-align:right">54,000.00</span></div>
+        <div class="g6r" style="grid-template-columns:78px minmax(0,1fr) 88px 48px 82px 92px;height:30px;font-size:13px;padding:0 12px;column-gap:8px"><span class="tnum" style="color:#475569">BEV-002</span><span style="font-weight:600">Orange Juice 1L</span><span style="color:#475569">Beverages</span><span style="color:#475569">EACH</span><span class="tnum" style="text-align:right">90.000</span><span class="tnum" style="text-align:right">43,200.00</span></div>
+        <div style="display:grid;grid-template-columns:78px minmax(0,1fr) 88px 48px 82px 92px;align-items:center;height:34px;padding:0 12px;border-top:1px solid #e2e8f0;background:#f8fafc;font:600 13px Inter,sans-serif"><span>Total</span><span>12 active</span><span>4 categories</span><span></span><span></span><span class="tnum" style="text-align:right">691,700.00</span></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div style="border:1px solid #cbd5e1;border-radius:8px;padding:13px 15px"><div style="font:600 13px/19px Inter,sans-serif">Where the stock sits</div><div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:4px">Two store rooms only. Meat and Dairy in <strong style="font-weight:600">Cold Room</strong> — LKR 398,900.00; Dry Goods and Beverages in <strong style="font-weight:600">Main Store</strong> — LKR 292,800.00. Together, exactly LKR 691,700.00.</div></div>
+        <div style="border:1px solid #cbd5e1;border-radius:8px;padding:13px 15px"><div style="font:600 13px/19px Inter,sans-serif">Attention, at this moment</div><div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:4px">Three low — Fish Fillet, Butter Block, Wheat Flour — and one out of stock, Cooking Oil. Chicken Breast is no longer low: it stands at 120.000 KG against a minimum of 20.000.</div></div>
+        <div style="border:1px solid #cbd5e1;border-radius:8px;padding:13px 15px"><div style="font:600 13px/19px Inter,sans-serif">Purchasing, at this moment</div><div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:4px">Both orders in the record are fully received, so open purchase orders and awaiting receipt read zero. Those panels say so in a sentence rather than showing an invented order.</div></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div style="border:1px solid #cbd5e1;border-radius:8px;padding:13px 15px"><div style="font:600 13px/19px Inter,sans-serif">Density and paging</div><div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:4px">36 px desktop operational rows, 25 rows per page, 100 rows maximum in one view, sorting only on indexed columns, search scoped to the list in its own FilterBar. No infinite scroll, no virtual list, no global search.</div></div>
+        <div style="border:1px solid #cbd5e1;border-radius:8px;padding:13px 15px"><div style="font:600 13px/19px Inter,sans-serif">Private by default</div><div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:4px">Every screen here is a private inventory surface and reads neutrally. A counterparty appears only as the source of one received quantity, and brings no stock, cost, warehouse or member data with it.</div></div>
+        <div style="border:1px solid #cbd5e1;border-radius:8px;padding:13px 15px"><div style="font:600 13px/19px Inter,sans-serif">Production minimums</div><div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:4px">Customer-facing text is never below <strong style="font-weight:600">12 px</strong>; touch targets are never below <strong style="font-weight:600">44 px</strong>. Phone specimens on these boards are drawn at reduced scale and must not be measured literally.</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+<p class="dv-cap"><strong>Authority.</strong> Screens 009–010, 012–024 and the two authorised report surfaces of the frozen registry, drawn with the five frozen layout families, nothing outside COMP-001..025, and the canonical seed exactly as recorded — no alternative products, SKUs, categories or arithmetic.</p>
+</div>
+
+<div class="dv-opt" id="6b" data-screen-label="G6-10 Dashboard">
+<div class="dv-olabel"><a class="dv-oid" href="#6b">6b</a>Dashboard — populated, final state</div>
+<div class="dv-card" style="width:1320px">
+  <div style="height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;background:#fff;border-bottom:1px solid #cbd5e1">
+    <div style="display:flex;align-items:center;gap:14px"><svg class="mk" viewBox="0 0 24 24" fill="#1d4ed8"><g stroke="none"><rect x="3.2" y="2" width="17.6" height="4.4" rx="1.2"></rect><rect x="3.2" y="2" width="4.4" height="9.8" rx="1.2"></rect><rect x="3.2" y="9.6" width="17.6" height="4.4" rx="1.2"></rect><rect x="16.4" y="11.8" width="4.4" height="10.2" rx="1.2"></rect><rect x="3.2" y="17.6" width="17.6" height="4.4" rx="1.2"></rect></g></svg><span style="font:700 17px/1 Inter,sans-serif;letter-spacing:-.01em">Stockmok</span><span style="width:1px;height:26px;background:#e2e8f0"></span><span style="width:32px;height:32px;border-radius:9999px;background:#1d4ed8;color:#fff;font:700 12px Inter,sans-serif;display:inline-flex;align-items:center;justify-content:center">GO</span><span style="font:600 15px/20px Inter,sans-serif">Grand Ocean Hotel</span><span class="pill" style="background:#eff6ff;color:#1e40af">Owner</span></div>
+    <div style="display:flex;align-items:center;gap:12px"><span style="position:relative;width:40px;height:40px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="2" stroke-linecap="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.7 21a2 2 0 0 1-3.4 0"></path></svg><span style="position:absolute;top:4px;right:4px;min-width:18px;height:18px;padding:0 5px;border-radius:9999px;background:#991b1b;color:#fff;font:700 12px/18px Inter,sans-serif;text-align:center">4</span></span><span style="width:36px;height:36px;border-radius:9999px;background:#f1f5f9;border:1px solid #cbd5e1;color:#334155;font:600 12px Inter,sans-serif;display:inline-flex;align-items:center;justify-content:center">NF</span></div>
+  </div>
+  <div style="display:grid;grid-template-columns:256px minmax(0,1fr)">
+    <div style="background:#fff;border-right:1px solid #cbd5e1;padding:8px 0 16px">
+      <div class="sect">Overview</div>
+      <div class="nav" style="background:#eff6ff"><span class="dot" style="background:#1d4ed8"></span><span style="font-weight:600;color:#1e40af">Dashboard</span></div>
+      <div class="sect">Inventory</div>
+      <div class="nav"><span class="dot"></span>Products</div>
+      <div class="nav"><span class="dot"></span>Categories</div>
+      <div class="nav"><span class="dot"></span>Warehouses</div>
+      <div class="nav"><span class="dot"></span>Stock Movements</div>
+      <div class="sect">Procurement</div>
+      <div class="nav"><span class="dot"></span>Purchase Orders</div>
+      <div class="nav"><span class="dot"></span>Receiving</div>
+      <div class="nav"><span class="dot"></span>Suppliers</div>
+      <div class="nav"><span class="dot"></span>Buyers</div>
+      <div class="sect">Network</div>
+      <div class="nav"><span class="dot"></span>Connected Businesses</div>
+      <div class="nav"><span class="dot"></span>Partner Catalog</div>
+      <div class="nav"><span class="dot"></span>Product Mappings</div>
+      <div class="sect">Insight</div>
+      <div class="nav"><span class="dot"></span>Reports</div>
+      <div class="nav" style="justify-content:space-between"><span style="display:flex;align-items:center;gap:10px"><span class="dot"></span>Notifications</span><span class="pill" style="background:#fee2e2;color:#991b1b">4</span></div>
+      <div class="sect">Workspace</div>
+      <div class="nav"><span class="dot"></span>Team</div>
+      <div class="nav"><span class="dot"></span>Settings</div>
+    </div>
+    <div style="background:#f8fafc;padding:22px 24px 26px">
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:20px">
+        <div><div style="font:700 26px/34px Inter,sans-serif;letter-spacing:-.02em">Dashboard</div><div style="font:400 14px/21px Inter,sans-serif;color:#475569;margin-top:2px">Grand Ocean Hotel · both store rooms · figures as at 13 Aug 2026, 09:12</div></div>
+        <div style="display:flex;gap:8px"><span class="btns">Refresh</span><span class="btnp">Adjust stock</span></div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin-top:18px">
+        <div class="kpi"><div class="kpil">Inventory value</div><div class="kpiv">LKR 691,700.00</div><div class="kpim">Replacement cost of stock on hand</div></div>
+        <div class="kpi"><div class="kpil">Active products</div><div class="kpiv">12</div><div class="kpim">Archived products not counted</div></div>
+        <div class="kpi" style="border-color:#fbbf24"><div class="kpil">Low stock</div><div class="kpiv" style="color:#854d0e">3</div><div class="kpim">At or below minimum</div></div>
+        <div class="kpi"><div class="kpil">Open purchase orders</div><div class="kpiv">0</div><div class="kpim">Nothing outstanding with a supplier</div></div>
+        <div class="kpi"><div class="kpil">Awaiting receipt</div><div class="kpiv">0</div><div class="kpim">No part-received order waiting</div></div>
+      </div>
+      <div style="display:grid;grid-template-columns:minmax(0,1fr) 420px;gap:16px;margin-top:16px;align-items:start">
+        <div style="background:#fff;border:1px solid #cbd5e1;border-radius:8px;overflow:hidden">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:13px 16px;border-bottom:1px solid #e2e8f0"><div><div style="font:600 16px/24px Inter,sans-serif">Needs attention</div><div style="font:400 12px/17px Inter,sans-serif;color:#475569">Four items · out of stock first, then the largest shortfall</div></div><span style="font:600 13px Inter,sans-serif;color:#1d4ed8">View all products</span></div>
+          <div class="g6h" style="grid-template-columns:minmax(0,1fr) 92px 148px 200px 116px;column-gap:12px"><span>Item</span><span>SKU</span><span>Status</span><span style="text-align:right">On hand · minimum</span><span style="text-align:right">Shortfall</span></div>
+          <div class="g6r" style="grid-template-columns:minmax(0,1fr) 92px 148px 200px 116px;column-gap:12px;border-top-color:#e2e8f0"><span style="font-weight:600">Cooking Oil</span><span class="tnum" style="color:#475569">DRY-004</span><span><span class="pill" style="background:#fee2e2;color:#991b1b">✕ Out of stock</span></span><span class="tnum" style="text-align:right">0.000 L · min 40.000</span><span class="tnum" style="text-align:right;color:#991b1b;font-weight:600">40.000 L</span></div>
+          <div class="g6r" style="grid-template-columns:minmax(0,1fr) 92px 148px 200px 116px;column-gap:12px"><span style="font-weight:600">Wheat Flour</span><span class="tnum" style="color:#475569">DRY-002</span><span><span class="pill" style="background:#fef3c7;color:#854d0e">◑ Low stock</span></span><span class="tnum" style="text-align:right">60.000 KG · min 80.000</span><span class="tnum" style="text-align:right;color:#854d0e;font-weight:600">20.000 KG</span></div>
+          <div class="g6r" style="grid-template-columns:minmax(0,1fr) 92px 148px 200px 116px;column-gap:12px"><span style="font-weight:600">Fish Fillet</span><span class="tnum" style="color:#475569">MEAT-003</span><span><span class="pill" style="background:#fef3c7;color:#854d0e">◑ Low stock</span></span><span class="tnum" style="text-align:right">10.000 KG · min 12.000</span><span class="tnum" style="text-align:right;color:#854d0e;font-weight:600">2.000 KG</span></div>
+          <div class="g6r" style="grid-template-columns:minmax(0,1fr) 92px 148px 200px 116px;column-gap:12px"><span style="font-weight:600">Butter Block</span><span class="tnum" style="color:#475569">DAIR-002</span><span><span class="pill" style="background:#fef3c7;color:#854d0e">◑ Low stock</span></span><span class="tnum" style="text-align:right">8.000 KG · min 10.000</span><span class="tnum" style="text-align:right;color:#854d0e;font-weight:600">2.000 KG</span></div>
+          <div style="padding:11px 16px;border-top:1px solid #e2e8f0;background:#f8fafc;font:500 13px/19px Inter,sans-serif;color:#475569">Each row opens that product. Raising a purchase order is offered here only to a role that may raise one.</div>
+        </div>
+        <div style="background:#fff;border:1px solid #cbd5e1;border-radius:8px;overflow:hidden">
+          <div style="padding:13px 16px;border-bottom:1px solid #e2e8f0;display:flex;align-items:center;justify-content:space-between"><div><div style="font:600 16px/24px Inter,sans-serif">Stock status</div><div style="font:400 12px/17px Inter,sans-serif;color:#475569">12 active products</div></div><span style="font:600 13px Inter,sans-serif;color:#1d4ed8">Show as table</span></div>
+          <div style="padding:18px 16px;display:flex;align-items:center;gap:20px" data-om-raster>
+            <div style="width:132px;height:132px;border-radius:9999px;flex:none;background:conic-gradient(#166534 0 66.7%,#d97706 66.7% 91.7%,#991b1b 91.7% 100%);display:flex;align-items:center;justify-content:center"><div style="width:88px;height:88px;border-radius:9999px;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center"><span class="tnum" style="font:700 22px/26px Inter,sans-serif">12</span><span style="font:500 12px/16px Inter,sans-serif;color:#475569">products</span></div></div>
+            <div style="flex:1;display:flex;flex-direction:column;gap:9px">
+              <div style="display:flex;align-items:center;gap:9px"><span style="width:12px;height:12px;border-radius:3px;background:#166534;flex:none"></span><span style="font:500 14px Inter,sans-serif;flex:1">In stock</span><span class="tnum" style="font:600 14px Inter,sans-serif">8</span></div>
+              <div style="display:flex;align-items:center;gap:9px"><span style="width:12px;height:12px;border-radius:3px;background:#d97706;flex:none"></span><span style="font:500 14px Inter,sans-serif;flex:1">Low stock</span><span class="tnum" style="font:600 14px Inter,sans-serif">3</span></div>
+              <div style="display:flex;align-items:center;gap:9px"><span style="width:12px;height:12px;border-radius:3px;background:#991b1b;flex:none"></span><span style="font:500 14px Inter,sans-serif;flex:1">Out of stock</span><span class="tnum" style="font:600 14px Inter,sans-serif">1</span></div>
+            </div>
+          </div>
+          <div style="padding:12px 16px;border-top:1px solid #e2e8f0;font:400 13px/19px Inter,sans-serif;color:#475569">Counts, not value — a share of inventory value would read as a judgement the figures cannot support. This is the only chart on the dashboard.</div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:16px">
+        <div style="background:#fff;border:1px solid #cbd5e1;border-radius:8px;padding:14px 16px"><div style="font:600 14px/20px Inter,sans-serif">Recent stock movements</div><div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px;font:500 13px Inter,sans-serif"><span style="color:#475569">Chicken Breast · received</span><span class="tnum" style="font-weight:600;color:#166534">+10.000 KG</span></div><div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px;font:500 13px Inter,sans-serif"><span style="color:#475569">Chicken Breast · received</span><span class="tnum" style="font-weight:600;color:#166534">+40.000 KG</span></div><div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px;font:500 13px Inter,sans-serif"><span style="color:#475569">Chicken Breast · recount correction</span><span class="tnum" style="font-weight:600;color:#166534">+2.000 KG</span></div><div style="font:600 13px Inter,sans-serif;color:#1d4ed8;margin-top:10px">All movements</div></div>
+        <div style="background:#fff;border:1px solid #cbd5e1;border-radius:8px;padding:14px 16px"><div style="font:600 14px/20px Inter,sans-serif">Purchase orders</div><div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:6px">Nothing is outstanding. Both orders in the record — one with Green Farm, one with Fresh Foods Ltd — are fully received.</div><div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px;font:500 13px Inter,sans-serif"><span style="color:#475569">CPO-2026-003 · Fresh Foods Ltd</span><span class="pill" style="background:#dcfce7;color:#166534">✓ Received</span></div><div style="font:600 13px Inter,sans-serif;color:#1d4ed8;margin-top:10px">All purchase orders</div></div>
+        <div style="background:#fff;border:1px solid #cbd5e1;border-radius:8px;padding:14px 16px"><div style="font:600 14px/20px Inter,sans-serif">Where your stock sits</div><div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px;font:500 13px Inter,sans-serif"><span style="color:#475569">Cold Room</span><span class="tnum" style="font-weight:600">LKR 398,900.00</span></div><div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px;font:500 13px Inter,sans-serif"><span style="color:#475569">Main Store</span><span class="tnum" style="font-weight:600">LKR 292,800.00</span></div><div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px;padding-top:8px;border-top:1px solid #f1f5f9;font:600 13px Inter,sans-serif"><span>Total</span><span class="tnum">LKR 691,700.00</span></div><div style="font:600 13px Inter,sans-serif;color:#1d4ed8;margin-top:10px">Warehouses</div></div>
+      </div>
+      <div style="font:400 12px/17px Inter,sans-serif;color:#64748b;margin-top:14px">Everything above is drawn from summary records kept up to date as stock moves. The page loads a fixed, small number of records however large the workspace grows, and nothing recalculates while you look at it.</div>
+    </div>
+  </div>
+</div>
+<p class="dv-cap"><strong>Five KPIs, one chart, one attention list, three bounded panels.</strong> 8 + 3 + 1 = 12 products; the value equals the sum of the twelve canonical rows; the two store-room subtotals sum to LKR 691,700.00. Zero is shown as zero and explained — no invented order fills the space. No global search, no unsupported export, no trend arrow the data cannot justify.</p>
+</div>
+
+<div class="dv-opt" id="6c" data-screen-label="G6-10b Dashboard alternatives">
+<div class="dv-olabel"><a class="dv-oid" href="#6c">6c</a>The chart's table alternative · loading and partial failure · role-reduced dashboard</div>
+<div class="dv-card" style="width:1320px">
+  <div style="display:grid;grid-template-columns:420px 1px minmax(0,1fr) 1px 360px;background:#f8fafc">
+    <div style="padding:24px 22px">
+      <div class="eyb">Same data, no chart</div>
+      <div style="background:#fff;border:1px solid #cbd5e1;border-radius:8px;margin-top:14px;overflow:hidden">
+        <div style="padding:13px 16px;border-bottom:1px solid #e2e8f0;display:flex;align-items:center;justify-content:space-between"><div style="font:600 16px/24px Inter,sans-serif">Stock status</div><span style="font:600 13px Inter,sans-serif;color:#1d4ed8">Show as chart</span></div>
+        <div class="g6h" style="grid-template-columns:minmax(0,1fr) 90px 110px"><span>Status</span><span style="text-align:right">Products</span><span style="text-align:right">Share</span></div>
+        <div class="g6r" style="grid-template-columns:minmax(0,1fr) 90px 110px;border-top-color:#e2e8f0"><span>In stock</span><span class="tnum" style="text-align:right">8</span><span class="tnum" style="text-align:right">66.7%</span></div>
+        <div class="g6r" style="grid-template-columns:minmax(0,1fr) 90px 110px"><span>Low stock</span><span class="tnum" style="text-align:right">3</span><span class="tnum" style="text-align:right">25.0%</span></div>
+        <div class="g6r" style="grid-template-columns:minmax(0,1fr) 90px 110px"><span>Out of stock</span><span class="tnum" style="text-align:right">1</span><span class="tnum" style="text-align:right">8.3%</span></div>
+        <div style="display:grid;grid-template-columns:minmax(0,1fr) 90px 110px;align-items:center;height:36px;padding:0 16px;border-top:1px solid #e2e8f0;background:#f8fafc;font:600 14px Inter,sans-serif"><span>Total</span><span class="tnum" style="text-align:right">12</span><span class="tnum" style="text-align:right">100%</span></div>
+      </div>
+      <div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:12px">The toggle is a real alternative, not a fallback: the same three numbers, reachable by keyboard, and the choice is remembered for the person who made it. Screen-reader users meet the table version first.</div>
+      <div style="background:#fff;border:1px solid #cbd5e1;border-radius:8px;margin-top:12px;padding:13px 15px"><div style="font:600 13px/19px Inter,sans-serif">Why no second chart</div><div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:3px">Value by store room is two numbers. A bar pair would decorate what a two-row panel already states exactly, so the dashboard states it instead.</div></div>
+    </div>
+    <div style="background:#cbd5e1"></div>
+    <div style="padding:24px 22px">
+      <div class="eyb">Loading · then partial failure</div>
+      <div style="display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-top:14px">
+        <div class="kpi"><span style="display:block;height:13px;width:70%;background:#f1f5f9;border-radius:4px"></span><span style="display:block;height:26px;width:88%;background:#f1f5f9;border-radius:4px;margin-top:8px"></span></div>
+        <div class="kpi"><span style="display:block;height:13px;width:60%;background:#f1f5f9;border-radius:4px"></span><span style="display:block;height:26px;width:50%;background:#f1f5f9;border-radius:4px;margin-top:8px"></span></div>
+        <div class="kpi"><span style="display:block;height:13px;width:66%;background:#f1f5f9;border-radius:4px"></span><span style="display:block;height:26px;width:44%;background:#f1f5f9;border-radius:4px;margin-top:8px"></span></div>
+        <div class="kpi"><span style="display:block;height:13px;width:80%;background:#f1f5f9;border-radius:4px"></span><span style="display:block;height:26px;width:40%;background:#f1f5f9;border-radius:4px;margin-top:8px"></span></div>
+        <div class="kpi"><span style="display:block;height:13px;width:72%;background:#f1f5f9;border-radius:4px"></span><span style="display:block;height:26px;width:46%;background:#f1f5f9;border-radius:4px;margin-top:8px"></span></div>
+      </div>
+      <div style="display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:12px;margin-top:12px">
+        <div style="background:#fff;border:1px solid #cbd5e1;border-radius:8px;padding:14px 16px"><span style="display:block;height:15px;width:34%;background:#f1f5f9;border-radius:4px"></span><span style="display:block;height:36px;background:#f8fafc;border-radius:4px;margin-top:10px"></span><span style="display:block;height:36px;background:#f8fafc;border-radius:4px;margin-top:6px"></span><span style="display:block;height:36px;background:#f8fafc;border-radius:4px;margin-top:6px"></span></div>
+        <div style="background:#fff;border:1px solid #cbd5e1;border-radius:8px;padding:14px 16px"><span style="display:block;height:15px;width:52%;background:#f1f5f9;border-radius:4px"></span><span style="display:block;width:96px;height:96px;border-radius:9999px;background:#f1f5f9;margin:12px auto 0"></span></div>
+      </div>
+      <div style="background:#fff;border:1px solid #cbd5e1;border-radius:8px;margin-top:14px;overflow:hidden">
+        <div style="padding:12px 16px;border-bottom:1px solid #e2e8f0;font:600 14px/20px Inter,sans-serif">When one panel cannot load</div>
+        <div style="padding:14px 16px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px">
+          <div class="kpi"><div class="kpil">Inventory value</div><div class="kpiv">LKR 691,700.00</div></div>
+          <div class="kpi"><div class="kpil">Active products</div><div class="kpiv">12</div></div>
+          <div class="kpi" style="display:flex;flex-direction:column;justify-content:center;gap:6px;background:#f8fafc"><div style="font:600 13px/19px Inter,sans-serif">Low stock unavailable</div><div style="font:400 12px/17px Inter,sans-serif;color:#475569">We could not load this figure. <span style="color:#1d4ed8;font-weight:600">Try again</span></div></div>
+        </div>
+        <div style="padding:0 16px 14px;font:400 13px/19px Inter,sans-serif;color:#475569">A panel that fails says so in its own frame. The rest of the dashboard stays usable, and no figure is guessed or shown as zero.</div>
+      </div>
+    </div>
+    <div style="background:#cbd5e1"></div>
+    <div style="padding:24px 22px">
+      <div class="eyb">Storekeeper · same page, less on it</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px">
+        <div class="kpi" style="border-color:#fbbf24"><div class="kpil">Low stock</div><div class="kpiv" style="color:#854d0e">3</div></div>
+        <div class="kpi"><div class="kpil">Awaiting receipt</div><div class="kpiv">0</div></div>
+      </div>
+      <div style="background:#fff;border:1px solid #cbd5e1;border-radius:8px;margin-top:12px;overflow:hidden">
+        <div style="padding:12px 16px;border-bottom:1px solid #e2e8f0;font:600 14px/20px Inter,sans-serif">Needs attention</div>
+        <div class="g6r" style="grid-template-columns:minmax(0,1fr) 130px;column-gap:10px"><span>Cooking Oil</span><span class="pill" style="background:#fee2e2;color:#991b1b;justify-self:end">Out of stock</span></div>
+        <div class="g6r" style="grid-template-columns:minmax(0,1fr) 130px;column-gap:10px"><span>Wheat Flour</span><span class="pill" style="background:#fef3c7;color:#854d0e;justify-self:end">Low stock</span></div>
+        <div class="g6r" style="grid-template-columns:minmax(0,1fr) 130px;column-gap:10px"><span>Fish Fillet</span><span class="pill" style="background:#fef3c7;color:#854d0e;justify-self:end">Low stock</span></div>
+        <div class="g6r" style="grid-template-columns:minmax(0,1fr) 130px;column-gap:10px"><span>Butter Block</span><span class="pill" style="background:#fef3c7;color:#854d0e;justify-self:end">Low stock</span></div>
+      </div>
+      <div style="background:#fff;border:1px solid #cbd5e1;border-radius:8px;margin-top:12px;padding:13px 15px"><div style="font:600 14px/20px Inter,sans-serif">What a Storekeeper does not see</div><div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:4px">Inventory value, the product count and open purchase orders are absent, not greyed out, and no <em>Order</em> link appears — raising an order is not this role's work. Nothing on the page is a control that would refuse.</div></div>
+      <div style="background:#fff;border:1px solid #cbd5e1;border-radius:8px;margin-top:12px;padding:13px 15px"><div style="font:600 14px/20px Inter,sans-serif">Empty dashboard</div><div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:4px">A workspace with no products shows the five-step setup checklist instead of zeroed KPIs — drawn in the Gate 5 first-run board, unchanged here.</div></div>
+    </div>
+  </div>
+</div>
+<p class="dv-cap"><strong>Three dashboard truths.</strong> The chart always has a text equal; loading and partial failure are drawn states, not afterthoughts; role filtering removes rather than disables.</p>
+</div>
+<div class="dv-opt" id="6d" data-screen-label="G6-12 Products list">
+<div class="dv-olabel"><a class="dv-oid" href="#6d">6d</a>Products — the canonical operational list, all twelve rows</div>
+<div class="dv-card" style="width:1320px">
+  <div style="height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;background:#fff;border-bottom:1px solid #cbd5e1">
+    <div style="display:flex;align-items:center;gap:14px"><svg class="mk" viewBox="0 0 24 24" fill="#1d4ed8"><g stroke="none"><rect x="3.2" y="2" width="17.6" height="4.4" rx="1.2"></rect><rect x="3.2" y="2" width="4.4" height="9.8" rx="1.2"></rect><rect x="3.2" y="9.6" width="17.6" height="4.4" rx="1.2"></rect><rect x="16.4" y="11.8" width="4.4" height="10.2" rx="1.2"></rect><rect x="3.2" y="17.6" width="17.6" height="4.4" rx="1.2"></rect></g></svg><span style="font:700 17px/1 Inter,sans-serif;letter-spacing:-.01em">Stockmok</span><span style="width:1px;height:26px;background:#e2e8f0"></span><span style="width:32px;height:32px;border-radius:9999px;background:#1d4ed8;color:#fff;font:700 12px Inter,sans-serif;display:inline-flex;align-items:center;justify-content:center">GO</span><span style="font:600 15px/20px Inter,sans-serif">Grand Ocean Hotel</span><span class="pill" style="background:#eff6ff;color:#1e40af">Inventory Manager</span></div>
+    <div style="display:flex;align-items:center;gap:12px"><span style="width:40px;height:40px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="2" stroke-linecap="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.7 21a2 2 0 0 1-3.4 0"></path></svg></span><span style="width:36px;height:36px;border-radius:9999px;background:#f1f5f9;border:1px solid #cbd5e1;color:#334155;font:600 12px Inter,sans-serif;display:inline-flex;align-items:center;justify-content:center">NP</span></div>
+  </div>
+  <div style="display:grid;grid-template-columns:256px minmax(0,1fr)">
+    <div style="background:#fff;border-right:1px solid #cbd5e1;padding:8px 0 16px">
+      <div class="sect">Overview</div>
+      <div class="nav"><span class="dot"></span>Dashboard</div>
+      <div class="sect">Inventory</div>
+      <div class="nav" style="background:#eff6ff"><span class="dot" style="background:#1d4ed8"></span><span style="font-weight:600;color:#1e40af">Products</span></div>
+      <div class="nav"><span class="dot"></span>Categories</div>
+      <div class="nav"><span class="dot"></span>Warehouses</div>
+      <div class="nav"><span class="dot"></span>Stock Movements</div>
+      <div class="sect">Procurement</div>
+      <div class="nav"><span class="dot"></span>Purchase Orders</div>
+      <div class="nav"><span class="dot"></span>Receiving</div>
+      <div class="nav"><span class="dot"></span>Suppliers</div>
+      <div class="nav"><span class="dot"></span>Buyers</div>
+      <div class="sect">Network</div>
+      <div class="nav"><span class="dot"></span>Connected Businesses</div>
+      <div class="nav"><span class="dot"></span>Partner Catalog</div>
+      <div class="nav"><span class="dot"></span>Product Mappings</div>
+      <div class="sect">Insight</div>
+      <div class="nav"><span class="dot"></span>Reports</div>
+      <div class="nav" style="justify-content:space-between"><span style="display:flex;align-items:center;gap:10px"><span class="dot"></span>Notifications</span><span class="pill" style="background:#fee2e2;color:#991b1b">4</span></div>
+      <div class="sect">Workspace</div>
+      <div class="nav"><span class="dot"></span>Team</div>
+      <div class="nav"><span class="dot"></span>Settings</div>
+    </div>
+    <div style="background:#f8fafc;padding:22px 24px 26px">
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:20px">
+        <div><div style="font:500 13px/19px Inter,sans-serif;color:#64748b">Inventory</div><div style="font:700 26px/34px Inter,sans-serif;letter-spacing:-.02em">Products</div><div style="font:400 14px/21px Inter,sans-serif;color:#475569;margin-top:2px">12 active products · LKR 691,700.00 on hand</div></div>
+        <div style="display:flex;gap:8px"><span class="btns">Adjust stock</span><span class="btnp">New product</span></div>
+      </div>
+      <div style="background:#fff;border:1px solid #cbd5e1;border-radius:8px;margin-top:16px;padding:12px 14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+        <div class="fld" style="flex:1;min-width:250px;justify-content:flex-start;gap:8px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4.2-4.2"></path></svg><span style="color:#64748b">Search these products by name or SKU</span></div>
+        <div class="fld" style="width:170px">Category: All<span style="color:#64748b">▾</span></div>
+        <div class="fld" style="width:180px">Store room: All<span style="color:#64748b">▾</span></div>
+        <div class="fld" style="width:150px">Status: All<span style="color:#64748b">▾</span></div>
+        <div class="fld" style="width:170px">Archived: Excluded<span style="color:#64748b">▾</span></div>
+      </div>
+      <div style="background:#fff;border:1px solid #cbd5e1;border-radius:8px;margin-top:14px;overflow:hidden">
+        <div class="g6h" style="grid-template-columns:minmax(0,1fr) 96px 112px 158px 130px 132px 40px;column-gap:12px"><span>Product ↑</span><span>SKU</span><span>Category</span><span style="text-align:right">On hand</span><span style="text-align:right">Minimum</span><span style="text-align:right">Stock value</span><span></span></div>
+        <div class="g6r" style="grid-template-columns:minmax(0,1fr) 96px 112px 158px 130px 132px 40px;column-gap:12px;border-top-color:#e2e8f0"><span style="font-weight:600">Basmati Rice</span><span class="tnum" style="color:#475569">DRY-001</span><span style="color:#475569">Dry Goods</span><span class="tnum" style="text-align:right">250.000 KG</span><span class="tnum" style="text-align:right;color:#475569">100.000 KG</span><span class="tnum" style="text-align:right">LKR 105,000.00</span><span style="text-align:right;color:#64748b">⋯</span></div>
+        <div class="g6r" style="grid-template-columns:minmax(0,1fr) 96px 112px 158px 130px 132px 40px;column-gap:12px"><span style="font-weight:600">Beef Mince</span><span class="tnum" style="color:#475569">MEAT-002</span><span style="color:#475569">Meat</span><span class="tnum" style="text-align:right">40.000 KG</span><span class="tnum" style="text-align:right;color:#475569">15.000 KG</span><span class="tnum" style="text-align:right">LKR 84,000.00</span><span style="text-align:right;color:#64748b">⋯</span></div>
+        <div class="g6r" style="grid-template-columns:minmax(0,1fr) 96px 112px 158px 130px 132px 40px;column-gap:12px"><span style="font-weight:600">Bottled Water 1L</span><span class="tnum" style="color:#475569">BEV-001</span><span style="color:#475569">Beverages</span><span class="tnum" style="text-align:right">600.000 EACH</span><span class="tnum" style="text-align:right;color:#475569">200.000 EACH</span><span class="tnum" style="text-align:right">LKR 54,000.00</span><span style="text-align:right;color:#64748b">⋯</span></div>
+        <div class="g6r" style="grid-template-columns:minmax(0,1fr) 96px 112px 158px 130px 132px 40px;column-gap:12px"><span style="font-weight:600">Butter Block</span><span class="tnum" style="color:#475569">DAIR-002</span><span style="color:#475569">Dairy</span><span class="tnum" style="text-align:right"><span class="pill" style="background:#fef3c7;color:#854d0e;margin-right:6px">Low</span>8.000 KG</span><span class="tnum" style="text-align:right;color:#475569">10.000 KG</span><span class="tnum" style="text-align:right">LKR 20,800.00</span><span style="text-align:right;color:#64748b">⋯</span></div>
+        <div class="g6r" style="grid-template-columns:minmax(0,1fr) 96px 112px 158px 130px 132px 40px;column-gap:12px"><span style="font-weight:600">Cheddar Cheese</span><span class="tnum" style="color:#475569">DAIR-003</span><span style="color:#475569">Dairy</span><span class="tnum" style="text-align:right">25.000 KG</span><span class="tnum" style="text-align:right;color:#475569">8.000 KG</span><span class="tnum" style="text-align:right">LKR 80,000.00</span><span style="text-align:right;color:#64748b">⋯</span></div>
+        <div class="g6r" style="grid-template-columns:minmax(0,1fr) 96px 112px 158px 130px 132px 40px;column-gap:12px;background:#f8fafc"><span style="font-weight:600">Chicken Breast</span><span class="tnum" style="color:#475569">MEAT-001</span><span style="color:#475569">Meat</span><span class="tnum" style="text-align:right">120.000 KG</span><span class="tnum" style="text-align:right;color:#475569">20.000 KG</span><span class="tnum" style="text-align:right">LKR 150,000.00</span><span style="text-align:right;color:#64748b">⋯</span></div>
+        <div class="g6r" style="grid-template-columns:minmax(0,1fr) 96px 112px 158px 130px 132px 40px;column-gap:12px"><span style="font-weight:600">Cooking Oil</span><span class="tnum" style="color:#475569">DRY-004</span><span style="color:#475569">Dry Goods</span><span class="tnum" style="text-align:right"><span class="pill" style="background:#fee2e2;color:#991b1b;margin-right:6px">Out</span>0.000 L</span><span class="tnum" style="text-align:right;color:#475569">40.000 L</span><span class="tnum" style="text-align:right">LKR 0.00</span><span style="text-align:right;color:#64748b">⋯</span></div>
+        <div class="g6r" style="grid-template-columns:minmax(0,1fr) 96px 112px 158px 130px 132px 40px;column-gap:12px"><span style="font-weight:600">Fish Fillet</span><span class="tnum" style="color:#475569">MEAT-003</span><span style="color:#475569">Meat</span><span class="tnum" style="text-align:right"><span class="pill" style="background:#fef3c7;color:#854d0e;margin-right:6px">Low</span>10.000 KG</span><span class="tnum" style="text-align:right;color:#475569">12.000 KG</span><span class="tnum" style="text-align:right">LKR 18,500.00</span><span style="text-align:right;color:#64748b">⋯</span></div>
+        <div class="g6r" style="grid-template-columns:minmax(0,1fr) 96px 112px 158px 130px 132px 40px;column-gap:12px"><span style="font-weight:600">Fresh Milk</span><span class="tnum" style="color:#475569">DAIR-001</span><span style="color:#475569">Dairy</span><span class="tnum" style="text-align:right">120.000 L</span><span class="tnum" style="text-align:right;color:#475569">50.000 L</span><span class="tnum" style="text-align:right">LKR 45,600.00</span><span style="text-align:right;color:#64748b">⋯</span></div>
+        <div class="g6r" style="grid-template-columns:minmax(0,1fr) 96px 112px 158px 130px 132px 40px;column-gap:12px"><span style="font-weight:600">Orange Juice 1L</span><span class="tnum" style="color:#475569">BEV-002</span><span style="color:#475569">Beverages</span><span class="tnum" style="text-align:right">90.000 EACH</span><span class="tnum" style="text-align:right;color:#475569">60.000 EACH</span><span class="tnum" style="text-align:right">LKR 43,200.00</span><span style="text-align:right;color:#64748b">⋯</span></div>
+        <div class="g6r" style="grid-template-columns:minmax(0,1fr) 96px 112px 158px 130px 132px 40px;column-gap:12px"><span style="font-weight:600">Sugar</span><span class="tnum" style="color:#475569">DRY-003</span><span style="color:#475569">Dry Goods</span><span class="tnum" style="text-align:right">300.000 KG</span><span class="tnum" style="text-align:right;color:#475569">60.000 KG</span><span class="tnum" style="text-align:right">LKR 78,000.00</span><span style="text-align:right;color:#64748b">⋯</span></div>
+        <div class="g6r" style="grid-template-columns:minmax(0,1fr) 96px 112px 158px 130px 132px 40px;column-gap:12px"><span style="font-weight:600">Wheat Flour</span><span class="tnum" style="color:#475569">DRY-002</span><span style="color:#475569">Dry Goods</span><span class="tnum" style="text-align:right"><span class="pill" style="background:#fef3c7;color:#854d0e;margin-right:6px">Low</span>60.000 KG</span><span class="tnum" style="text-align:right;color:#475569">80.000 KG</span><span class="tnum" style="text-align:right">LKR 12,600.00</span><span style="text-align:right;color:#64748b">⋯</span></div>
+        <div style="display:grid;grid-template-columns:minmax(0,1fr) 132px 40px;column-gap:12px;align-items:center;height:40px;padding:0 16px;border-top:1px solid #e2e8f0;background:#f8fafc;font:600 14px Inter,sans-serif"><span>Total · 12 products</span><span class="tnum" style="text-align:right">LKR 691,700.00</span><span></span></div>
+        <div class="pg"><span>Showing 1–12 of 12 · 25 per page</span><div style="display:flex;align-items:center;gap:6px"><span class="pgb" style="color:#94a3b8">Previous</span><span class="pgb" style="background:#1d4ed8;color:#fff;border-color:#1d4ed8">1</span><span class="pgb" style="color:#94a3b8">Next</span></div></div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:14px">
+        <div style="background:#fff;border:1px solid #cbd5e1;border-radius:8px;padding:13px 15px"><div style="font:600 13px/19px Inter,sans-serif">Row menu · what is offered</div><div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:4px">Open · Edit · Adjust stock · View movements · Archive. There is no delete: a product with history is archived so its movements stay readable.</div></div>
+        <div style="background:#fff;border:1px solid #cbd5e1;border-radius:8px;padding:13px 15px"><div style="font:600 13px/19px Inter,sans-serif">Sorting and paging</div><div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:4px">Product name, SKU, on-hand quantity and last updated sort; stock value does not, because it is derived. 25 rows a page, 100 rows at most in one view, and the count is always stated.</div></div>
+        <div style="background:#fff;border:1px solid #cbd5e1;border-radius:8px;padding:13px 15px"><div style="font:600 13px/19px Inter,sans-serif">Nothing important is cut</div><div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:4px">Names, SKUs, quantities, units and money are never truncated. Only a long category name shortens, and it keeps a tooltip with the full text.</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+<p class="dv-cap"><strong>The reconciliation.</strong> All twelve seeded products are on one page — three <em>Low</em>, one <em>Out</em>, eight in stock — with a footer total of LKR 691,700.00 identical to the KPI in <a href="#6b">6b</a>. Search sits inside this list's FilterBar and searches nothing else.</p>
+</div>
+
+<div class="dv-opt" id="6e" data-screen-label="G6-14 Product create and edit">
+<div class="dv-olabel"><a class="dv-oid" href="#6e">6e</a>New product · editing an existing one</div>
+<div class="dv-card" style="width:1320px">
+  <div style="display:grid;grid-template-columns:minmax(0,1fr) 1px 470px;background:#f8fafc">
+    <div style="padding:24px 24px 26px">
+      <div class="eyb">Form family · new product</div>
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-top:14px"><div><div style="font:500 13px/19px Inter,sans-serif;color:#64748b">Products › New</div><div style="font:700 24px/32px Inter,sans-serif;letter-spacing:-.02em">New product</div></div><div style="display:flex;gap:8px"><span class="btns">Cancel</span><span class="btnp">Create product</span></div></div>
+      <div style="background:#fff;border:1px solid #cbd5e1;border-radius:8px;margin-top:14px;overflow:hidden">
+        <div style="padding:14px 18px;border-bottom:1px solid #e2e8f0;font:600 15px/22px Inter,sans-serif">Identity</div>
+        <div style="padding:16px 18px;display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:14px">
+          <div><label class="lbl">Product name</label><div class="fld" style="justify-content:flex-start">Cheddar Cheese</div></div>
+          <div><label class="lbl">SKU</label><div class="fld tnum" style="justify-content:flex-start">DAIR-003</div><div class="hint">Must be unique in this workspace. Letters, numbers and hyphens.</div></div>
+          <div><label class="lbl">Category</label><div class="fld">Dairy<span style="color:#64748b">▾</span></div></div>
+          <div><label class="lbl">Description <span style="font-weight:400;color:#64748b">optional</span></label><div class="fld" style="justify-content:flex-start;color:#94a3b8">Block, matured, for the kitchen</div></div>
+        </div>
+        <div style="padding:14px 18px;border-top:1px solid #e2e8f0;border-bottom:1px solid #e2e8f0;font:600 15px/22px Inter,sans-serif;background:#f8fafc">How you count it</div>
+        <div style="padding:16px 18px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px">
+          <div><label class="lbl">Base unit</label><div class="fld">KG — kilogram<span style="color:#64748b">▾</span></div><div class="hint">Every quantity for this product is held in this unit. It cannot be changed once stock exists.</div></div>
+          <div><label class="lbl">Minimum stock</label><div class="fld tnum" style="justify-content:space-between">8.000<span style="color:#64748b">KG</span></div><div class="hint">At or below this the product is flagged as low stock. Leave empty for no minimum.</div></div>
+          <div><label class="lbl">Purchase cost</label><div class="fld tnum" style="justify-content:space-between"><span style="color:#64748b">LKR</span>3,200.00</div><div class="hint">Used to value stock on hand. Not a selling price.</div></div>
+        </div>
+        <div style="padding:14px 18px;border-top:1px solid #e2e8f0;border-bottom:1px solid #e2e8f0;font:600 15px/22px Inter,sans-serif;background:#f8fafc">Opening stock <span style="font-weight:400;color:#64748b;font-size:13px">optional — you can record it later</span></div>
+        <div style="padding:16px 18px">
+          <div style="display:grid;grid-template-columns:minmax(0,1fr) 200px 200px;gap:14px">
+            <div><label class="lbl">Store room</label><div class="fld">Cold Room<span style="color:#64748b">▾</span></div></div>
+            <div><label class="lbl">Quantity</label><div class="fld tnum" style="justify-content:space-between">25.000<span style="color:#64748b">KG</span></div></div>
+            <div><label class="lbl">As at</label><div class="fld tnum">1 Aug 2026<span style="color:#64748b">▾</span></div></div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;margin-top:12px;font:600 13px Inter,sans-serif;color:#1d4ed8"><span style="width:20px;height:20px;border-radius:9999px;border:1px solid #1d4ed8;display:inline-flex;align-items:center;justify-content:center">+</span>Add another store room</div>
+          <div style="display:flex;gap:10px;padding:12px 14px;background:#eff6ff;border-radius:8px;margin-top:14px"><span style="width:20px;height:20px;border-radius:9999px;background:#1d4ed8;color:#fff;font:700 12px Inter,sans-serif;display:inline-flex;align-items:center;justify-content:center;flex:none">i</span><div style="font:500 13px/19px Inter,sans-serif">Recording opening stock writes the first entry in this product's history. Everything after it is a movement, so the balance can always be explained.</div></div>
+        </div>
+        <div style="padding:14px 18px;border-top:1px solid #e2e8f0;display:flex;justify-content:flex-end;gap:8px"><span class="btns">Cancel</span><span class="btnp">Create product</span></div>
+      </div>
+    </div>
+    <div style="background:#cbd5e1"></div>
+    <div style="padding:24px 22px 26px">
+      <div class="eyb">Editing · and what edit cannot do</div>
+      <div style="background:#fff;border:1px solid #cbd5e1;border-radius:8px;margin-top:14px;overflow:hidden">
+        <div style="padding:13px 16px;border-bottom:1px solid #e2e8f0"><div style="font:600 15px/22px Inter,sans-serif">Edit Chicken Breast</div><div style="font:400 13px/19px Inter,sans-serif;color:#475569">MEAT-001 · 120.000 KG on hand</div></div>
+        <div style="padding:14px 16px">
+          <div><label class="lbl">Base unit</label><div style="height:40px;border:1px solid #e2e8f0;border-radius:6px;background:#f1f5f9;display:flex;align-items:center;justify-content:space-between;padding:0 12px;font:400 14px Inter,sans-serif;color:#475569">KG — kilogram<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2"><rect x="4" y="10.5" width="16" height="10" rx="2"></rect><path d="M8 10.5V7a4 4 0 0 1 8 0v3.5"></path></svg></div><div class="hint">Fixed while stock exists. Changing it would silently rewrite 120.000 KG of history.</div></div>
+          <div style="margin-top:12px"><label class="lbl">Minimum stock</label><div class="fld tnum" style="justify-content:space-between">20.000<span style="color:#64748b">KG</span></div></div>
+          <div style="margin-top:12px"><label class="lbl">On hand</label><div style="height:40px;border:1px solid #e2e8f0;border-radius:6px;background:#f1f5f9;display:flex;align-items:center;justify-content:space-between;padding:0 12px;font:400 14px Inter,sans-serif;color:#475569"><span class="tnum">120.000 KG</span><span style="font:600 13px Inter,sans-serif;color:#1d4ed8">Adjust stock</span></div><div class="hint">Quantities are never typed over on this form. Stock changes through an adjustment, which records who, when and why.</div></div>
+          <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:16px"><span class="btns">Cancel</span><span class="btnp">Save changes</span></div>
+        </div>
+      </div>
+      <div style="background:#fff;border:1px solid #cbd5e1;border-radius:8px;margin-top:12px;padding:14px 16px">
+        <div style="font:600 14px/20px Inter,sans-serif">Validation, at the field</div>
+        <div style="margin-top:10px"><div class="tnum" style="height:40px;border:1px solid #991b1b;border-radius:6px;display:flex;align-items:center;padding:0 12px;font:400 14px Inter,sans-serif">MEAT-001</div><div style="font:600 12px/17px Inter,sans-serif;color:#991b1b;margin-top:5px">Another product already uses this SKU</div></div>
+        <div style="margin-top:10px"><div class="tnum" style="height:40px;border:1px solid #991b1b;border-radius:6px;display:flex;align-items:center;padding:0 12px;font:400 14px Inter,sans-serif">−5.000</div><div style="font:600 12px/17px Inter,sans-serif;color:#991b1b;margin-top:5px">Opening stock cannot be negative</div></div>
+        <div class="hint" style="margin-top:10px">Errors sit with the field that caused them; the save button never becomes the only clue that something is wrong.</div>
+      </div>
+      <div style="background:#fff;border:1px solid #cbd5e1;border-radius:8px;margin-top:12px;padding:14px 16px">
+        <div style="font:600 14px/20px Inter,sans-serif">Saving</div>
+        <div style="display:flex;gap:8px;margin-top:10px"><span class="btnp" style="background:#1e40af;gap:8px"><span style="width:14px;height:14px;border-radius:9999px;border:2px solid rgba(255,255,255,.45);border-top-color:#fff"></span>Saving…</span><span class="btns" style="color:#94a3b8;border-color:#e2e8f0">Cancel</span></div>
+        <div class="hint" style="margin-top:10px">The button keeps its width, blocks a second press, and the form stays visible so nothing looks lost. On success: <em>Chicken Breast saved</em>, and the list returns with that row in view.</div>
+      </div>
+    </div>
+  </div>
+</div>
+<p class="dv-cap"><strong>Two irreversible things are locked, not hidden:</strong> the base unit once stock exists, and the quantity itself. Both explain why in one sentence and point at the route that is allowed.</p>
+</div>
+
+<div class="dv-opt" id="6f" data-screen-label="G6-13 Product detail">
+<div class="dv-olabel"><a class="dv-oid" href="#6f">6f</a>Product detail — tabs, store-room balances, the six-movement ledger, archive</div>
+<div class="dv-card" style="width:1320px">
+  <div style="background:#f8fafc;padding:22px 24px 26px">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:20px">
+      <div><div style="font:500 13px/19px Inter,sans-serif;color:#64748b">Products › Chicken Breast</div><div style="display:flex;align-items:center;gap:10px;margin-top:2px"><div style="font:700 26px/34px Inter,sans-serif;letter-spacing:-.02em">Chicken Breast</div><span class="pill" style="background:#dcfce7;color:#166534">✓ In stock</span></div><div style="font:400 14px/21px Inter,sans-serif;color:#475569;margin-top:2px">MEAT-001 · Meat · base unit KG · minimum 20.000 KG</div></div>
+      <div style="display:flex;gap:8px"><span class="btns">Archive</span><span class="btns">Adjust stock</span><span class="btnp">Edit product</span></div>
+    </div>
+    <div style="display:flex;gap:22px;margin-top:16px;border-bottom:1px solid #cbd5e1">
+      <span style="font:600 14px/20px Inter,sans-serif;color:#1e40af;padding-bottom:10px;border-bottom:2px solid #1d4ed8">Overview</span>
+      <span style="font:500 14px/20px Inter,sans-serif;color:#475569;padding-bottom:10px">Stock by store room</span>
+      <span style="font:500 14px/20px Inter,sans-serif;color:#475569;padding-bottom:10px">Movement history</span>
+      <span style="font:500 14px/20px Inter,sans-serif;color:#475569;padding-bottom:10px">Purchase orders</span>
+    </div>
+    <div style="display:grid;grid-template-columns:minmax(0,1fr) 400px;gap:16px;margin-top:16px;align-items:start">
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div style="background:#fff;border:1px solid #cbd5e1;border-radius:8px;overflow:hidden">
+          <div style="padding:13px 16px;border-bottom:1px solid #e2e8f0;display:flex;align-items:center;justify-content:space-between"><div style="font:600 16px/24px Inter,sans-serif">Stock by store room</div><span style="font:500 13px Inter,sans-serif;color:#475569">All quantities in KG</span></div>
+          <div class="g6h" style="grid-template-columns:minmax(0,1fr) 150px 120px 160px;column-gap:12px"><span>Store room</span><span style="text-align:right">On hand</span><span style="text-align:right">Share</span><span style="text-align:right">Value</span></div>
+          <div class="g6r" style="grid-template-columns:minmax(0,1fr) 150px 120px 160px;column-gap:12px;border-top-color:#e2e8f0"><span style="font-weight:600">Cold Room</span><span class="tnum" style="text-align:right">120.000 KG</span><span class="tnum" style="text-align:right;color:#475569">100%</span><span class="tnum" style="text-align:right">LKR 150,000.00</span></div>
+          <div class="g6r" style="grid-template-columns:minmax(0,1fr) 150px 120px 160px;column-gap:12px"><span style="color:#475569">Main Store</span><span class="tnum" style="text-align:right;color:#475569">0.000 KG</span><span class="tnum" style="text-align:right;color:#475569">—</span><span class="tnum" style="text-align:right;color:#475569">LKR 0.00</span></div>
+          <div style="display:grid;grid-template-columns:minmax(0,1fr) 150px 120px 160px;column-gap:12px;align-items:center;height:40px;padding:0 16px;border-top:1px solid #e2e8f0;background:#f8fafc;font:600 14px Inter,sans-serif"><span>Total on hand</span><span class="tnum" style="text-align:right">120.000 KG</span><span class="tnum" style="text-align:right">100%</span><span class="tnum" style="text-align:right">LKR 150,000.00</span></div>
+          <div style="padding:11px 16px;border-top:1px solid #f1f5f9;font:400 13px/19px Inter,sans-serif;color:#475569">A store room with none of this product is listed at zero rather than hidden, so nobody wonders whether it was checked.</div>
+        </div>
+        <div style="background:#fff;border:1px solid #cbd5e1;border-radius:8px;overflow:hidden">
+          <div style="padding:13px 16px;border-bottom:1px solid #e2e8f0;display:flex;align-items:center;justify-content:space-between"><div><div style="font:600 16px/24px Inter,sans-serif">Movement history</div><div style="font:400 12px/17px Inter,sans-serif;color:#475569">Newest first · six entries · each shows the balance it produced</div></div><span style="font:600 13px Inter,sans-serif;color:#1d4ed8">Full history</span></div>
+          <div class="g6h" style="grid-template-columns:104px minmax(0,1fr) 118px 112px 122px 118px;column-gap:14px"><span>Date</span><span>What happened</span><span>Store room</span><span style="text-align:right">Change</span><span style="text-align:right">Balance after</span><span>By</span></div>
+          <div class="g6r" style="grid-template-columns:104px minmax(0,1fr) 118px 112px 122px 118px;column-gap:14px;border-top-color:#e2e8f0"><span class="tnum" style="color:#475569">12 Aug</span><span>Received against CPO-2026-003 · 2 PACK from Fresh Foods Ltd</span><span style="color:#475569">Cold Room</span><span class="tnum" style="text-align:right;color:#166534;font-weight:600">+10.000</span><span class="tnum" style="text-align:right;font-weight:600">120.000 KG</span><span style="color:#475569">Nimal Perera</span></div>
+          <div class="g6r" style="grid-template-columns:104px minmax(0,1fr) 118px 112px 122px 118px;column-gap:14px"><span class="tnum" style="color:#475569">11 Aug</span><span>Received against CPO-2026-003 · 8 PACK from Fresh Foods Ltd</span><span style="color:#475569">Cold Room</span><span class="tnum" style="text-align:right;color:#166534;font-weight:600">+40.000</span><span class="tnum" style="text-align:right;font-weight:600">110.000 KG</span><span style="color:#475569">Nimal Perera</span></div>
+          <div class="g6r" style="grid-template-columns:104px minmax(0,1fr) 118px 112px 122px 118px;column-gap:14px"><span class="tnum" style="color:#475569">7 Aug</span><span>Received against PO-2026-001 · Green Farm</span><span style="color:#475569">Cold Room</span><span class="tnum" style="text-align:right;color:#166534;font-weight:600">+10.000</span><span class="tnum" style="text-align:right;font-weight:600">70.000 KG</span><span style="color:#475569">Nimal Perera</span></div>
+          <div class="g6r" style="grid-template-columns:104px minmax(0,1fr) 118px 112px 122px 118px;column-gap:14px"><span class="tnum" style="color:#475569">4 Aug</span><span>Received against PO-2026-001 · Green Farm</span><span style="color:#475569">Cold Room</span><span class="tnum" style="text-align:right;color:#166534;font-weight:600">+40.000</span><span class="tnum" style="text-align:right;font-weight:600">60.000 KG</span><span style="color:#475569">Nimal Perera</span></div>
+          <div class="g6r" style="grid-template-columns:104px minmax(0,1fr) 118px 112px 122px 118px;column-gap:14px"><span class="tnum" style="color:#475569">2 Aug</span><span>Correction · <span style="color:#475569">recount correction</span></span><span style="color:#475569">Cold Room</span><span class="tnum" style="text-align:right;color:#166534;font-weight:600">+2.000</span><span class="tnum" style="text-align:right;font-weight:600">20.000 KG</span><span style="color:#475569">Nohan</span></div>
+          <div class="g6r" style="grid-template-columns:104px minmax(0,1fr) 118px 112px 122px 118px;column-gap:14px"><span class="tnum" style="color:#475569">1 Aug</span><span>Opening balance recorded</span><span style="color:#475569">Cold Room</span><span class="tnum" style="text-align:right;color:#166534;font-weight:600">+18.000</span><span class="tnum" style="text-align:right;font-weight:600">18.000 KG</span><span style="color:#475569">Nohan</span></div>
+          <div style="padding:12px 16px;border-top:1px solid #e2e8f0;background:#f8fafc;font:400 13px/19px Inter,sans-serif;color:#475569">18 + 2 + 40 + 10 + 40 + 10 = <strong style="color:#0f172a;font-weight:600">120.000 KG</strong>. Lines are never edited or removed; a mistake is corrected by a new entry with its own reason, so the balance and the trail always agree.</div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div style="background:#fff;border:1px solid #cbd5e1;border-radius:8px;padding:14px 16px">
+          <div style="font:600 15px/22px Inter,sans-serif">On hand</div>
+          <div class="kpiv" style="font-size:30px;line-height:38px">120.000 KG</div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-top:10px;padding-top:10px;border-top:1px solid #f1f5f9;font:500 13px Inter,sans-serif"><span style="color:#475569">Minimum</span><span class="tnum" style="font-weight:600">20.000 KG</span></div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px;font:500 13px Inter,sans-serif"><span style="color:#475569">Purchase cost</span><span class="tnum" style="font-weight:600">LKR 1,250.00 / KG</span></div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px;font:500 13px Inter,sans-serif"><span style="color:#475569">Stock value</span><span class="tnum" style="font-weight:600">LKR 150,000.00</span></div>
+        </div>
+        <div style="background:#fff;border:1px solid #cbd5e1;border-radius:8px;overflow:hidden">
+          <div style="padding:12px 16px;border-bottom:1px solid #e2e8f0;font:600 15px/22px Inter,sans-serif">Purchase orders for this product</div>
+          <div style="padding:12px 16px">
+            <div style="display:flex;align-items:center;justify-content:space-between"><span style="font:600 14px Inter,sans-serif">CPO-2026-003</span><span class="pill" style="background:#dcfce7;color:#166534">✓ Received</span></div>
+            <div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:4px">Fresh Foods Ltd · 10 PACK ordered, all received · verified mapping 1 PACK = 5 KG, so 50.000 KG reached your stock</div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-top:10px;padding-top:10px;border-top:1px solid #f1f5f9"><span style="font:600 14px Inter,sans-serif">PO-2026-001</span><span class="pill" style="background:#dcfce7;color:#166534">✓ Received</span></div>
+            <div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:4px">Green Farm · 50.000 KG ordered, received in two parts</div>
+            <div class="hint">Nothing is outstanding for this product, so no receiving action is offered.</div>
+          </div>
+        </div>
+        <div style="background:#fff;border:1px solid #cbd5e1;border-radius:8px;padding:14px 16px">
+          <div style="font:600 15px/22px Inter,sans-serif">Archiving this product</div>
+          <div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:4px">Because it has stock and history, this product can be archived but not deleted. Archiving hides it from new orders and adjustments; its movements stay readable, and the workspace total no longer counts it.</div>
+        </div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:520px minmax(0,1fr);gap:16px;margin-top:16px;align-items:start">
+      <div style="background:#fff;border:1px solid #cbd5e1;border-radius:12px;overflow:hidden;box-shadow:0 20px 40px rgb(15 23 42 / .16)">
+        <div style="padding:16px 20px;border-bottom:1px solid #e2e8f0;font:600 17px/25px Inter,sans-serif">Archive Chicken Breast?</div>
+        <div style="padding:16px 20px 18px">
+          <div style="font:400 14px/21px Inter,sans-serif;color:#0f172a">It will no longer appear when adding order lines or recording adjustments. Its 120.000 KG on hand and all six movements stay exactly as they are, and an Owner can restore it at any time.</div>
+          <div style="display:flex;gap:10px;padding:12px 14px;background:#fef3c7;border-radius:8px;margin-top:14px"><span style="width:20px;height:20px;border-radius:9999px;background:#854d0e;color:#fff;font:700 12px Inter,sans-serif;display:inline-flex;align-items:center;justify-content:center;flex:none">!</span><div style="font:500 13px/19px Inter,sans-serif">This product still holds 120.000 KG in Cold Room, worth LKR 150,000.00. Archiving removes that value from your inventory total.</div></div>
+          <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:16px"><span class="btns">Keep active</span><span class="btnp" style="background:#b91c1c">Archive product</span></div>
+        </div>
+      </div>
+      <div style="background:#fff;border:1px solid #cbd5e1;border-radius:8px;overflow:hidden">
+        <div style="padding:12px 16px;border-bottom:1px solid #e2e8f0;font:600 15px/22px Inter,sans-serif">Archived products, and coming back</div>
+        <div style="padding:22px 16px;text-align:center">
+          <span style="width:52px;height:52px;border-radius:9999px;background:#f1f5f9;display:inline-flex;align-items:center;justify-content:center"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4" width="17" height="4.5" rx="1"></rect><path d="M5.5 8.5V19a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1V8.5"></path><path d="M10 12.5h4"></path></svg></span>
+          <div style="font:600 15px/22px Inter,sans-serif;margin-top:10px">Nothing is archived yet</div>
+          <div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:4px;max-width:420px;margin-left:auto;margin-right:auto">All twelve products are active. Anything you archive appears here, behind the <em>Archived</em> filter and never mixed into the active list, and can be restored with its history intact.</div>
+        </div>
+        <div style="padding:11px 16px;border-top:1px solid #f1f5f9;background:#f8fafc;font:400 13px/19px Inter,sans-serif;color:#475569">The 12 active products and the LKR 691,700.00 total both exclude anything archived, which is why the counts on every surface agree.</div>
+      </div>
+    </div>
+  </div>
+</div>
+<p class="dv-cap"><strong>Detail-with-tabs, used as intended:</strong> <em>how much, where, why</em> is answered on the first tab, the ledger explains the number line by line and its arithmetic is shown, and the only destructive action offered is Archive — with the consequence that would surprise someone stated before they confirm.</p>
+</div>
+<div class="dv-opt" id="6g" data-screen-label="G6-16 Categories">
+<div class="dv-olabel"><a class="dv-oid" href="#6g">6g</a>Categories — the four seeded groups, create, rename, archive</div>
+<div class="dv-card" style="width:1320px">
+  <div style="display:grid;grid-template-columns:minmax(0,1fr) 1px 440px;background:#f8fafc">
+    <div style="padding:24px 24px 26px">
+      <div style="display:flex;align-items:flex-end;justify-content:space-between"><div><div style="font:500 13px/19px Inter,sans-serif;color:#64748b">Inventory</div><div style="font:700 24px/32px Inter,sans-serif;letter-spacing:-.02em">Categories</div><div style="font:400 14px/21px Inter,sans-serif;color:#475569;margin-top:2px">4 categories · every product belongs to exactly one</div></div><span class="btnp">New category</span></div>
+      <div style="background:#fff;border:1px solid #cbd5e1;border-radius:8px;margin-top:14px;padding:12px 14px;display:flex;gap:10px"><div class="fld" style="flex:1;justify-content:flex-start;gap:8px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4.2-4.2"></path></svg><span style="color:#64748b">Search these categories</span></div><div class="fld" style="width:180px">Showing: Active<span style="color:#64748b">▾</span></div></div>
+      <div style="background:#fff;border:1px solid #cbd5e1;border-radius:8px;margin-top:14px;overflow:hidden">
+        <div class="g6h" style="grid-template-columns:minmax(0,1fr) 110px 170px 180px 40px;column-gap:12px"><span>Category ↑</span><span style="text-align:right">Products</span><span style="text-align:right">Stock on hand value</span><span style="text-align:right">Low or out of stock</span><span></span></div>
+        <div class="g6r" style="grid-template-columns:minmax(0,1fr) 110px 170px 180px 40px;column-gap:12px;border-top-color:#e2e8f0"><span style="font-weight:600">Beverages</span><span class="tnum" style="text-align:right">2</span><span class="tnum" style="text-align:right">LKR 97,200.00</span><span class="tnum" style="text-align:right;color:#475569">None</span><span style="text-align:right;color:#64748b">⋯</span></div>
+        <div class="g6r" style="grid-template-columns:minmax(0,1fr) 110px 170px 180px 40px;column-gap:12px"><span style="font-weight:600">Dairy</span><span class="tnum" style="text-align:right">3</span><span class="tnum" style="text-align:right">LKR 146,400.00</span><span class="tnum" style="text-align:right;color:#854d0e;font-weight:600">1 low</span><span style="text-align:right;color:#64748b">⋯</span></div>
+        <div class="g6r" style="grid-template-columns:minmax(0,1fr) 110px 170px 180px 40px;column-gap:12px"><span style="font-weight:600">Dry Goods</span><span class="tnum" style="text-align:right">4</span><span class="tnum" style="text-align:right">LKR 195,600.00</span><span class="tnum" style="text-align:right;color:#991b1b;font-weight:600">1 low · 1 out</span><span style="text-align:right;color:#64748b">⋯</span></div>
+        <div class="g6r" style="grid-template-columns:minmax(0,1fr) 110px 170px 180px 40px;column-gap:12px"><span style="font-weight:600">Meat</span><span class="tnum" style="text-align:right">3</span><span class="tnum" style="text-align:right">LKR 252,500.00</span><span class="tnum" style="text-align:right;color:#854d0e;font-weight:600">1 low</span><span style="text-align:right;color:#64748b">⋯</span></div>
+        <div style="display:grid;grid-template-columns:minmax(0,1fr) 110px 170px 180px 40px;column-gap:12px;align-items:center;height:40px;padding:0 16px;border-top:1px solid #e2e8f0;background:#f8fafc;font:600 14px Inter,sans-serif"><span>Total</span><span class="tnum" style="text-align:right">12</span><span class="tnum" style="text-align:right">LKR 691,700.00</span><span class="tnum" style="text-align:right;color:#854d0e">4</span><span></span></div>
+        <div class="pg"><span>Showing 1–4 of 4</span><div style="display:flex;gap:6px"><span class="pgb" style="color:#94a3b8">Previous</span><span class="pgb" style="background:#1d4ed8;color:#fff;border-color:#1d4ed8">1</span><span class="pgb" style="color:#94a3b8">Next</span></div></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px">
+        <div style="background:#fff;border:1px solid #cbd5e1;border-radius:8px;padding:13px 15px"><div style="font:600 13px/19px Inter,sans-serif">Row menu</div><div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:3px">Rename · View its products · Archive. Renaming is safe: products keep their link, and the ledger shows the name as it reads today.</div></div>
+        <div style="background:#fff;border:1px solid #cbd5e1;border-radius:8px;padding:13px 15px"><div style="font:600 13px/19px Inter,sans-serif">Why the counts are worth showing</div><div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:3px">Three of the four categories carry something that needs restocking. The category list is the fastest way to see whether a whole area of the kitchen is running thin.</div></div>
+      </div>
+    </div>
+    <div style="background:#cbd5e1"></div>
+    <div style="padding:24px 22px 26px">
+      <div class="eyb">New category · rename · archive</div>
+      <div style="background:#fff;border:1px solid #cbd5e1;border-radius:12px;margin-top:14px;overflow:hidden;box-shadow:0 16px 32px rgb(15 23 42 / .14)">
+        <div style="padding:15px 18px;border-bottom:1px solid #e2e8f0;font:600 16px/24px Inter,sans-serif">New category</div>
+        <div style="padding:15px 18px 17px">
+          <div><label class="lbl">Name</label><div class="fld" style="justify-content:flex-start;box-shadow:0 0 0 2px #fff,0 0 0 4px #1d4ed8;border-color:#1d4ed8">Cleaning Supplies</div><div class="hint">Must be unique. Use the words your team already says when they ask for something.</div></div>
+          <div style="margin-top:12px"><label class="lbl">Description <span style="font-weight:400;color:#64748b">optional</span></label><div class="fld" style="justify-content:flex-start;color:#94a3b8">Detergents, sanitiser, housekeeping consumables</div></div>
+          <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:16px"><span class="btns">Cancel</span><span class="btnp">Create category</span></div>
+        </div>
+      </div>
+      <div style="background:#fff;border:1px solid #cbd5e1;border-radius:8px;margin-top:12px;padding:14px 16px">
+        <div style="font:600 14px/20px Inter,sans-serif">Name already used</div>
+        <div style="height:40px;border:1px solid #991b1b;border-radius:6px;display:flex;align-items:center;padding:0 12px;font:400 14px Inter,sans-serif;margin-top:8px">Dairy</div>
+        <div style="font:600 12px/17px Inter,sans-serif;color:#991b1b;margin-top:5px">A category called Dairy already exists</div>
+      </div>
+      <div style="background:#fff;border:1px solid #cbd5e1;border-radius:8px;margin-top:12px;overflow:hidden">
+        <div style="padding:13px 16px;border-bottom:1px solid #e2e8f0;font:600 15px/22px Inter,sans-serif">Archive a category that is in use</div>
+        <div style="padding:14px 16px">
+          <div style="display:flex;gap:10px;padding:12px 14px;background:#fef3c7;border-radius:8px"><span style="width:20px;height:20px;border-radius:9999px;background:#854d0e;color:#fff;font:700 12px Inter,sans-serif;display:inline-flex;align-items:center;justify-content:center;flex:none">!</span><div style="font:500 13px/19px Inter,sans-serif">Dairy has 3 products — Fresh Milk, Butter Block and Cheddar Cheese. Move them to another category before archiving, or archive those products too.</div></div>
+          <span class="btns" style="margin-top:12px;width:100%;justify-content:center">Show the 3 products</span>
+          <div class="hint" style="margin-top:10px">An empty category archives immediately, with an undo in the confirmation toast. There is no delete: a category that has ever held a product is part of the record.</div>
+        </div>
+      </div>
+      <div style="background:#fff;border:1px solid #cbd5e1;border-radius:8px;margin-top:12px;padding:13px 15px"><div style="font:600 13px/19px Inter,sans-serif">Rename in place</div><div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:3px">The same dialog with the current name filled in and the title <em>Rename category</em>. Nothing about the products changes, which is why rename needs no warning.</div></div>
+    </div>
+  </div>
+</div>
+<p class="dv-cap"><strong>Category totals reconcile:</strong> 97,200 + 146,400 + 195,600 + 252,500 = LKR 691,700.00, and the four attention items are the same four the dashboard names. Nothing here is a second source of truth.</p>
+</div>
+
+<div class="dv-opt" id="6h" data-screen-label="G6-20 Stock movements">
+<div class="dv-olabel"><a class="dv-oid" href="#6h">6h</a>Stock Movements — the workspace ledger, seventeen entries</div>
+<div class="dv-card" style="width:1320px">
+  <div style="background:#f8fafc;padding:22px 24px 26px">
+    <div style="display:flex;align-items:flex-end;justify-content:space-between"><div><div style="font:500 13px/19px Inter,sans-serif;color:#64748b">Inventory</div><div style="font:700 24px/32px Inter,sans-serif;letter-spacing:-.02em">Stock Movements</div><div style="font:400 14px/21px Inter,sans-serif;color:#475569;margin-top:2px">Every increase and decrease, in the order it happened. Entries are never edited.</div></div><span class="btnp">Adjust stock</span></div>
+    <div style="background:#fff;border:1px solid #cbd5e1;border-radius:8px;margin-top:14px;padding:12px 14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+      <div class="fld" style="flex:1;min-width:220px;justify-content:flex-start;gap:8px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4.2-4.2"></path></svg><span style="color:#64748b">Search these movements by product or SKU</span></div>
+      <div class="fld" style="width:180px">Product: All<span style="color:#64748b">▾</span></div>
+      <div class="fld" style="width:180px">Store room: All<span style="color:#64748b">▾</span></div>
+      <div class="fld" style="width:190px">Kind: All<span style="color:#64748b">▾</span></div>
+      <div class="fld tnum" style="width:230px">1 Aug – 13 Aug 2026<span style="color:#64748b">▾</span></div>
+    </div>
+    <div style="background:#fff;border:1px solid #cbd5e1;border-radius:8px;margin-top:14px;overflow:hidden">
+      <div class="g6h" style="grid-template-columns:112px minmax(0,1fr) 112px 210px 118px 128px 118px;column-gap:12px"><span>Date ↓</span><span>Product</span><span>Store room</span><span>What happened</span><span style="text-align:right">Change</span><span style="text-align:right">Balance after</span><span>By</span></div>
+      <div class="g6r" style="grid-template-columns:112px minmax(0,1fr) 112px 210px 118px 128px 118px;column-gap:12px;border-top-color:#e2e8f0"><span class="tnum" style="color:#475569">12 Aug 15:40</span><span style="font-weight:600">Chicken Breast</span><span style="color:#475569">Cold Room</span><span>Received · CPO-2026-003</span><span class="tnum" style="text-align:right;color:#166534;font-weight:600">+10.000 KG</span><span class="tnum" style="text-align:right;font-weight:600">120.000 KG</span><span style="color:#475569">Nimal Perera</span></div>
+      <div class="g6r" style="grid-template-columns:112px minmax(0,1fr) 112px 210px 118px 128px 118px;column-gap:12px"><span class="tnum" style="color:#475569">11 Aug 14:20</span><span style="font-weight:600">Chicken Breast</span><span style="color:#475569">Cold Room</span><span>Received · CPO-2026-003</span><span class="tnum" style="text-align:right;color:#166534;font-weight:600">+40.000 KG</span><span class="tnum" style="text-align:right;font-weight:600">110.000 KG</span><span style="color:#475569">Nimal Perera</span></div>
+      <div class="g6r" style="grid-template-columns:112px minmax(0,1fr) 112px 210px 118px 128px 118px;column-gap:12px"><span class="tnum" style="color:#475569">7 Aug 10:05</span><span style="font-weight:600">Chicken Breast</span><span style="color:#475569">Cold Room</span><span>Received · PO-2026-001</span><span class="tnum" style="text-align:right;color:#166534;font-weight:600">+10.000 KG</span><span class="tnum" style="text-align:right;font-weight:600">70.000 KG</span><span style="color:#475569">Nimal Perera</span></div>
+      <div class="g6r" style="grid-template-columns:112px minmax(0,1fr) 112px 210px 118px 128px 118px;column-gap:12px"><span class="tnum" style="color:#475569">4 Aug 13:48</span><span style="font-weight:600">Chicken Breast</span><span style="color:#475569">Cold Room</span><span>Received · PO-2026-001</span><span class="tnum" style="text-align:right;color:#166534;font-weight:600">+40.000 KG</span><span class="tnum" style="text-align:right;font-weight:600">60.000 KG</span><span style="color:#475569">Nimal Perera</span></div>
+      <div class="g6r" style="grid-template-columns:112px minmax(0,1fr) 112px 210px 118px 128px 118px;column-gap:12px"><span class="tnum" style="color:#475569">2 Aug 08:15</span><span style="font-weight:600">Chicken Breast</span><span style="color:#475569">Cold Room</span><span>Correction · recount correction</span><span class="tnum" style="text-align:right;color:#166534;font-weight:600">+2.000 KG</span><span class="tnum" style="text-align:right;font-weight:600">20.000 KG</span><span style="color:#475569">Nohan</span></div>
+      <div class="g6r" style="grid-template-columns:112px minmax(0,1fr) 112px 210px 118px 128px 118px;column-gap:12px"><span class="tnum" style="color:#475569">1 Aug 08:00</span><span style="font-weight:600">Chicken Breast</span><span style="color:#475569">Cold Room</span><span>Opening balance</span><span class="tnum" style="text-align:right;color:#166534;font-weight:600">+18.000 KG</span><span class="tnum" style="text-align:right;font-weight:600">18.000 KG</span><span style="color:#475569">Nohan</span></div>
+      <div class="g6r" style="grid-template-columns:112px minmax(0,1fr) 112px 210px 118px 128px 118px;column-gap:12px"><span class="tnum" style="color:#475569">1 Aug 08:00</span><span style="font-weight:600">Beef Mince</span><span style="color:#475569">Cold Room</span><span>Opening balance</span><span class="tnum" style="text-align:right;color:#166534;font-weight:600">+40.000 KG</span><span class="tnum" style="text-align:right;font-weight:600">40.000 KG</span><span style="color:#475569">Nohan</span></div>
+      <div class="g6r" style="grid-template-columns:112px minmax(0,1fr) 112px 210px 118px 128px 118px;column-gap:12px"><span class="tnum" style="color:#475569">1 Aug 08:00</span><span style="font-weight:600">Fish Fillet</span><span style="color:#475569">Cold Room</span><span>Opening balance</span><span class="tnum" style="text-align:right;color:#166534;font-weight:600">+10.000 KG</span><span class="tnum" style="text-align:right;font-weight:600">10.000 KG</span><span style="color:#475569">Nohan</span></div>
+      <div class="g6r" style="grid-template-columns:112px minmax(0,1fr) 112px 210px 118px 128px 118px;column-gap:12px"><span class="tnum" style="color:#475569">1 Aug 08:00</span><span style="font-weight:600">Fresh Milk</span><span style="color:#475569">Cold Room</span><span>Opening balance</span><span class="tnum" style="text-align:right;color:#166534;font-weight:600">+120.000 L</span><span class="tnum" style="text-align:right;font-weight:600">120.000 L</span><span style="color:#475569">Nohan</span></div>
+      <div class="g6r" style="grid-template-columns:112px minmax(0,1fr) 112px 210px 118px 128px 118px;column-gap:12px"><span class="tnum" style="color:#475569">1 Aug 08:00</span><span style="font-weight:600">Butter Block</span><span style="color:#475569">Cold Room</span><span>Opening balance</span><span class="tnum" style="text-align:right;color:#166534;font-weight:600">+8.000 KG</span><span class="tnum" style="text-align:right;font-weight:600">8.000 KG</span><span style="color:#475569">Nohan</span></div>
+      <div class="g6r" style="grid-template-columns:112px minmax(0,1fr) 112px 210px 118px 128px 118px;column-gap:12px"><span class="tnum" style="color:#475569">1 Aug 08:00</span><span style="font-weight:600">Cheddar Cheese</span><span style="color:#475569">Cold Room</span><span>Opening balance</span><span class="tnum" style="text-align:right;color:#166534;font-weight:600">+25.000 KG</span><span class="tnum" style="text-align:right;font-weight:600">25.000 KG</span><span style="color:#475569">Nohan</span></div>
+      <div class="g6r" style="grid-template-columns:112px minmax(0,1fr) 112px 210px 118px 128px 118px;column-gap:12px"><span class="tnum" style="color:#475569">1 Aug 08:00</span><span style="font-weight:600">Basmati Rice</span><span style="color:#475569">Main Store</span><span>Opening balance</span><span class="tnum" style="text-align:right;color:#166534;font-weight:600">+250.000 KG</span><span class="tnum" style="text-align:right;font-weight:600">250.000 KG</span><span style="color:#475569">Nohan</span></div>
+      <div class="g6r" style="grid-template-columns:112px minmax(0,1fr) 112px 210px 118px 128px 118px;column-gap:12px"><span class="tnum" style="color:#475569">1 Aug 08:00</span><span style="font-weight:600">Wheat Flour</span><span style="color:#475569">Main Store</span><span>Opening balance</span><span class="tnum" style="text-align:right;color:#166534;font-weight:600">+60.000 KG</span><span class="tnum" style="text-align:right;font-weight:600">60.000 KG</span><span style="color:#475569">Nohan</span></div>
+      <div class="g6r" style="grid-template-columns:112px minmax(0,1fr) 112px 210px 118px 128px 118px;column-gap:12px"><span class="tnum" style="color:#475569">1 Aug 08:00</span><span style="font-weight:600">Sugar</span><span style="color:#475569">Main Store</span><span>Opening balance</span><span class="tnum" style="text-align:right;color:#166534;font-weight:600">+300.000 KG</span><span class="tnum" style="text-align:right;font-weight:600">300.000 KG</span><span style="color:#475569">Nohan</span></div>
+      <div class="g6r" style="grid-template-columns:112px minmax(0,1fr) 112px 210px 118px 128px 118px;column-gap:12px"><span class="tnum" style="color:#475569">1 Aug 08:00</span><span style="font-weight:600">Cooking Oil</span><span style="color:#475569">Main Store</span><span>Opening balance</span><span class="tnum" style="text-align:right;font-weight:600">0.000 L</span><span class="tnum" style="text-align:right;font-weight:600">0.000 L</span><span style="color:#475569">Nohan</span></div>
+      <div class="g6r" style="grid-template-columns:112px minmax(0,1fr) 112px 210px 118px 128px 118px;column-gap:12px"><span class="tnum" style="color:#475569">1 Aug 08:00</span><span style="font-weight:600">Bottled Water 1L</span><span style="color:#475569">Main Store</span><span>Opening balance</span><span class="tnum" style="text-align:right;color:#166534;font-weight:600">+600.000 EACH</span><span class="tnum" style="text-align:right;font-weight:600">600.000 EACH</span><span style="color:#475569">Nohan</span></div>
+      <div class="g6r" style="grid-template-columns:112px minmax(0,1fr) 112px 210px 118px 128px 118px;column-gap:12px"><span class="tnum" style="color:#475569">1 Aug 08:00</span><span style="font-weight:600">Orange Juice 1L</span><span style="color:#475569">Main Store</span><span>Opening balance</span><span class="tnum" style="text-align:right;color:#166534;font-weight:600">+90.000 EACH</span><span class="tnum" style="text-align:right;font-weight:600">90.000 EACH</span><span style="color:#475569">Nohan</span></div>
+      <div class="pg"><span>Showing 1–17 of 17 · 25 per page · a single view shows at most 100</span><div style="display:flex;gap:6px"><span class="pgb" style="color:#94a3b8">Previous</span><span class="pgb" style="background:#1d4ed8;color:#fff;border-color:#1d4ed8">1</span><span class="pgb" style="color:#94a3b8">Next</span></div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:14px">
+      <div style="background:#fff;border:1px solid #cbd5e1;border-radius:8px;padding:13px 15px"><div style="font:600 13px/19px Inter,sans-serif">Plain words for every kind</div><div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:3px">Opening balance · Received · Issued · Transferred in · Transferred out · Correction. The Kind filter offers exactly these words and nothing from the system underneath.</div></div>
+      <div style="background:#fff;border:1px solid #cbd5e1;border-radius:8px;padding:13px 15px"><div style="font:600 13px/19px Inter,sans-serif">A transfer is two lines</div><div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:3px">Out of one store room, into another, at the same moment, each with its own resulting balance. Total stock is unchanged and the pair is visibly a pair.</div></div>
+      <div style="background:#fff;border:1px solid #cbd5e1;border-radius:8px;padding:13px 15px"><div style="font:600 13px/19px Inter,sans-serif">Read-only, by design</div><div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:3px">There is no edit and no archive on a movement — not a disabled one. A wrong entry is answered with a correction that carries a reason.</div></div>
+      <div style="background:#fff;border:1px solid #cbd5e1;border-radius:8px;padding:13px 15px"><div style="font:600 13px/19px Inter,sans-serif">Filtered to nothing</div><div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:3px"><em>No movements in this range.</em> There are 17 since 1 August — widen the dates or clear the filters. The full count is always offered.</div></div>
+    </div>
+  </div>
+</div>
+<p class="dv-cap"><strong>Every line answers three questions:</strong> what changed, in which store room, and what the balance became. Twelve opening balances plus the five later movements on Chicken Breast are the whole record — no invented traffic. Order references appear because a person needs them; nothing from the system's internals does.</p>
+</div>
+
+<div class="dv-opt" id="6i" data-screen-label="G6-22 Opening balance and adjustment">
+<div class="dv-olabel"><a class="dv-oid" href="#6i">6i</a>Opening balance · stock adjustment · transfer</div>
+<div class="dv-card" style="width:1320px">
+  <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));background:#f8fafc">
+    <div style="padding:24px 22px 26px;border-right:1px solid #cbd5e1">
+      <div class="eyb">Opening balance · once per product and store room</div>
+      <div style="background:#fff;border:1px solid #cbd5e1;border-radius:8px;margin-top:14px;overflow:hidden">
+        <div style="padding:14px 16px;border-bottom:1px solid #e2e8f0"><div style="font:600 16px/24px Inter,sans-serif">Record opening stock</div><div style="font:400 13px/19px Inter,sans-serif;color:#475569">What you hold today, before Stockmok starts counting.</div></div>
+        <div style="padding:14px 16px">
+          <div><label class="lbl">Product</label><div class="fld">Beef Mince · MEAT-002<span style="color:#64748b">▾</span></div></div>
+          <div style="margin-top:12px"><label class="lbl">Store room</label><div class="fld">Cold Room<span style="color:#64748b">▾</span></div></div>
+          <div style="margin-top:12px"><label class="lbl">Quantity held</label><div class="fld tnum" style="justify-content:space-between;border-color:#1d4ed8;box-shadow:0 0 0 2px #fff,0 0 0 4px #1d4ed8">40.000<span style="color:#64748b">KG</span></div><div class="hint">In kilograms, the unit this product is counted in.</div></div>
+          <div style="margin-top:12px"><label class="lbl">As at</label><div class="fld tnum">1 Aug 2026<span style="color:#64748b">▾</span></div><div class="hint">Cannot be later than today.</div></div>
+          <div style="border:1px solid #cbd5e1;border-radius:8px;margin-top:14px;overflow:hidden">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 13px;background:#f8fafc;border-bottom:1px solid #e2e8f0;font:600 13px Inter,sans-serif">What this will do</div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 13px;font:500 13px Inter,sans-serif"><span style="color:#475569">Cold Room now</span><span class="tnum" style="font-weight:600">0.000 KG</span></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 13px;border-top:1px solid #f1f5f9;font:500 13px Inter,sans-serif"><span style="color:#475569">After recording</span><span class="tnum" style="font-weight:600;color:#166534">40.000 KG</span></div>
+          </div>
+          <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:14px"><span class="btns">Cancel</span><span class="btnp">Record opening stock</span></div>
+        </div>
+      </div>
+      <div style="background:#fff;border:1px solid #cbd5e1;border-radius:8px;margin-top:12px;padding:13px 15px"><div style="font:600 13px/19px Inter,sans-serif">Already recorded</div><div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:3px"><em>Cold Room already has an opening balance for this product, recorded on 1 Aug 2026.</em> The way to change today's figure is an adjustment, and the option offered is exactly that.</div></div>
+    </div>
+    <div style="padding:24px 22px 26px;border-right:1px solid #cbd5e1">
+      <div class="eyb">Adjustment · direction, reason, consequence</div>
+      <div style="background:#fff;border:1px solid #cbd5e1;border-radius:8px;margin-top:14px;overflow:hidden">
+        <div style="padding:14px 16px;border-bottom:1px solid #e2e8f0"><div style="font:600 16px/24px Inter,sans-serif">Adjust stock</div><div style="font:400 13px/19px Inter,sans-serif;color:#475569">Chicken Breast · MEAT-001 · counted in KG</div></div>
+        <div style="padding:14px 16px">
+          <div><label class="lbl">Store room</label><div class="fld">Cold Room · 18.000 KG on hand<span style="color:#64748b">▾</span></div></div>
+          <div style="margin-top:12px"><label class="lbl">Direction</label>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+              <div style="height:44px;border:1px solid #1d4ed8;background:#eff6ff;border-radius:6px;display:flex;align-items:center;justify-content:center;gap:8px;font:600 14px Inter,sans-serif;color:#1e40af">Increase</div>
+              <div style="height:44px;border:1px solid #cbd5e1;border-radius:6px;display:flex;align-items:center;justify-content:center;gap:8px;font:600 14px Inter,sans-serif;color:#475569">Decrease</div>
+            </div>
+            <div class="hint">Two explicit choices, so a plus or minus sign is never the only clue.</div>
+          </div>
+          <div style="margin-top:12px"><label class="lbl">Quantity</label><div class="fld tnum" style="justify-content:space-between;border-color:#1d4ed8;box-shadow:0 0 0 2px #fff,0 0 0 4px #1d4ed8">2.000<span style="color:#64748b">KG</span></div></div>
+          <div style="margin-top:12px"><label class="lbl">Reason <span style="font-weight:400;color:#64748b">required</span></label><div class="fld">Recount correction<span style="color:#64748b">▾</span></div><div class="hint">Recount correction · Damaged in storage · Expired · Wastage · Theft or loss · Other. Choosing Other requires a note.</div></div>
+          <div style="margin-top:12px"><label class="lbl">Note <span style="font-weight:400;color:#64748b">optional</span></label><div class="fld" style="justify-content:flex-start;color:#94a3b8">Recounted the cold room shelf on Monday</div></div>
+          <div style="border:1px solid #1d4ed8;border-radius:8px;margin-top:14px;overflow:hidden">
+            <div style="padding:10px 13px;background:#eff6ff;border-bottom:1px solid #dbeafe;font:600 13px Inter,sans-serif;color:#1e40af">Your stock after this</div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 13px;font:500 13px Inter,sans-serif"><span style="color:#475569">Cold Room now</span><span class="tnum" style="font-weight:600">18.000 KG</span></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 13px;border-top:1px solid #f1f5f9;font:500 13px Inter,sans-serif"><span style="color:#475569">This adjustment</span><span class="tnum" style="font-weight:600;color:#166534">+2.000 KG</span></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 13px;border-top:1px solid #f1f5f9;background:#f8fafc;font:600 14px Inter,sans-serif"><span>Cold Room after</span><span class="tnum">20.000 KG</span></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 13px;border-top:1px solid #f1f5f9;font:500 13px Inter,sans-serif"><span style="color:#475569">Status after</span><span style="font-weight:600">no longer low · minimum 20.000</span></div>
+          </div>
+          <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:14px"><span class="btns">Cancel</span><span class="btnp">Record adjustment</span></div>
+        </div>
+      </div>
+      <div style="background:#fff;border:1px solid #cbd5e1;border-radius:8px;margin-top:12px;padding:13px 15px"><div style="font:600 13px/19px Inter,sans-serif">This is the canonical first adjustment</div><div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:3px">Chicken Breast opened at 18.000 KG against a minimum of 20.000, so it was low. This recount of +2.000 KG is what took it to 20.000 and dropped the dashboard's low-stock count from four to three.</div></div>
+    </div>
+    <div style="padding:24px 22px 26px">
+      <div class="eyb">Guard rails · transfer · confirmation</div>
+      <div style="background:#fff;border:1px solid #cbd5e1;border-radius:8px;margin-top:14px;padding:14px 16px">
+        <div style="font:600 15px/22px Inter,sans-serif">More than you hold</div>
+        <div style="display:flex;gap:10px;padding:12px 14px;background:#fee2e2;border-radius:8px;margin-top:10px"><span style="width:20px;height:20px;border-radius:9999px;background:#991b1b;color:#fff;font:700 12px Inter,sans-serif;display:inline-flex;align-items:center;justify-content:center;flex:none">!</span><div style="font:500 13px/19px Inter,sans-serif;color:#0f172a">Cold Room holds 8.000 KG of Butter Block. A decrease of 10.000 KG would leave −2.000 KG, and stock cannot go below zero. Reduce the quantity, or record the difference in the store room that actually holds it.</div></div>
+        <div class="hint" style="margin-top:10px">The record button stays blocked while this is true. Nothing is written and nothing partially applies.</div>
+      </div>
+      <div style="background:#fff;border:1px solid #cbd5e1;border-radius:8px;margin-top:12px;padding:14px 16px">
+        <div style="font:600 15px/22px Inter,sans-serif">Crossing the minimum</div>
+        <div style="display:flex;gap:10px;padding:12px 14px;background:#fef3c7;border-radius:8px;margin-top:10px"><span style="width:20px;height:20px;border-radius:9999px;background:#854d0e;color:#fff;font:700 12px Inter,sans-serif;display:inline-flex;align-items:center;justify-content:center;flex:none">!</span><div style="font:500 13px/19px Inter,sans-serif;color:#0f172a">This will leave 12.000 KG of Beef Mince, below the minimum of 15.000 KG, so it will be flagged as low stock. You can still record it.</div></div>
+        <div class="hint" style="margin-top:10px">A warning, not a block — the minimum is a signal to buy, not a rule about reality.</div>
+      </div>
+      <div style="background:#fff;border:1px solid #cbd5e1;border-radius:8px;margin-top:12px;overflow:hidden">
+        <div style="padding:13px 16px;border-bottom:1px solid #e2e8f0;font:600 15px/22px Inter,sans-serif">Move stock between store rooms</div>
+        <div style="padding:14px 16px">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"><div><label class="lbl">From</label><div class="fld">Main Store<span style="color:#64748b">▾</span></div></div><div><label class="lbl">To</label><div class="fld">Cold Room<span style="color:#64748b">▾</span></div></div></div>
+          <div style="margin-top:12px"><label class="lbl">Product</label><div class="fld">Basmati Rice · DRY-001<span style="color:#64748b">▾</span></div></div>
+          <div style="margin-top:12px"><label class="lbl">Quantity</label><div class="fld tnum" style="justify-content:space-between">50.000<span style="color:#64748b">KG</span></div></div>
+          <div style="border:1px solid #cbd5e1;border-radius:8px;margin-top:12px;overflow:hidden">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 13px;font:500 13px Inter,sans-serif"><span style="color:#475569">Main Store 250.000 →</span><span class="tnum" style="font-weight:600">200.000 KG</span></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 13px;border-top:1px solid #f1f5f9;font:500 13px Inter,sans-serif"><span style="color:#475569">Cold Room 0.000 →</span><span class="tnum" style="font-weight:600">50.000 KG</span></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 13px;border-top:1px solid #f1f5f9;background:#f8fafc;font:600 13px Inter,sans-serif"><span>Total stock</span><span class="tnum">unchanged · 250.000 KG</span></div>
+          </div>
+          <div class="hint" style="margin-top:10px">A transfer never changes what you own, only where it is — and it writes both halves at once.</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;padding:12px;background:#fff;border:1px solid #cbd5e1;border-radius:8px;box-shadow:0 8px 20px rgb(15 23 42 / .12);margin-top:12px"><span style="width:20px;height:20px;border-radius:9999px;background:#166534;color:#fff;font:700 12px Inter,sans-serif;display:inline-flex;align-items:center;justify-content:center;flex:none">✓</span><div style="font:500 13px/19px Inter,sans-serif">Adjustment recorded · Cold Room now holds 20.000 KG <span style="color:#1d4ed8;font-weight:600;margin-left:6px">View movement</span></div></div>
+    </div>
+  </div>
+</div>
+<p class="dv-cap"><strong>Every stock operation states the consequence before it is committed</strong> — current balance, the change, the resulting balance, and whether a minimum is crossed. Reasons are required because the ledger has to be readable months later.</p>
+</div>
+
+<div class="dv-opt" id="6j" data-screen-label="G6-18 Warehouses">
+<div class="dv-olabel"><a class="dv-oid" href="#6j">6j</a>Warehouses — the two store rooms, create, archive</div>
+<div class="dv-card" style="width:1320px">
+  <div style="display:grid;grid-template-columns:minmax(0,1fr) 1px 440px;background:#f8fafc">
+    <div style="padding:24px 24px 26px">
+      <div style="display:flex;align-items:flex-end;justify-content:space-between"><div><div style="font:500 13px/19px Inter,sans-serif;color:#64748b">Inventory</div><div style="font:700 24px/32px Inter,sans-serif;letter-spacing:-.02em">Warehouses</div><div style="font:400 14px/21px Inter,sans-serif;color:#475569;margin-top:2px">2 store rooms · LKR 691,700.00 held between them</div></div><span class="btnp">New warehouse</span></div>
+      <div style="background:#fff;border:1px solid #cbd5e1;border-radius:8px;margin-top:14px;overflow:hidden">
+        <div class="g6h" style="grid-template-columns:minmax(0,1fr) 150px 140px 110px 170px 40px;column-gap:12px"><span>Warehouse ↑</span><span>Type</span><span style="text-align:right">Products held</span><span style="text-align:right">Share</span><span style="text-align:right">Stock value</span><span></span></div>
+        <div class="g6r" style="grid-template-columns:minmax(0,1fr) 150px 140px 110px 170px 40px;column-gap:12px;border-top-color:#e2e8f0"><span style="font-weight:600">Cold Room</span><span style="color:#475569">Refrigerated</span><span class="tnum" style="text-align:right">6</span><span class="tnum" style="text-align:right;color:#475569">57.7%</span><span class="tnum" style="text-align:right">LKR 398,900.00</span><span style="text-align:right;color:#64748b">⋯</span></div>
+        <div class="g6r" style="grid-template-columns:minmax(0,1fr) 150px 140px 110px 170px 40px;column-gap:12px"><span style="font-weight:600">Main Store <span class="pill" style="background:#eff6ff;color:#1e40af;margin-left:6px">Default</span></span><span style="color:#475569">Store room</span><span class="tnum" style="text-align:right">6</span><span class="tnum" style="text-align:right;color:#475569">42.3%</span><span class="tnum" style="text-align:right">LKR 292,800.00</span><span style="text-align:right;color:#64748b">⋯</span></div>
+        <div style="display:grid;grid-template-columns:minmax(0,1fr) 150px 140px 110px 170px 40px;column-gap:12px;align-items:center;height:40px;padding:0 16px;border-top:1px solid #e2e8f0;background:#f8fafc;font:600 14px Inter,sans-serif"><span>Total</span><span></span><span class="tnum" style="text-align:right">12</span><span class="tnum" style="text-align:right">100%</span><span class="tnum" style="text-align:right">LKR 691,700.00</span><span></span></div>
+        <div class="pg"><span>Showing 1–2 of 2</span><div style="display:flex;gap:6px"><span class="pgb" style="color:#94a3b8">Previous</span><span class="pgb" style="background:#1d4ed8;color:#fff;border-color:#1d4ed8">1</span><span class="pgb" style="color:#94a3b8">Next</span></div></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px">
+        <div style="background:#fff;border:1px solid #cbd5e1;border-radius:8px;padding:13px 15px"><div style="font:600 13px/19px Inter,sans-serif">Products held counts presence, not ownership</div><div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:3px">Meat and Dairy sit in Cold Room; Dry Goods and Beverages in Main Store. A product held in both would count in both, so the footer states the distinct total of 12.</div></div>
+        <div style="background:#fff;border:1px solid #cbd5e1;border-radius:8px;padding:13px 15px"><div style="font:600 13px/19px Inter,sans-serif">The default store room</div><div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:3px">Main Store is pre-selected when receiving or adjusting, and always changeable on the form. Exactly one warehouse is the default, and it cannot be archived while it holds that status.</div></div>
+      </div>
+    </div>
+    <div style="background:#cbd5e1"></div>
+    <div style="padding:24px 22px 26px">
+      <div class="eyb">New warehouse · archive rules</div>
+      <div style="background:#fff;border:1px solid #cbd5e1;border-radius:12px;margin-top:14px;overflow:hidden;box-shadow:0 16px 32px rgb(15 23 42 / .14)">
+        <div style="padding:15px 18px;border-bottom:1px solid #e2e8f0;font:600 16px/24px Inter,sans-serif">New warehouse</div>
+        <div style="padding:15px 18px 17px">
+          <div><label class="lbl">Name</label><div class="fld" style="justify-content:flex-start;border-color:#1d4ed8;box-shadow:0 0 0 2px #fff,0 0 0 4px #1d4ed8">Bar Store</div></div>
+          <div style="margin-top:12px"><label class="lbl">Type</label><div class="fld">Store room<span style="color:#64748b">▾</span></div><div class="hint">Store room · Refrigerated · Freezer · Kitchen · Other. Type is descriptive; it does not change any rule.</div></div>
+          <div style="margin-top:12px"><label class="lbl">Location <span style="font-weight:400;color:#64748b">optional</span></label><div class="fld" style="justify-content:flex-start;color:#94a3b8">Ground floor, behind the bar</div></div>
+          <div style="display:flex;align-items:flex-start;gap:10px;margin-top:14px"><span style="width:20px;height:20px;border:1px solid #64748b;border-radius:4px;flex:none;margin-top:1px"></span><div><div style="font:500 14px/20px Inter,sans-serif">Make this the default store room</div><div class="hint" style="margin-top:2px">Main Store is the default today. Choosing this moves that status here.</div></div></div>
+          <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:16px"><span class="btns">Cancel</span><span class="btnp">Create warehouse</span></div>
+        </div>
+      </div>
+      <div style="background:#fff;border:1px solid #cbd5e1;border-radius:8px;margin-top:12px;padding:14px 16px">
+        <div style="font:600 15px/22px Inter,sans-serif">Archiving a store room that holds stock</div>
+        <div style="display:flex;gap:10px;padding:12px 14px;background:#fee2e2;border-radius:8px;margin-top:10px"><span style="width:20px;height:20px;border-radius:9999px;background:#991b1b;color:#fff;font:700 12px Inter,sans-serif;display:inline-flex;align-items:center;justify-content:center;flex:none">!</span><div style="font:500 13px/19px Inter,sans-serif;color:#0f172a">Cold Room holds 6 products worth LKR 398,900.00. Move that stock to another store room before archiving — stock cannot be left in a place that no longer exists.</div></div>
+        <span class="btns" style="margin-top:12px;width:100%;justify-content:center">Move stock out of Cold Room</span>
+        <div class="hint" style="margin-top:10px">An empty store room archives with a plain confirmation. Its past movements keep the name, so old lines still read correctly.</div>
+      </div>
+      <div style="background:#fff;border:1px solid #cbd5e1;border-radius:8px;margin-top:12px;padding:13px 15px"><div style="font:600 13px/19px Inter,sans-serif">First-run</div><div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:3px">A new workspace has only the store room created during setup, and the list says so rather than showing an empty table.</div></div>
+    </div>
+  </div>
+</div>
+<p class="dv-cap"><strong>Shares sum to 100%</strong> and the two values sum to LKR 691,700.00, matching the panel in <a href="#6b">6b</a>. Archive is guarded by physical truth, not by permission alone.</p>
+</div>
+
+<div class="dv-opt" id="6k" data-screen-label="G6-15 Low and out of stock">
+<div class="dv-olabel"><a class="dv-oid" href="#6k">6k</a>Low and out of stock — one filtered view, and what it asks you to do</div>
+<div class="dv-card" style="width:1320px">
+  <div style="height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;background:#fff;border-bottom:1px solid #cbd5e1">
+    <div style="display:flex;align-items:center;gap:14px"><svg class="mk" viewBox="0 0 24 24" fill="#1d4ed8"><g stroke="none"><rect x="3.2" y="2" width="17.6" height="4.4" rx="1.2"></rect><rect x="3.2" y="2" width="4.4" height="9.8" rx="1.2"></rect><rect x="3.2" y="9.6" width="17.6" height="4.4" rx="1.2"></rect><rect x="16.4" y="11.8" width="4.4" height="10.2" rx="1.2"></rect><rect x="3.2" y="17.6" width="17.6" height="4.4" rx="1.2"></rect></g></svg><span style="font:700 17px/1 Inter,sans-serif;letter-spacing:-.01em">Stockmok</span><span style="width:1px;height:26px;background:#e2e8f0"></span><span style="width:32px;height:32px;border-radius:9999px;background:#1d4ed8;color:#fff;font:700 12px Inter,sans-serif;display:inline-flex;align-items:center;justify-content:center">GO</span><span style="font:600 15px/20px Inter,sans-serif">Grand Ocean Hotel</span><span class="pill" style="background:#eff6ff;color:#1e40af">Owner</span></div>
+    <div style="display:flex;align-items:center;gap:12px"><span style="position:relative;width:40px;height:40px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="2" stroke-linecap="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.7 21a2 2 0 0 1-3.4 0"></path></svg><span style="position:absolute;top:4px;right:4px;min-width:18px;height:18px;padding:0 5px;border-radius:9999px;background:#991b1b;color:#fff;font:700 12px/18px Inter,sans-serif;text-align:center">4</span></span><span style="width:36px;height:36px;border-radius:9999px;background:#f1f5f9;border:1px solid #cbd5e1;color:#334155;font:600 12px Inter,sans-serif;display:inline-flex;align-items:center;justify-content:center">NF</span></div>
+  </div>
+  <div style="display:grid;grid-template-columns:256px minmax(0,1fr)">
+    <div style="background:#fff;border-right:1px solid #cbd5e1;padding:8px 0 16px">
+      <div class="sect">Overview</div>
+      <div class="nav"><span class="dot"></span>Dashboard</div>
+      <div class="sect">Inventory</div>
+      <div class="nav" style="background:#eff6ff"><span class="dot" style="background:#1d4ed8"></span><span style="font-weight:600;color:#1e40af">Products</span></div>
+      <div class="nav"><span class="dot"></span>Categories</div>
+      <div class="nav"><span class="dot"></span>Warehouses</div>
+      <div class="nav"><span class="dot"></span>Stock Movements</div>
+      <div class="sect">Procurement</div>
+      <div class="nav"><span class="dot"></span>Purchase Orders</div>
+      <div class="nav"><span class="dot"></span>Receiving</div>
+      <div class="nav"><span class="dot"></span>Suppliers</div>
+      <div class="nav"><span class="dot"></span>Buyers</div>
+      <div class="sect">Network</div>
+      <div class="nav"><span class="dot"></span>Connected Businesses</div>
+      <div class="nav"><span class="dot"></span>Partner Catalog</div>
+      <div class="nav"><span class="dot"></span>Product Mappings</div>
+      <div class="sect">Insight</div>
+      <div class="nav"><span class="dot"></span>Reports</div>
+      <div class="nav" style="justify-content:space-between"><span style="display:flex;align-items:center;gap:10px"><span class="dot"></span>Notifications</span><span class="pill" style="background:#fee2e2;color:#991b1b">4</span></div>
+      <div class="sect">Workspace</div>
+      <div class="nav"><span class="dot"></span>Team</div>
+      <div class="nav"><span class="dot"></span>Settings</div>
+    </div>
+    <div style="background:#f8fafc;padding:22px 24px 26px">
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:20px">
+        <div><div style="font:500 13px/19px Inter,sans-serif;color:#64748b">Inventory</div><div style="font:700 26px/34px Inter,sans-serif;letter-spacing:-.02em">Products</div><div style="font:400 14px/21px Inter,sans-serif;color:#475569;margin-top:2px">Filtered to stock that has fallen to or below its minimum</div></div>
+        <div style="display:flex;gap:8px"><span class="btns">Clear filter</span><span class="btnp">Adjust stock</span></div>
+      </div>
+      <div style="background:#fff;border:1px solid #cbd5e1;border-radius:8px;margin-top:14px;padding:12px 14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+        <div class="fld" style="flex:1;min-width:240px;justify-content:flex-start;gap:8px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4.2-4.2"></path></svg><span style="color:#64748b">Search these products by name or SKU</span></div>
+        <div class="fld" style="width:180px">Category: All<span style="color:#64748b">▾</span></div>
+        <div class="fld" style="width:200px">Store room: All<span style="color:#64748b">▾</span></div>
+        <div style="display:flex;gap:8px">
+          <span class="pill" style="height:36px;align-items:center;padding:0 14px;background:#0f172a;color:#fff">Needs attention · 4</span>
+          <span class="pill" style="height:36px;align-items:center;padding:0 14px;background:#fff;border:1px solid #cbd5e1;color:#475569">All products · 12</span>
+        </div>
+      </div>
+      <div style="background:#fff;border:1px solid #cbd5e1;border-radius:8px;margin-top:14px;overflow:hidden">
+        <div class="g6h" style="grid-template-columns:minmax(0,1fr) 96px 112px 150px 130px 128px 148px;column-gap:12px"><span>Product</span><span>SKU</span><span>Category</span><span style="text-align:right">On hand</span><span style="text-align:right">Minimum</span><span style="text-align:right">Short by</span><span style="text-align:right">Suggested action</span></div>
+        <div class="g6r" style="grid-template-columns:minmax(0,1fr) 96px 112px 150px 130px 128px 148px;column-gap:12px;border-top-color:#e2e8f0"><span style="font-weight:600">Cooking Oil</span><span class="tnum" style="color:#475569">DRY-004</span><span style="color:#475569">Dry Goods</span><span class="tnum" style="text-align:right"><span class="pill" style="background:#fee2e2;color:#991b1b;margin-right:6px">Out</span>0.000 L</span><span class="tnum" style="text-align:right;color:#475569">40.000 L</span><span class="tnum" style="text-align:right;color:#991b1b;font-weight:600">40.000 L</span><span style="text-align:right;color:#1d4ed8;font-weight:600">Order from supplier</span></div>
+        <div class="g6r" style="grid-template-columns:minmax(0,1fr) 96px 112px 150px 130px 128px 148px;column-gap:12px"><span style="font-weight:600">Wheat Flour</span><span class="tnum" style="color:#475569">DRY-002</span><span style="color:#475569">Dry Goods</span><span class="tnum" style="text-align:right"><span class="pill" style="background:#fef3c7;color:#854d0e;margin-right:6px">Low</span>60.000 KG</span><span class="tnum" style="text-align:right;color:#475569">80.000 KG</span><span class="tnum" style="text-align:right;color:#854d0e;font-weight:600">20.000 KG</span><span style="text-align:right;color:#1d4ed8;font-weight:600">Order from supplier</span></div>
+        <div class="g6r" style="grid-template-columns:minmax(0,1fr) 96px 112px 150px 130px 128px 148px;column-gap:12px"><span style="font-weight:600">Butter Block</span><span class="tnum" style="color:#475569">DAIR-002</span><span style="color:#475569">Dairy</span><span class="tnum" style="text-align:right"><span class="pill" style="background:#fef3c7;color:#854d0e;margin-right:6px">Low</span>8.000 KG</span><span class="tnum" style="text-align:right;color:#475569">10.000 KG</span><span class="tnum" style="text-align:right;color:#854d0e;font-weight:600">2.000 KG</span><span style="text-align:right;color:#1d4ed8;font-weight:600">Order from supplier</span></div>
+        <div class="g6r" style="grid-template-columns:minmax(0,1fr) 96px 112px 150px 130px 128px 148px;column-gap:12px"><span style="font-weight:600">Fish Fillet</span><span class="tnum" style="color:#475569">MEAT-003</span><span style="color:#475569">Meat</span><span class="tnum" style="text-align:right"><span class="pill" style="background:#fef3c7;color:#854d0e;margin-right:6px">Low</span>10.000 KG</span><span class="tnum" style="text-align:right;color:#475569">12.000 KG</span><span class="tnum" style="text-align:right;color:#854d0e;font-weight:600">2.000 KG</span><span style="text-align:right;color:#1d4ed8;font-weight:600">Order from supplier</span></div>
+        <div class="pg"><span>Showing 4 of 12 products · 1 out of stock, 3 low</span><div style="display:flex;align-items:center;gap:6px"><span class="pgb" style="color:#94a3b8">Previous</span><span class="pgb" style="background:#1d4ed8;color:#fff;border-color:#1d4ed8">1</span><span class="pgb" style="color:#94a3b8">Next</span></div></div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:14px">
+        <div style="background:#fff;border:1px solid #cbd5e1;border-radius:8px;padding:13px 15px"><div style="font:600 13px/19px Inter,sans-serif">Out is ordered before low</div><div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:3px">The one product at zero sits at the top regardless of the sort, because nothing can be served from it today. Low rows follow in shortfall order.</div></div>
+        <div style="background:#fff;border:1px solid #cbd5e1;border-radius:8px;padding:13px 15px"><div style="font:600 13px/19px Inter,sans-serif">Colour is never the only signal</div><div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:3px">Every amber and red row also carries the word <em>Low</em> or <em>Out</em> and a stated shortfall, so the list survives greyscale printing and colour blindness.</div></div>
+        <div style="background:#fff;border:1px solid #cbd5e1;border-radius:8px;padding:13px 15px"><div style="font:600 13px/19px Inter,sans-serif">Minimums are per product, not global</div><div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:3px">Bottled Water at 600 EACH is comfortable against a minimum of 200; Fish Fillet at 10 KG is short against 12. The list compares each product only with its own minimum.</div></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px">
+        <div style="background:#fff;border:1px solid #cbd5e1;border-radius:8px;padding:16px 18px">
+          <div class="eyb" style="border:0;padding:0">When nothing needs attention</div>
+          <div style="display:flex;flex-direction:column;align-items:center;text-align:center;padding:18px 12px 6px">
+            <span style="width:56px;height:56px;border-radius:9999px;background:#dcfce7;display:inline-flex;align-items:center;justify-content:center"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#166534" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m4.5 12.5 5 5 10-11"></path></svg></span>
+            <div style="font:600 16px/24px Inter,sans-serif;margin-top:12px">Every product is above its minimum</div>
+            <div style="font:400 14px/21px Inter,sans-serif;color:#475569;margin-top:4px;max-width:400px">Nothing is low or out of stock right now. This view will fill itself as stock is used.</div>
+            <span class="btns" style="margin-top:14px">View all products</span>
+          </div>
+        </div>
+        <div style="background:#fff;border:1px solid #cbd5e1;border-radius:8px;padding:16px 18px">
+          <div class="eyb" style="border:0;padding:0">When the filter matches nothing</div>
+          <div style="display:flex;flex-direction:column;align-items:center;text-align:center;padding:18px 12px 6px">
+            <span style="width:56px;height:56px;border-radius:9999px;background:#f1f5f9;display:inline-flex;align-items:center;justify-content:center"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4.2-4.2"></path></svg></span>
+            <div style="font:600 16px/24px Inter,sans-serif;margin-top:12px">No low stock in Beverages</div>
+            <div style="font:400 14px/21px Inter,sans-serif;color:#475569;margin-top:4px;max-width:400px">Both beverages are above their minimums. Four other products need attention in Dry Goods, Dairy and Meat.</div>
+            <span class="btns" style="margin-top:14px">Show all categories</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<p class="dv-cap"><strong>The attention view is the products list under a filter</strong> — same rows, same density, one added column that states the shortfall so the next action is arithmetic rather than judgement. Two empty states are distinguished: nothing is wrong, versus nothing matches this filter.</p>
+</div>
+
+<div class="dv-opt" id="6l" data-screen-label="G6-24 Reports">
+<div class="dv-olabel"><a class="dv-oid" href="#6l">6l</a>Reports — the two authorised surfaces, and the only place Export appears</div>
+<div class="dv-card" style="width:1320px">
+  <div style="height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;background:#fff;border-bottom:1px solid #cbd5e1">
+    <div style="display:flex;align-items:center;gap:14px"><svg class="mk" viewBox="0 0 24 24" fill="#1d4ed8"><g stroke="none"><rect x="3.2" y="2" width="17.6" height="4.4" rx="1.2"></rect><rect x="3.2" y="2" width="4.4" height="9.8" rx="1.2"></rect><rect x="3.2" y="9.6" width="17.6" height="4.4" rx="1.2"></rect><rect x="16.4" y="11.8" width="4.4" height="10.2" rx="1.2"></rect><rect x="3.2" y="17.6" width="17.6" height="4.4" rx="1.2"></rect></g></svg><span style="font:700 17px/1 Inter,sans-serif;letter-spacing:-.01em">Stockmok</span><span style="width:1px;height:26px;background:#e2e8f0"></span><span style="width:32px;height:32px;border-radius:9999px;background:#1d4ed8;color:#fff;font:700 12px Inter,sans-serif;display:inline-flex;align-items:center;justify-content:center">GO</span><span style="font:600 15px/20px Inter,sans-serif">Grand Ocean Hotel</span><span class="pill" style="background:#eff6ff;color:#1e40af">Owner</span></div>
+    <div style="display:flex;align-items:center;gap:12px"><span style="position:relative;width:40px;height:40px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="2" stroke-linecap="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.7 21a2 2 0 0 1-3.4 0"></path></svg><span style="position:absolute;top:4px;right:4px;min-width:18px;height:18px;padding:0 5px;border-radius:9999px;background:#991b1b;color:#fff;font:700 12px/18px Inter,sans-serif;text-align:center">4</span></span><span style="width:36px;height:36px;border-radius:9999px;background:#f1f5f9;border:1px solid #cbd5e1;color:#334155;font:600 12px Inter,sans-serif;display:inline-flex;align-items:center;justify-content:center">NF</span></div>
+  </div>
+  <div style="display:grid;grid-template-columns:256px minmax(0,1fr)">
+    <div style="background:#fff;border-right:1px solid #cbd5e1;padding:8px 0 16px">
+      <div class="sect">Overview</div>
+      <div class="nav"><span class="dot"></span>Dashboard</div>
+      <div class="sect">Inventory</div>
+      <div class="nav"><span class="dot"></span>Products</div>
+      <div class="nav"><span class="dot"></span>Categories</div>
+      <div class="nav"><span class="dot"></span>Warehouses</div>
+      <div class="nav"><span class="dot"></span>Stock Movements</div>
+      <div class="sect">Procurement</div>
+      <div class="nav"><span class="dot"></span>Purchase Orders</div>
+      <div class="nav"><span class="dot"></span>Receiving</div>
+      <div class="nav"><span class="dot"></span>Suppliers</div>
+      <div class="nav"><span class="dot"></span>Buyers</div>
+      <div class="sect">Network</div>
+      <div class="nav"><span class="dot"></span>Connected Businesses</div>
+      <div class="nav"><span class="dot"></span>Partner Catalog</div>
+      <div class="nav"><span class="dot"></span>Product Mappings</div>
+      <div class="sect">Insight</div>
+      <div class="nav" style="background:#eff6ff"><span class="dot" style="background:#1d4ed8"></span><span style="font-weight:600;color:#1e40af">Reports</span></div>
+      <div class="nav" style="justify-content:space-between"><span style="display:flex;align-items:center;gap:10px"><span class="dot"></span>Notifications</span><span class="pill" style="background:#fee2e2;color:#991b1b">4</span></div>
+      <div class="sect">Workspace</div>
+      <div class="nav"><span class="dot"></span>Team</div>
+      <div class="nav"><span class="dot"></span>Settings</div>
+    </div>
+    <div style="background:#f8fafc;padding:22px 24px 26px">
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:20px">
+        <div><div style="font:500 13px/19px Inter,sans-serif;color:#64748b">Insight</div><div style="font:700 26px/34px Inter,sans-serif;letter-spacing:-.02em">Reports</div><div style="font:400 14px/21px Inter,sans-serif;color:#475569;margin-top:2px">Two reports in this release. Both read the same records the rest of the product reads.</div></div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:14px">
+        <span class="pill" style="height:36px;align-items:center;padding:0 16px;background:#0f172a;color:#fff">Stock on hand</span>
+        <span class="pill" style="height:36px;align-items:center;padding:0 16px;background:#fff;border:1px solid #cbd5e1;color:#475569">Stock movement</span>
+      </div>
+      <div style="background:#fff;border:1px solid #cbd5e1;border-radius:8px;margin-top:14px;overflow:hidden">
+        <div style="padding:14px 16px;border-bottom:1px solid #e2e8f0;display:flex;align-items:flex-end;justify-content:space-between;gap:16px">
+          <div><div style="font:600 16px/24px Inter,sans-serif">Stock on hand · valuation</div><div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:2px">Grand Ocean Hotel · both store rooms · as at 13 Aug 2026, 09:12 · LKR</div></div>
+          <div style="display:flex;gap:8px"><div class="fld" style="width:180px">Store room: All<span style="color:#64748b">▾</span></div><div class="fld" style="width:170px">Category: All<span style="color:#64748b">▾</span></div><span class="btns">Export CSV</span></div>
+        </div>
+        <div class="g6h" style="grid-template-columns:minmax(0,1fr) 96px 92px 132px 128px 148px;column-gap:12px"><span>Product</span><span>SKU</span><span>Category</span><span style="text-align:right">On hand</span><span style="text-align:right">Unit cost</span><span style="text-align:right">Stock value</span></div>
+        <div class="g6r" style="grid-template-columns:minmax(0,1fr) 96px 92px 132px 128px 148px;column-gap:12px"><span style="font-weight:600">Chicken Breast</span><span class="tnum" style="color:#475569">MEAT-001</span><span style="color:#475569">Meat</span><span class="tnum" style="text-align:right">120.000 KG</span><span class="tnum" style="text-align:right;color:#475569">1,250.00</span><span class="tnum" style="text-align:right">150,000.00</span></div>
+        <div class="g6r" style="grid-template-columns:minmax(0,1fr) 96px 92px 132px 128px 148px;column-gap:12px"><span style="font-weight:600">Beef Mince</span><span class="tnum" style="color:#475569">MEAT-002</span><span style="color:#475569">Meat</span><span class="tnum" style="text-align:right">40.000 KG</span><span class="tnum" style="text-align:right;color:#475569">2,100.00</span><span class="tnum" style="text-align:right">84,000.00</span></div>
+        <div class="g6r" style="grid-template-columns:minmax(0,1fr) 96px 92px 132px 128px 148px;column-gap:12px"><span style="font-weight:600">Fish Fillet</span><span class="tnum" style="color:#475569">MEAT-003</span><span style="color:#475569">Meat</span><span class="tnum" style="text-align:right">10.000 KG</span><span class="tnum" style="text-align:right;color:#475569">1,850.00</span><span class="tnum" style="text-align:right">18,500.00</span></div>
+        <div style="display:grid;grid-template-columns:minmax(0,1fr) 96px 92px 132px 128px 148px;column-gap:12px;align-items:center;height:32px;padding:0 16px;border-top:1px solid #e2e8f0;background:#f8fafc;font:600 13px Inter,sans-serif"><span>Meat · 3 products</span><span></span><span></span><span></span><span></span><span class="tnum" style="text-align:right">252,500.00</span></div>
+        <div class="g6r" style="grid-template-columns:minmax(0,1fr) 96px 92px 132px 128px 148px;column-gap:12px"><span style="font-weight:600">Fresh Milk</span><span class="tnum" style="color:#475569">DAIR-001</span><span style="color:#475569">Dairy</span><span class="tnum" style="text-align:right">120.000 L</span><span class="tnum" style="text-align:right;color:#475569">380.00</span><span class="tnum" style="text-align:right">45,600.00</span></div>
+        <div class="g6r" style="grid-template-columns:minmax(0,1fr) 96px 92px 132px 128px 148px;column-gap:12px"><span style="font-weight:600">Butter Block</span><span class="tnum" style="color:#475569">DAIR-002</span><span style="color:#475569">Dairy</span><span class="tnum" style="text-align:right">8.000 KG</span><span class="tnum" style="text-align:right;color:#475569">2,600.00</span><span class="tnum" style="text-align:right">20,800.00</span></div>
+        <div class="g6r" style="grid-template-columns:minmax(0,1fr) 96px 92px 132px 128px 148px;column-gap:12px"><span style="font-weight:600">Cheddar Cheese</span><span class="tnum" style="color:#475569">DAIR-003</span><span style="color:#475569">Dairy</span><span class="tnum" style="text-align:right">25.000 KG</span><span class="tnum" style="text-align:right;color:#475569">3,200.00</span><span class="tnum" style="text-align:right">80,000.00</span></div>
+        <div style="display:grid;grid-template-columns:minmax(0,1fr) 96px 92px 132px 128px 148px;column-gap:12px;align-items:center;height:32px;padding:0 16px;border-top:1px solid #e2e8f0;background:#f8fafc;font:600 13px Inter,sans-serif"><span>Dairy · 3 products</span><span></span><span></span><span></span><span></span><span class="tnum" style="text-align:right">146,400.00</span></div>
+        <div class="g6r" style="grid-template-columns:minmax(0,1fr) 96px 92px 132px 128px 148px;column-gap:12px"><span style="font-weight:600">Basmati Rice</span><span class="tnum" style="color:#475569">DRY-001</span><span style="color:#475569">Dry Goods</span><span class="tnum" style="text-align:right">250.000 KG</span><span class="tnum" style="text-align:right;color:#475569">420.00</span><span class="tnum" style="text-align:right">105,000.00</span></div>
+        <div class="g6r" style="grid-template-columns:minmax(0,1fr) 96px 92px 132px 128px 148px;column-gap:12px"><span style="font-weight:600">Wheat Flour</span><span class="tnum" style="color:#475569">DRY-002</span><span style="color:#475569">Dry Goods</span><span class="tnum" style="text-align:right">60.000 KG</span><span class="tnum" style="text-align:right;color:#475569">210.00</span><span class="tnum" style="text-align:right">12,600.00</span></div>
+        <div class="g6r" style="grid-template-columns:minmax(0,1fr) 96px 92px 132px 128px 148px;column-gap:12px"><span style="font-weight:600">Sugar</span><span class="tnum" style="color:#475569">DRY-003</span><span style="color:#475569">Dry Goods</span><span class="tnum" style="text-align:right">300.000 KG</span><span class="tnum" style="text-align:right;color:#475569">260.00</span><span class="tnum" style="text-align:right">78,000.00</span></div>
+        <div class="g6r" style="grid-template-columns:minmax(0,1fr) 96px 92px 132px 128px 148px;column-gap:12px"><span style="font-weight:600">Cooking Oil</span><span class="tnum" style="color:#475569">DRY-004</span><span style="color:#475569">Dry Goods</span><span class="tnum" style="text-align:right">0.000 L</span><span class="tnum" style="text-align:right;color:#475569">890.00</span><span class="tnum" style="text-align:right">0.00</span></div>
+        <div style="display:grid;grid-template-columns:minmax(0,1fr) 96px 92px 132px 128px 148px;column-gap:12px;align-items:center;height:32px;padding:0 16px;border-top:1px solid #e2e8f0;background:#f8fafc;font:600 13px Inter,sans-serif"><span>Dry Goods · 4 products</span><span></span><span></span><span></span><span></span><span class="tnum" style="text-align:right">195,600.00</span></div>
+        <div class="g6r" style="grid-template-columns:minmax(0,1fr) 96px 92px 132px 128px 148px;column-gap:12px"><span style="font-weight:600">Bottled Water 1L</span><span class="tnum" style="color:#475569">BEV-001</span><span style="color:#475569">Beverages</span><span class="tnum" style="text-align:right">600.000 EACH</span><span class="tnum" style="text-align:right;color:#475569">90.00</span><span class="tnum" style="text-align:right">54,000.00</span></div>
+        <div class="g6r" style="grid-template-columns:minmax(0,1fr) 96px 92px 132px 128px 148px;column-gap:12px"><span style="font-weight:600">Orange Juice 1L</span><span class="tnum" style="color:#475569">BEV-002</span><span style="color:#475569">Beverages</span><span class="tnum" style="text-align:right">90.000 EACH</span><span class="tnum" style="text-align:right;color:#475569">480.00</span><span class="tnum" style="text-align:right">43,200.00</span></div>
+        <div style="display:grid;grid-template-columns:minmax(0,1fr) 96px 92px 132px 128px 148px;column-gap:12px;align-items:center;height:32px;padding:0 16px;border-top:1px solid #e2e8f0;background:#f8fafc;font:600 13px Inter,sans-serif"><span>Beverages · 2 products</span><span></span><span></span><span></span><span></span><span class="tnum" style="text-align:right">97,200.00</span></div>
+        <div style="display:grid;grid-template-columns:minmax(0,1fr) 96px 92px 132px 128px 148px;column-gap:12px;align-items:center;height:42px;padding:0 16px;border-top:1px solid #cbd5e1;background:#0f172a;color:#fff;font:700 15px Inter,sans-serif"><span>Total inventory value</span><span></span><span style="font-weight:500;font-size:13px">4 categories</span><span></span><span></span><span class="tnum" style="text-align:right">LKR 691,700.00</span></div>
+        <div class="pg"><span>12 rows · the same twelve products, the same figure the dashboard shows</span><span style="color:#64748b">Cooking Oil is listed at zero rather than omitted</span></div>
+      </div>
+      <div style="display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:14px;margin-top:14px">
+        <div style="background:#fff;border:1px solid #cbd5e1;border-radius:8px;overflow:hidden">
+          <div style="padding:14px 16px;border-bottom:1px solid #e2e8f0;display:flex;align-items:flex-end;justify-content:space-between;gap:16px">
+            <div><div style="font:600 16px/24px Inter,sans-serif">Stock movement · by product</div><div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:2px">1 – 13 Aug 2026 · 17 recorded movements</div></div>
+            <span class="btns">Export CSV</span>
+          </div>
+          <div class="g6h" style="grid-template-columns:minmax(0,1fr) 104px 104px 112px 104px 112px;column-gap:12px"><span>Product</span><span style="text-align:right">Opening</span><span style="text-align:right">Received</span><span style="text-align:right">Issued</span><span style="text-align:right">Corrected</span><span style="text-align:right">Closing</span></div>
+          <div class="g6r" style="grid-template-columns:minmax(0,1fr) 104px 104px 112px 104px 112px;column-gap:12px;border-top-color:#e2e8f0"><span style="font-weight:600">Chicken Breast <span style="font-weight:400;color:#64748b">KG</span></span><span class="tnum" style="text-align:right;color:#475569">18.000</span><span class="tnum" style="text-align:right">100.000</span><span class="tnum" style="text-align:right;color:#64748b">0.000</span><span class="tnum" style="text-align:right">+2.000</span><span class="tnum" style="text-align:right;font-weight:600">120.000</span></div>
+          <div class="g6r" style="grid-template-columns:minmax(0,1fr) 104px 104px 112px 104px 112px;column-gap:12px;height:auto;padding-top:9px;padding-bottom:9px"><span style="color:#475569">The other eleven products <span style="color:#64748b">opened on 1 August and have not moved since</span></span><span class="tnum" style="text-align:right;color:#64748b">as listed</span><span class="tnum" style="text-align:right;color:#64748b">0.000</span><span class="tnum" style="text-align:right;color:#64748b">0.000</span><span class="tnum" style="text-align:right;color:#64748b">0.000</span><span class="tnum" style="text-align:right;color:#475569">unchanged</span></div>
+          <div class="pg"><span>17 movements · twelve opening balances on 1 August, five later movements, all of them on Chicken Breast</span><a href="#6f" style="font-weight:600">See the Chicken Breast ledger</a></div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div style="background:#fff;border:1px solid #cbd5e1;border-radius:8px;padding:14px 16px"><div style="font:600 14px/20px Inter,sans-serif">Export is a report feature, not a page feature</div><div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:4px">These two reports are the only surfaces carrying Export in this release. It writes the rows already on screen for the current filters — nothing is re-queried, and no page beyond the visible one is fetched.</div></div>
+          <div style="background:#fff;border:1px solid #cbd5e1;border-radius:8px;padding:14px 16px"><div style="font:600 14px/20px Inter,sans-serif">Reports state their basis</div><div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:4px">Each report names the workspace, the store rooms included, the currency and the moment it was taken, so a printed copy can still be trusted a week later.</div></div>
+          <div style="background:#fff;border:1px solid #cbd5e1;border-radius:8px;padding:14px 16px"><div style="font:600 14px/20px Inter,sans-serif">Only your own numbers</div><div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:4px">A received quantity that arrived from a supplier appears here as your own movement. No counterparty stock, cost or store-room figure is ever included in a report.</div></div>
+          <div style="background:#f1f5f9;border:1px solid #cbd5e1;border-radius:8px;padding:14px 16px"><div style="font:600 14px/20px Inter,sans-serif">Not in this release</div><div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:4px">No forecasting, no reorder prediction, no supplier scorecards, no custom report builder. The Reports page lists exactly two entries and says so.</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<p class="dv-cap"><strong>Both reports reconcile.</strong> Category subtotals sum to LKR 691,700.00 and match the store-room split in <a href="#6j">6j</a> (Meat + Dairy = Cold Room 398,900.00; Dry Goods + Beverages = Main Store 292,800.00); the movement report's closing column matches the on-hand column of <a href="#6d">6d</a> product for product, and its five later movements are exactly the five drawn in the ledger of <a href="#6h">6h</a>.</p>
+</div>
+
+<div class="dv-opt" id="6m" data-screen-label="G6 Mobile inventory 390">
+<div class="dv-olabel"><a class="dv-oid" href="#6m">6m</a>390 px — what inventory becomes on a phone in the store room</div>
+<div class="dv-card" style="width:1320px">
+  <div style="background:#f8fafc;padding:22px 24px 26px">
+    <div style="display:flex;gap:30px;justify-content:center">
+<div style="width:390px;flex:none"><div style="font:600 12px/17px Inter,sans-serif;color:#475569;margin-bottom:8px">Products · list becomes cards</div><div style="width:390px;height:844px;background:#fff;border:1px solid #cbd5e1;border-radius:22px;overflow:hidden;display:flex;flex-direction:column"><div style="height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 22px;font:600 14px Inter,sans-serif"><span class="tnum">9:41</span><span style="display:flex;align-items:center;gap:5px"><svg width="17" height="11" viewBox="0 0 17 11" fill="#0f172a"><rect x="0" y="7" width="3" height="4" rx="1"></rect><rect x="4.6" y="5" width="3" height="6" rx="1"></rect><rect x="9.2" y="2.6" width="3" height="8.4" rx="1"></rect><rect x="13.8" y="0" width="3" height="11" rx="1"></rect></svg><svg width="24" height="12" viewBox="0 0 24 12" fill="none"><rect x="0.5" y="0.5" width="19" height="11" rx="3" stroke="#0f172a" opacity=".4"></rect><rect x="2" y="2" width="14" height="8" rx="1.6" fill="#0f172a"></rect><path d="M21.5 4v4a2.2 2.2 0 0 0 0-4" fill="#0f172a" opacity=".4"></path></svg></span></div><div style="padding:6px 16px 12px;border-bottom:1px solid #e2e8f0">
+  <div style="display:flex;align-items:center;justify-content:space-between;height:44px"><span style="font:700 22px/30px Inter,sans-serif;letter-spacing:-.02em">Products</span><span style="width:44px;height:44px;border-radius:9999px;background:#1d4ed8;color:#fff;font:600 24px/44px Inter,sans-serif;text-align:center">+</span></div>
+  <div style="height:44px;border:1px solid #64748b;border-radius:8px;display:flex;align-items:center;gap:8px;padding:0 12px;margin-top:8px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4.2-4.2"></path></svg><span style="font:400 15px Inter,sans-serif;color:#64748b">Search name or SKU</span></div>
+  <div style="display:flex;gap:8px;margin-top:10px;overflow:hidden"><span class="pill" style="height:36px;align-items:center;padding:0 14px;background:#0f172a;color:#fff;flex:none">All · 12</span><span class="pill" style="height:36px;align-items:center;padding:0 14px;background:#fff;border:1px solid #cbd5e1;color:#475569;flex:none">Needs attention · 4</span><span class="pill" style="height:36px;align-items:center;padding:0 14px;background:#fff;border:1px solid #cbd5e1;color:#475569;flex:none">Cold Room</span></div>
+</div>
+<div style="flex:1;overflow:hidden">
+  <div style="min-height:72px;padding:13px 16px;border-bottom:1px solid #f1f5f9;display:flex;align-items:center;justify-content:space-between;gap:12px">
+    <div style="min-width:0"><div style="font:600 16px/22px Inter,sans-serif;display:flex;align-items:center;gap:7px">Chicken Breast</div><div style="font:400 13px/18px Inter,sans-serif;color:#64748b;margin-top:2px">MEAT-001 · Cold Room · min 20.000</div></div>
+    <div style="text-align:right;flex:none"><div class="tnum" style="font:600 16px/22px Inter,sans-serif;color:#0f172a">120.000 KG</div><div style="font:500 13px/18px Inter,sans-serif;color:#1d4ed8;margin-top:2px">Adjust</div></div>
+  </div>
+  <div style="min-height:72px;padding:13px 16px;border-bottom:1px solid #f1f5f9;display:flex;align-items:center;justify-content:space-between;gap:12px">
+    <div style="min-width:0"><div style="font:600 16px/22px Inter,sans-serif;display:flex;align-items:center;gap:7px">Cooking Oil<span class="pill" style="background:#fee2e2;color:#991b1b">Out</span></div><div style="font:400 13px/18px Inter,sans-serif;color:#64748b;margin-top:2px">DRY-004 · Main Store · min 40.000</div></div>
+    <div style="text-align:right;flex:none"><div class="tnum" style="font:600 16px/22px Inter,sans-serif;color:#991b1b">0.000 L</div><div style="font:500 13px/18px Inter,sans-serif;color:#1d4ed8;margin-top:2px">Adjust</div></div>
+  </div>
+  <div style="min-height:72px;padding:13px 16px;border-bottom:1px solid #f1f5f9;display:flex;align-items:center;justify-content:space-between;gap:12px">
+    <div style="min-width:0"><div style="font:600 16px/22px Inter,sans-serif;display:flex;align-items:center;gap:7px">Wheat Flour<span class="pill" style="background:#fef3c7;color:#854d0e">Low</span></div><div style="font:400 13px/18px Inter,sans-serif;color:#64748b;margin-top:2px">DRY-002 · Main Store · min 80.000</div></div>
+    <div style="text-align:right;flex:none"><div class="tnum" style="font:600 16px/22px Inter,sans-serif;color:#854d0e">60.000 KG</div><div style="font:500 13px/18px Inter,sans-serif;color:#1d4ed8;margin-top:2px">Adjust</div></div>
+  </div>
+  <div style="min-height:72px;padding:13px 16px;border-bottom:1px solid #f1f5f9;display:flex;align-items:center;justify-content:space-between;gap:12px">
+    <div style="min-width:0"><div style="font:600 16px/22px Inter,sans-serif;display:flex;align-items:center;gap:7px">Butter Block<span class="pill" style="background:#fef3c7;color:#854d0e">Low</span></div><div style="font:400 13px/18px Inter,sans-serif;color:#64748b;margin-top:2px">DAIR-002 · Cold Room · min 10.000</div></div>
+    <div style="text-align:right;flex:none"><div class="tnum" style="font:600 16px/22px Inter,sans-serif;color:#854d0e">8.000 KG</div><div style="font:500 13px/18px Inter,sans-serif;color:#1d4ed8;margin-top:2px">Adjust</div></div>
+  </div>
+  <div style="min-height:72px;padding:13px 16px;border-bottom:1px solid #f1f5f9;display:flex;align-items:center;justify-content:space-between;gap:12px">
+    <div style="min-width:0"><div style="font:600 16px/22px Inter,sans-serif;display:flex;align-items:center;gap:7px">Fish Fillet<span class="pill" style="background:#fef3c7;color:#854d0e">Low</span></div><div style="font:400 13px/18px Inter,sans-serif;color:#64748b;margin-top:2px">MEAT-003 · Cold Room · min 12.000</div></div>
+    <div style="text-align:right;flex:none"><div class="tnum" style="font:600 16px/22px Inter,sans-serif;color:#854d0e">10.000 KG</div><div style="font:500 13px/18px Inter,sans-serif;color:#1d4ed8;margin-top:2px">Adjust</div></div>
+  </div>
+  <div style="padding:14px 16px;font:400 13px/19px Inter,sans-serif;color:#64748b">Showing 5 of 12 · scroll for the rest</div>
+</div>
+<div style="margin-top:auto;height:76px;border-top:1px solid #e2e8f0;background:#fff;display:grid;grid-template-columns:repeat(4,1fr);align-items:start;padding-top:8px">
+<div style="height:56px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px"><span style="width:22px;height:22px;border-radius:6px;background:#cbd5e1"></span><span style="font:500 12px/16px Inter,sans-serif;color:#64748b">Home</span></div>
+<div style="height:56px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px"><span style="width:22px;height:22px;border-radius:6px;background:#1d4ed8"></span><span style="font:600 12px/16px Inter,sans-serif;color:#1e40af">Products</span></div>
+<div style="height:56px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px"><span style="width:22px;height:22px;border-radius:6px;background:#cbd5e1"></span><span style="font:500 12px/16px Inter,sans-serif;color:#64748b">Receive</span></div>
+<div style="height:56px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px"><span style="width:22px;height:22px;border-radius:6px;background:#cbd5e1"></span><span style="font:500 12px/16px Inter,sans-serif;color:#64748b">More</span></div>
+</div></div></div>
+<div style="width:390px;flex:none"><div style="font:600 12px/17px Inter,sans-serif;color:#475569;margin-bottom:8px">Product detail · one column, ledger last</div><div style="width:390px;height:844px;background:#fff;border:1px solid #cbd5e1;border-radius:22px;overflow:hidden;display:flex;flex-direction:column"><div style="height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 22px;font:600 14px Inter,sans-serif"><span class="tnum">9:41</span><span style="display:flex;align-items:center;gap:5px"><svg width="17" height="11" viewBox="0 0 17 11" fill="#0f172a"><rect x="0" y="7" width="3" height="4" rx="1"></rect><rect x="4.6" y="5" width="3" height="6" rx="1"></rect><rect x="9.2" y="2.6" width="3" height="8.4" rx="1"></rect><rect x="13.8" y="0" width="3" height="11" rx="1"></rect></svg><svg width="24" height="12" viewBox="0 0 24 12" fill="none"><rect x="0.5" y="0.5" width="19" height="11" rx="3" stroke="#0f172a" opacity=".4"></rect><rect x="2" y="2" width="14" height="8" rx="1.6" fill="#0f172a"></rect><path d="M21.5 4v4a2.2 2.2 0 0 0 0-4" fill="#0f172a" opacity=".4"></path></svg></span></div><div style="padding:0 16px 12px;border-bottom:1px solid #e2e8f0">
+  <div style="height:44px;display:flex;align-items:center;gap:10px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0f172a" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"></path></svg><span style="font:500 15px Inter,sans-serif;color:#475569">Products</span></div>
+  <div style="font:700 22px/30px Inter,sans-serif;letter-spacing:-.02em;margin-top:2px">Chicken Breast</div>
+  <div style="font:400 14px/20px Inter,sans-serif;color:#64748b">MEAT-001 · Meat · base unit KG</div>
+</div>
+<div style="flex:1;overflow:hidden;background:#f8fafc;padding:14px 16px">
+  <div style="background:#fff;border:1px solid #cbd5e1;border-radius:10px;padding:16px">
+    <div style="font:500 14px/20px Inter,sans-serif;color:#475569">On hand</div>
+    <div class="tnum" style="font:700 34px/42px Inter,sans-serif;letter-spacing:-.02em">120.000 KG</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:12px;padding-top:12px;border-top:1px solid #f1f5f9;font:500 14px Inter,sans-serif"><span style="color:#475569">Minimum</span><span class="tnum">20.000 KG</span></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px;font:500 14px Inter,sans-serif"><span style="color:#475569">Stock value</span><span class="tnum">LKR 150,000.00</span></div>
+  </div>
+  <div style="background:#fff;border:1px solid #cbd5e1;border-radius:10px;margin-top:12px;overflow:hidden">
+    <div style="padding:12px 14px;border-bottom:1px solid #f1f5f9;font:600 15px/21px Inter,sans-serif">Where it sits</div>
+    <div style="padding:12px 14px;display:flex;align-items:center;justify-content:space-between;font:500 15px Inter,sans-serif"><span>Cold Room</span><span class="tnum">80.000 KG</span></div>
+    <div style="padding:12px 14px;border-top:1px solid #f1f5f9;display:flex;align-items:center;justify-content:space-between;font:500 15px Inter,sans-serif"><span>Main Store</span><span class="tnum">40.000 KG</span></div>
+  </div>
+  <div style="background:#fff;border:1px solid #cbd5e1;border-radius:10px;margin-top:12px;overflow:hidden">
+    <div style="padding:12px 14px;border-bottom:1px solid #f1f5f9;font:600 15px/21px Inter,sans-serif">Recent movements</div>
+    <div style="padding:12px 14px;border-top:1px solid #f1f5f9;display:flex;align-items:flex-start;justify-content:space-between;gap:12px"><div style="min-width:0"><div style="font:500 15px/21px Inter,sans-serif">Received · CPO-2026-003</div><div style="font:400 13px/18px Inter,sans-serif;color:#64748b">12 Aug · Cold Room</div></div><div style="text-align:right;flex:none"><div class="tnum" style="font:600 15px/21px Inter,sans-serif;color:#166534">+10.000</div><div class="tnum" style="font:400 13px/18px Inter,sans-serif;color:#64748b">120.000 KG</div></div></div>
+    <div style="padding:12px 14px;border-top:1px solid #f1f5f9;display:flex;align-items:flex-start;justify-content:space-between;gap:12px"><div style="min-width:0"><div style="font:500 15px/21px Inter,sans-serif">Received · CPO-2026-003</div><div style="font:400 13px/18px Inter,sans-serif;color:#64748b">11 Aug · Cold Room</div></div><div style="text-align:right;flex:none"><div class="tnum" style="font:600 15px/21px Inter,sans-serif;color:#166534">+40.000</div><div class="tnum" style="font:400 13px/18px Inter,sans-serif;color:#64748b">110.000 KG</div></div></div>
+    <div style="padding:12px 14px;border-top:1px solid #f1f5f9;display:flex;align-items:flex-start;justify-content:space-between;gap:12px"><div style="min-width:0"><div style="font:500 15px/21px Inter,sans-serif">Received · PO-2026-001</div><div style="font:400 13px/18px Inter,sans-serif;color:#64748b">7 Aug · Cold Room</div></div><div style="text-align:right;flex:none"><div class="tnum" style="font:600 15px/21px Inter,sans-serif;color:#166534">+10.000</div><div class="tnum" style="font:400 13px/18px Inter,sans-serif;color:#64748b">70.000 KG</div></div></div>
+    <div style="padding:12px 14px;border-top:1px solid #f1f5f9;font:600 14px Inter,sans-serif;color:#1d4ed8">See all six movements</div>
+  </div>
+</div>
+<div style="border-top:1px solid #e2e8f0;background:#fff;padding:12px 16px;display:flex;gap:10px"><span style="flex:1;height:48px;border:1px solid #64748b;border-radius:8px;display:flex;align-items:center;justify-content:center;font:600 15px Inter,sans-serif">Edit</span><span style="flex:1;height:48px;border-radius:8px;background:#1d4ed8;color:#fff;display:flex;align-items:center;justify-content:center;font:600 15px Inter,sans-serif">Adjust stock</span></div></div></div>
+<div style="width:390px;flex:none"><div style="font:600 12px/17px Inter,sans-serif;color:#475569;margin-bottom:8px">Adjust stock · sheet, not a page</div><div style="width:390px;height:844px;background:#fff;border:1px solid #cbd5e1;border-radius:22px;overflow:hidden;display:flex;flex-direction:column"><div style="height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 22px;font:600 14px Inter,sans-serif"><span class="tnum">9:41</span><span style="display:flex;align-items:center;gap:5px"><svg width="17" height="11" viewBox="0 0 17 11" fill="#0f172a"><rect x="0" y="7" width="3" height="4" rx="1"></rect><rect x="4.6" y="5" width="3" height="6" rx="1"></rect><rect x="9.2" y="2.6" width="3" height="8.4" rx="1"></rect><rect x="13.8" y="0" width="3" height="11" rx="1"></rect></svg><svg width="24" height="12" viewBox="0 0 24 12" fill="none"><rect x="0.5" y="0.5" width="19" height="11" rx="3" stroke="#0f172a" opacity=".4"></rect><rect x="2" y="2" width="14" height="8" rx="1.6" fill="#0f172a"></rect><path d="M21.5 4v4a2.2 2.2 0 0 0 0-4" fill="#0f172a" opacity=".4"></path></svg></span></div><div style="flex:1;background:#f8fafc;position:relative;overflow:hidden">
+  <div style="opacity:.35;padding:16px">
+    <div style="font:700 22px/30px Inter,sans-serif">Chicken Breast</div>
+    <div class="tnum" style="font:700 34px/42px Inter,sans-serif;margin-top:10px">120.000 KG</div>
+  </div>
+  <div style="position:absolute;inset:0;background:rgb(15 23 42 / .45)"></div>
+  <div style="position:absolute;left:0;right:0;bottom:0;background:#fff;border-radius:18px 18px 0 0;padding:8px 16px 16px;box-shadow:0 -12px 30px rgb(15 23 42 / .2)">
+    <div style="width:44px;height:5px;border-radius:9999px;background:#cbd5e1;margin:6px auto 12px"></div>
+    <div style="font:700 20px/28px Inter,sans-serif">Adjust stock</div>
+    <div style="font:400 14px/20px Inter,sans-serif;color:#64748b;margin-top:2px">Chicken Breast · MEAT-001 · KG</div>
+    <div style="margin-top:14px"><label class="lbl" style="font-size:14px">Store room</label><div style="height:48px;border:1px solid #64748b;border-radius:8px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;font:400 16px Inter,sans-serif">Cold Room<span style="color:#64748b">▾</span></div></div>
+    <div style="margin-top:12px"><label class="lbl" style="font-size:14px">New counted quantity</label><div style="display:flex;gap:10px"><span style="width:48px;height:48px;border:1px solid #64748b;border-radius:8px;display:flex;align-items:center;justify-content:center;font:600 22px Inter,sans-serif;flex:none">−</span><div class="tnum" style="flex:1;height:48px;border:1px solid #1d4ed8;border-radius:8px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;font:600 17px Inter,sans-serif;box-shadow:0 0 0 3px rgb(29 78 216 / .18)">76.000<span style="font-weight:500;color:#64748b">KG</span></div><span style="width:48px;height:48px;border:1px solid #64748b;border-radius:8px;display:flex;align-items:center;justify-content:center;font:600 22px Inter,sans-serif;flex:none">+</span></div></div>
+    <div style="margin-top:12px;border:1px solid #cbd5e1;border-radius:10px;overflow:hidden">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 14px;font:500 15px Inter,sans-serif"><span style="color:#475569">Cold Room now</span><span class="tnum">80.000 KG</span></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-top:1px solid #f1f5f9;font:500 15px Inter,sans-serif"><span style="color:#475569">Change</span><span class="tnum" style="color:#991b1b;font-weight:600">−4.000 KG</span></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-top:1px solid #f1f5f9;background:#f8fafc;font:600 15px Inter,sans-serif"><span>Cold Room after</span><span class="tnum">76.000 KG</span></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-top:1px solid #f1f5f9;font:500 14px Inter,sans-serif"><span style="color:#475569">Total across both store rooms</span><span class="tnum" style="color:#475569">116.000 KG</span></div>
+    </div>
+    <div style="margin-top:12px"><label class="lbl" style="font-size:14px">Reason <span style="font-weight:400;color:#991b1b">required</span></label><div style="height:48px;border:1px solid #64748b;border-radius:8px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;font:400 16px Inter,sans-serif">Recount after service<span style="color:#64748b">▾</span></div><div class="hint" style="font-size:13px">The reason is kept with the movement for good, and shows next to it in the history.</div></div>
+    <div style="display:flex;gap:10px;margin-top:16px"><span style="flex:1;height:48px;border:1px solid #64748b;border-radius:8px;display:flex;align-items:center;justify-content:center;font:600 15px Inter,sans-serif">Cancel</span><span style="flex:1.4;height:48px;border-radius:8px;background:#1d4ed8;color:#fff;display:flex;align-items:center;justify-content:center;font:600 15px Inter,sans-serif">Record adjustment</span></div>
+  </div>
+</div></div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:20px">
+      <div style="background:#fff;border:1px solid #cbd5e1;border-radius:8px;padding:14px 16px"><div style="font:600 14px/20px Inter,sans-serif">Tables become cards, not scrollers</div><div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:4px">The seven-column desktop list keeps only what a person in the store room acts on: name, state, quantity, where it sits, and one action. Nothing is placed behind a sideways scroll.</div></div>
+      <div style="background:#fff;border:1px solid #cbd5e1;border-radius:8px;padding:14px 16px"><div style="font:600 14px/20px Inter,sans-serif">44 px is the floor, 48 px is the habit</div><div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:4px">Rows are 72 px, tab items 56 px, form controls and buttons 48 px, and the smallest tappable thing on any of these three screens is the 44 px new-product button. Text never drops below 13 px.</div></div>
+      <div style="background:#fff;border:1px solid #cbd5e1;border-radius:8px;padding:14px 16px"><div style="font:600 14px/20px Inter,sans-serif">The arithmetic still shows</div><div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:4px">The adjustment sheet states now, change and after for the chosen store room, plus the resulting total across both — the same guard rail as the desktop form, in a shorter sentence.</div></div>
+      <div style="background:#fff;border:1px solid #cbd5e1;border-radius:8px;padding:14px 16px"><div style="font:600 14px/20px Inter,sans-serif">Four destinations, not sixteen</div><div style="font:400 13px/19px Inter,sans-serif;color:#475569;margin-top:4px">The phone carries Home, Products, Receive and More; the remaining destinations live under More in the same order as the sidebar, so the two shapes stay learnable as one product.</div></div>
+    </div>
+  </div>
+</div>
+<p class="dv-cap"><strong>Drawn at true 390 × 844.</strong> A reduction of the same 120.000 KG record — no phone-only figure, no phone-only feature, and no capability removed that the role still permits. Reason stays required on the small screen, because that is where a hurried adjustment is most likely.</p>
+</div>
+
+</div>
+</section>
+</x-dc>
+</body>
+</html>
