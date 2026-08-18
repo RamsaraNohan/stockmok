@@ -14,11 +14,29 @@ describe('frozen public registries and package boundary', () => {
     expect(Object.keys(converters)).toHaveLength(30);
   });
 
-  it('reserves canonical seed and replay script names', () => {
+  /**
+   * A3R-P2 reserved the canonical `seed` name for the **real command layer**,
+   * and B4 is the phase that claims it: `scripts/seed.ts` builds DB-08 §1–§4
+   * through `org.create`, `product.create`, `stock.recordOpeningBalance` and the
+   * connected commands. The C1 emulator-bootstrap variants stay beside it under
+   * their own `:bootstrap` names — they certify fixture construction and
+   * arithmetic only, and were never an upgrade of `T-SEED-01a`/`T-SEED-01b`.
+   *
+   * `seed:prod` stays **undefined**: DB-08 §5 requires an interactive
+   * confirmation and a refusal against a non-empty database, and a script that
+   * does not exist cannot be run by accident.
+   */
+  it('the canonical seed name is claimed by the command-driven seed, and seed:prod is not', () => {
     const packageJson = JSON.parse(readFileSync('package.json', 'utf8')) as {
       scripts: Record<string, string>;
     };
-    expect(packageJson.scripts.seed).toBeUndefined();
+    expect(packageJson.scripts.seed).toBe('tsx scripts/seed.ts --target=emulator');
+    expect(packageJson.scripts['seed:chain']).toBe('tsx scripts/seed.ts --target=emulator --chain');
+    // Every entry point states the emulator target explicitly; none may omit it.
+    for (const name of ['seed', 'seed:chain', 'seed:bootstrap', 'replay:bootstrap']) {
+      expect(packageJson.scripts[name], name).toContain('--target=emulator');
+    }
+    expect(packageJson.scripts['seed:prod']).toBeUndefined();
     expect(packageJson.scripts.replay).toBeUndefined();
     expect(packageJson.scripts['seed:bootstrap']).toBeDefined();
     expect(packageJson.scripts['replay:bootstrap']).toBeDefined();

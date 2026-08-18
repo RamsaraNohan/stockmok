@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { assertBootstrapSafety } from '../scripts/bootstrap/context.js';
+import { assertSeedSafety } from '../scripts/canonical/context.js';
 
 const KEYS = [
   'FIRESTORE_EMULATOR_HOST',
@@ -62,5 +63,59 @@ describe('emulator bootstrap safety boundary', () => {
     expect(() => {
       assertBootstrapSafety(['--target=emulator']);
     }).toThrow('forbidden');
+  });
+});
+
+/**
+ * The canonical seed's own gate (DB-08 §5, §35). It is a **separate** function
+ * from the bootstrap gate rather than a shared one, because the two scripts have
+ * different requirements — the canonical seed does not need the Auth emulator —
+ * and a gate that is loosened for one caller is loosened for both.
+ */
+describe('assertSeedSafety — the canonical seed refuses rather than defaults', () => {
+  it('accepts an explicit emulator target with a loopback host', () => {
+    expect(() => {
+      assertSeedSafety(['--target=emulator']);
+    }).not.toThrow();
+  });
+
+  it('refuses when no target is stated at all', () => {
+    expect(() => {
+      assertSeedSafety([]);
+    }).toThrow(/requires --target=emulator/);
+  });
+
+  it('refuses any argument naming production, even alongside the emulator target', () => {
+    expect(() => {
+      assertSeedSafety(['--target=emulator', '--target=production']);
+    }).toThrow(/refuses a production target/);
+    expect(() => {
+      assertSeedSafety(['--target=emulator', '--confirm-production']);
+    }).toThrow(/refuses a production target/);
+  });
+
+  it('refuses a missing or non-loopback Firestore host', () => {
+    delete process.env.FIRESTORE_EMULATOR_HOST;
+    expect(() => {
+      assertSeedSafety(['--target=emulator']);
+    }).toThrow(/FIRESTORE_EMULATOR_HOST is required/);
+
+    process.env.FIRESTORE_EMULATOR_HOST = 'firestore.googleapis.com:443';
+    expect(() => {
+      assertSeedSafety(['--target=emulator']);
+    }).toThrow(/must point to a loopback emulator/);
+  });
+
+  it('refuses a different project and refuses live credentials outright', () => {
+    process.env.GCLOUD_PROJECT = 'stockmok-production';
+    expect(() => {
+      assertSeedSafety(['--target=emulator']);
+    }).toThrow(/emulator project must be stockmok/);
+
+    process.env.GCLOUD_PROJECT = 'stockmok';
+    process.env.GOOGLE_APPLICATION_CREDENTIALS = '/keys/service-account.json';
+    expect(() => {
+      assertSeedSafety(['--target=emulator']);
+    }).toThrow(/Live service-account credentials are forbidden/);
   });
 });
