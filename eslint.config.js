@@ -40,7 +40,13 @@ export default tseslint.config(
     },
   },
   {
-    files: ['packages/shared/src/server/**', 'scripts/**', 'tests/**'],
+    // Zone-4 paths are server-only, not client-only: the trusted backend under
+    // `functions/src/**` is exactly the "server" the restriction means to allow
+    // (DB-01 §4, FIREBASE_PATH_CONTRACT §4) — B1's original allowlist covered
+    // the package's own server module plus tooling but omitted the backend
+    // itself, which B2's `org.create` (handleReservations) is the first real
+    // consumer of.
+    files: ['packages/shared/src/server/**', 'functions/src/**', 'scripts/**', 'tests/**'],
     rules: {
       'no-restricted-imports': 'off',
     },
