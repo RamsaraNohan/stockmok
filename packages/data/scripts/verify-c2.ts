@@ -1,5 +1,6 @@
 import { readFile } from 'node:fs/promises';
 import { ACTIVE_QUERY_IDS } from '@stockmok/shared';
+import { generateAllIndexes } from '../../../scripts/index-spec.js';
 import { PRODUCT_LIST_MATRIX } from '../src/product-matrix.js';
 import { QUERY_COVERAGE_REGISTRY } from '../src/registry.js';
 
@@ -19,7 +20,15 @@ const db04 = await readFile(
   'utf8',
 );
 const indexes = JSON.parse(await readFile(new URL('firestore.indexes.json', root), 'utf8')) as {
-  readonly indexes: readonly { readonly collectionGroup: string }[];
+  readonly indexes: readonly {
+    readonly collectionGroup: string;
+    readonly queryScope: 'COLLECTION';
+    readonly fields: readonly {
+      readonly fieldPath: string;
+      readonly order?: 'ASCENDING' | 'DESCENDING';
+      readonly arrayConfig?: 'CONTAINS';
+    }[];
+  }[];
 };
 
 const authorityStart = db04.indexOf('## 1. Public and user-scoped');
@@ -75,6 +84,21 @@ for (const record of QUERY_COVERAGE_REGISTRY) {
 
 if (indexes.indexes.length !== 67)
   throw new Error('firestore.indexes.json must remain at 67 indexes');
+const canonicalIndex = (value: (typeof indexes.indexes)[number]): string =>
+  JSON.stringify({
+    collectionGroup: value.collectionGroup,
+    queryScope: value.queryScope,
+    fields: value.fields,
+  });
+const actualIndexSet = indexes.indexes.map(canonicalIndex).sort();
+const generatedIndexSet = generateAllIndexes()
+  .map(({ collectionGroup, queryScope, fields }) =>
+    canonicalIndex({ collectionGroup, queryScope, fields }),
+  )
+  .sort();
+if (JSON.stringify(actualIndexSet) !== JSON.stringify(generatedIndexSet)) {
+  throw new Error('firestore.indexes.json differs from the generated 67-index authority');
+}
 if (PRODUCT_LIST_MATRIX.length !== 32) throw new Error('Product-list matrix must contain 32 rows');
 if (
   PRODUCT_LIST_MATRIX.some(
@@ -100,6 +124,31 @@ for (const record of QUERY_COVERAGE_REGISTRY) {
   }
 }
 
+const q053 = QUERY_COVERAGE_REGISTRY.find(({ queryId }) => queryId === 'Q-053');
+const q053Filter = q053?.filters[0];
+if (
+  q053?.indexIds.length !== 1 ||
+  q053.indexIds[0] !== 'IDX-69' ||
+  q053.filters.length !== 1 ||
+  q053Filter?.field !== 'productStatus' ||
+  q053Filter.operator !== '==' ||
+  q053Filter.value !== 'ACTIVE'
+) {
+  throw new Error('Q-053 must use the DB-CR-039 ACTIVE-summary contract through IDX-69');
+}
+
+for (const record of QUERY_COVERAGE_REGISTRY) {
+  if (record.scope === 'organization' && !record.path.startsWith('organizations/{orgId}')) {
+    throw new Error(`${record.queryId} is not rooted in its construction-bound organization scope`);
+  }
+  if (record.scope === 'user' && !record.path.startsWith('users/{uid}')) {
+    throw new Error(`${record.queryId} is not rooted in its construction-bound user scope`);
+  }
+  if (record.kind !== 'reference' && !record.converter) {
+    throw new Error(`${record.queryId} lacks a shared-schema converter`);
+  }
+}
+
 console.log('ACTIVE_QUERY_IDS=92');
 console.log('ACTIVE_QUERY_IDS_ACCOUNTED_FOR=92');
 console.log('ACTIVE_QUERY_IDS_IMPLEMENTED=91');
@@ -112,4 +161,12 @@ console.log('ACTIVE_INDEX_IDS=67');
 console.log('PRODUCT_LIST_MATRIX_INDEXES=32');
 console.log('REALTIME_QUERY_COUNT=4');
 console.log('REALTIME_QUERIES_IMPLEMENTED=3');
+console.log('INDEX_SET_MATCH=PASS');
+console.log('DB04_MATRIX_CONTRACT_MATCH=PASS');
+console.log('PAGINATION_CONTRACTS=PASS');
+console.log('QUERY_INDEX_REFERENCES=PASS');
+console.log('TENANT_PATH_SCOPING=PASS');
+console.log('READ_SCHEMA_VALIDATION=PASS');
+console.log('Q053_DB_CR_039=PASS');
+console.log('REALTIME_QUERIES=BLOCKED_BY_Q005');
 console.log('C2_CONTRACT_VERIFICATION=PASS');

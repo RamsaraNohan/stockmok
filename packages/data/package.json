@@ -23,7 +23,7 @@
   "scripts": {
     "build": "npm run build --workspace @stockmok/shared && tsc -p tsconfig.build.json",
     "typecheck": "tsc --noEmit",
-    "lint": "eslint src test vitest.config.ts",
+    "lint": "eslint src scripts test vitest.config.ts vitest.emulator.config.ts",
     "format:check": "prettier --check package.json tsconfig.json tsconfig.build.json vitest.config.ts vitest.emulator.config.ts \"src/**/*.ts\" \"scripts/**/*.ts\" \"test/**/*.ts\"",
     "test": "vitest run --config vitest.config.ts",
     "test:emulator:inner": "vitest run --config vitest.emulator.config.ts",
