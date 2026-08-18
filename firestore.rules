@@ -156,6 +156,232 @@ service cloud.firestore {
         && get(parentPurchaseOrder(orgId, poId)).data.status == 'DRAFT';
     }
 
+    // ─────────────────────────────────────────────────────────────────────────
+    // Validated shapes (BACKEND-IR-001)
+    //
+    // Client-side Zod validation is NOT a security boundary — the client SDK
+    // persists whatever the caller hands it. Every SAFE_DIRECT_CLIENT_WRITE
+    // surface therefore re-derives its frozen document shape here: required
+    // keys, allowed keys, primitive types, enum bounds, safe-integer ranges,
+    // path/document-id equality and immutable identity/provenance.
+    //
+    // Authority: DB-02 §§2.1, 2.3, 4.1, 4.2, 5.1–5.3 · DB-03 §6 safe-direct-write
+    // register · DB-05 §§3, 4, 4.1 · the strict shared schemas
+    // (packages/shared/src/schemas/client-writes.ts and the domain schemas it
+    // derives from). No predicate below reads a document, so PATH CONSTANCY
+    // holds and DATA_DERIVED_RULE_READS stays 0.
+    // ─────────────────────────────────────────────────────────────────────────
+
+    // Quantities are integer milli-units and money is integer minor units —
+    // `SafeIntegerSchema`, bounded by Number.MAX_SAFE_INTEGER at both ends.
+    function isSafeInt(value) {
+      return value is int && value >= -9007199254740991 && value <= 9007199254740991;
+    }
+
+    function isNonNegativeInt(value) {
+      return isSafeInt(value) && value >= 0;
+    }
+
+    function isBoundedString(value, minLength, maxLength) {
+      return value is string && value.size() >= minLength && value.size() <= maxLength;
+    }
+
+    // IdSchema — 1…200 characters, exactly one path segment.
+    function isId(value) {
+      return isBoundedString(value, 1, 200) && !value.matches('.*/.*');
+    }
+
+    // CurrencySchema persists an upper-case ISO-4217 alpha-3 code.
+    function isCurrency(value) {
+      return value is string && value.matches('[A-Z]{3}');
+    }
+
+    // BACKEND-IR-001 — creation provenance is attributed to the caller, never
+    // asserted by them. `createdBy` is then immutable, so the pair cannot be
+    // forged at create and cannot be rewritten afterwards. `updatedBy` is left
+    // to the document's own audit fields: any writer holding the role may make
+    // the next edit.
+    function createdBySelf() {
+      return request.resource.data.createdBy == request.auth.uid;
+    }
+
+    // DB-02 §0.1 enums, verbatim.
+    function LIFECYCLE_STATUSES() {
+      return ['ACTIVE', 'ARCHIVED'];
+    }
+
+    function PARTNER_STATUSES() {
+      return ['ACTIVE', 'DEACTIVATED'];
+    }
+
+    function PARTNER_TYPES() {
+      return ['SUPPLIER', 'BUYER'];
+    }
+
+    function WAREHOUSE_TYPES() {
+      return ['STORE_ROOM', 'REFRIGERATED', 'FREEZER', 'KITCHEN', 'OTHER'];
+    }
+
+    function UNITS() {
+      return ['KG', 'L', 'EACH', 'PACK'];
+    }
+
+    // DB-02 §2.1 · UserClientWriteSchema. `email` and `status` are backend-only:
+    // the create allowlist and onlyChanged() on update keep them out, and `uid`
+    // is the document id.
+    function userShape(data, uid) {
+      return data.keys().hasAll(['uid', 'displayName', 'createdAt'])
+        && data.uid == uid
+        && isBoundedString(data.displayName, 1, 80)
+        && data.createdAt is timestamp
+        && (!('photoUrl' in data) || isBoundedString(data.photoUrl, 1, 2000))
+        && (!('lastSeenAt' in data) || data.lastSeenAt is timestamp);
+    }
+
+    // DB-02 §4.1 · CategoryClientWriteSchema. `status` is command-only
+    // (DB-CR-012) but is part of the persisted document, so it is bounded to the
+    // enum here and pinned by the create/update rules.
+    function categoryShape(data, categoryId) {
+      return data.keys().hasOnly([
+          'categoryId', 'name', 'description', 'status',
+          'createdAt', 'createdBy', 'updatedAt', 'updatedBy'
+        ])
+        && data.keys().hasAll([
+          'categoryId', 'name', 'status',
+          'createdAt', 'createdBy', 'updatedAt', 'updatedBy'
+        ])
+        && data.categoryId == categoryId
+        && isBoundedString(data.name, 1, 80)
+        && (!('description' in data) || isBoundedString(data.description, 0, 400))
+        && data.status in LIFECYCLE_STATUSES()
+        && data.createdAt is timestamp
+        && isId(data.createdBy)
+        && data.updatedAt is timestamp
+        && isId(data.updatedBy);
+    }
+
+    // DB-02 §4.2 · WarehouseClientWriteSchema. There is no `isDefault` field
+    // (DB-CR-013) — the key allowlist is what denies it.
+    function warehouseShape(data, warehouseId) {
+      return data.keys().hasOnly([
+          'warehouseId', 'name', 'code', 'type', 'status', 'address',
+          'createdAt', 'createdBy', 'updatedAt', 'updatedBy'
+        ])
+        && data.keys().hasAll([
+          'warehouseId', 'name', 'type', 'status',
+          'createdAt', 'createdBy', 'updatedAt', 'updatedBy'
+        ])
+        && data.warehouseId == warehouseId
+        && isBoundedString(data.name, 1, 80)
+        && (!('code' in data) || isBoundedString(data.code, 0, 40))
+        && data.type in WAREHOUSE_TYPES()
+        && data.status in LIFECYCLE_STATUSES()
+        && (!('address' in data) || isBoundedString(data.address, 0, 400))
+        && data.createdAt is timestamp
+        && isId(data.createdBy)
+        && data.updatedAt is timestamp
+        && isId(data.updatedBy);
+    }
+
+    // DB-02 §5.1 · PrivatePartnerClientWriteSchema. `partnerTypes` is the only
+    // array in the schema, bounded at 1…2 members drawn from the enum — an empty
+    // list satisfies hasOnly() on its own, which is why the floor is asserted
+    // separately.
+    function privatePartnerShape(data, partnerId) {
+      return data.keys().hasOnly([
+          'partnerId', 'partnerTypes', 'name', 'contactPerson', 'email', 'phone',
+          'address', 'notes', 'status', 'ordersPlacedCount',
+          'createdAt', 'createdBy', 'updatedAt', 'updatedBy'
+        ])
+        && data.keys().hasAll([
+          'partnerId', 'partnerTypes', 'name', 'status', 'ordersPlacedCount',
+          'createdAt', 'createdBy', 'updatedAt', 'updatedBy'
+        ])
+        && data.partnerId == partnerId
+        && data.partnerTypes is list
+        && data.partnerTypes.size() >= 1
+        && data.partnerTypes.size() <= 2
+        && data.partnerTypes.hasOnly(PARTNER_TYPES())
+        && isBoundedString(data.name, 1, 120)
+        && (!('contactPerson' in data) || isBoundedString(data.contactPerson, 0, 120))
+        && (!('email' in data) || (isBoundedString(data.email, 3, 320)
+          && data.email.matches('[^@]+@[^@]+')))
+        && (!('phone' in data) || isBoundedString(data.phone, 0, 40))
+        && (!('address' in data) || isBoundedString(data.address, 0, 400))
+        && (!('notes' in data) || isBoundedString(data.notes, 0, 1000))
+        && data.status in PARTNER_STATUSES()
+        && isNonNegativeInt(data.ordersPlacedCount)
+        && data.createdAt is timestamp
+        && isId(data.createdBy)
+        && data.updatedAt is timestamp
+        && isId(data.updatedBy);
+    }
+
+    // DB-02 §5.2 · PrivatePurchaseOrderDraftClientWriteSchema — the exact
+    // private-draft header. Every connected-only and command-only field
+    // (`orderNumber`, `counterpartyOrgId`, `counterpartyHandle`, `connectionId`,
+    // `receivingWarehouseId`, `lastOperationId` and every transition timestamp)
+    // sits outside the allowlist, so a buyer cannot forge one onto a draft.
+    //
+    // DB-05 §4.1's draftFieldsOnly() names `notes` as a changeable key while
+    // DB-02 §5.2 and the strict schema define no such field. The two agree once
+    // stated precisely: one bounds the change set, the other bounds the
+    // document, and `notes` is therefore not persistable.
+    function privateDraftShape(data, poId) {
+      return data.keys().hasOnly([
+          'purchaseOrderId', 'viewRole', 'supplierKind', 'counterpartyName',
+          'privateSupplierId', 'status', 'currency', 'expectedDate',
+          'totalMinor', 'isProjection', 'createdBy', 'createdAt', 'updatedAt'
+        ])
+        && data.keys().hasAll([
+          'purchaseOrderId', 'viewRole', 'supplierKind', 'counterpartyName',
+          'status', 'currency', 'totalMinor', 'isProjection',
+          'createdBy', 'createdAt', 'updatedAt'
+        ])
+        && data.purchaseOrderId == poId
+        && data.viewRole == 'BUYER'
+        && data.supplierKind == 'PRIVATE'
+        && isBoundedString(data.counterpartyName, 1, 120)
+        && (!('privateSupplierId' in data) || isId(data.privateSupplierId))
+        && data.status == 'DRAFT'
+        && isCurrency(data.currency)
+        && (!('expectedDate' in data) || data.expectedDate is timestamp)
+        && isNonNegativeInt(data.totalMinor)
+        && data.isProjection == false
+        && isId(data.createdBy)
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    // DB-02 §5.3 — the buyer-side line. The eight supplier/mapping snapshot
+    // fields belong to CONNECTED orders, whose lines are command-only, so they
+    // are outside this allowlist. Received quantity may never exceed ordered
+    // quantity (INV-12), and on a draft no receipt has happened at all — every
+    // receipt is C-17.
+    function privateDraftItemShape(data, itemId) {
+      return data.keys().hasOnly([
+          'itemId', 'buyerProductId', 'buyerProductNameSnapshot', 'buyerSkuSnapshot',
+          'buyerBaseUnitSnapshot', 'orderedBuyerBaseMilli', 'receivedBuyerBaseMilli',
+          'unitPriceMinor', 'lineTotalMinor', 'currency'
+        ])
+        && data.keys().hasAll([
+          'itemId', 'buyerProductId', 'buyerProductNameSnapshot', 'buyerSkuSnapshot',
+          'buyerBaseUnitSnapshot', 'orderedBuyerBaseMilli', 'receivedBuyerBaseMilli',
+          'unitPriceMinor', 'lineTotalMinor', 'currency'
+        ])
+        && data.itemId == itemId
+        && isId(data.buyerProductId)
+        && isBoundedString(data.buyerProductNameSnapshot, 1, 120)
+        && isBoundedString(data.buyerSkuSnapshot, 1, 80)
+        && data.buyerBaseUnitSnapshot in UNITS()
+        && isNonNegativeInt(data.orderedBuyerBaseMilli)
+        && isNonNegativeInt(data.receivedBuyerBaseMilli)
+        && data.receivedBuyerBaseMilli <= data.orderedBuyerBaseMilli
+        && isNonNegativeInt(data.unitPriceMinor)
+        && isNonNegativeInt(data.lineTotalMinor)
+        && isCurrency(data.currency);
+    }
+
     // ═════════════════════════════════════════════════════════════════════════
     // ZONE 1 — PUBLIC (DB-05 §2)
     // ═════════════════════════════════════════════════════════════════════════
@@ -187,10 +413,11 @@ service cloud.firestore {
       // email and status are backend-written and are absent from a client create.
       allow create: if isSelf(uid)
         && keysWithin(['uid', 'displayName', 'photoUrl', 'createdAt', 'lastSeenAt'])
-        && keysInclude(['uid', 'displayName', 'createdAt'])
-        && request.resource.data.uid == uid;
+        && userShape(request.resource.data, uid);
 
-      allow update: if isSelf(uid) && onlyChanged(['displayName', 'photoUrl', 'lastSeenAt']);
+      allow update: if isSelf(uid)
+        && onlyChanged(['displayName', 'photoUrl', 'lastSeenAt'])
+        && userShape(request.resource.data, uid);
       allow delete: if false;
 
       // A3 · F-H-10 — the ninth bounded path.
@@ -206,7 +433,10 @@ service cloud.firestore {
         allow get: if isSelf(uid);
         allow list: if isSelf(uid);
         allow create: if false;
-        allow update: if isSelf(uid) && onlyChanged(['read']);
+        allow update: if isSelf(uid)
+          && onlyChanged(['read'])
+          && keysInclude(['read'])
+          && request.resource.data.read is bool;
         allow delete: if false;
       }
     }
@@ -262,18 +492,15 @@ service cloud.firestore {
         allow list: if isActiveMember(orgId) && boundedList();
 
         allow create: if hasRole(orgId, ROLE_INVENTORY_WRITERS())
-          && keysWithin([
-            'categoryId', 'name', 'description', 'status',
-            'createdAt', 'createdBy', 'updatedAt', 'updatedBy'
-          ])
+          && categoryShape(request.resource.data, categoryId)
+          && createdBySelf()
           && request.resource.data.status == 'ACTIVE';
 
+        // Identity and creation provenance are fixed at create: a client may
+        // rename a category, never re-point it or forge who made it.
         allow update: if hasRole(orgId, ROLE_INVENTORY_WRITERS())
-          && keysWithin([
-            'categoryId', 'name', 'description', 'status',
-            'createdAt', 'createdBy', 'updatedAt', 'updatedBy'
-          ])
-          && neverChanged(['status']);
+          && categoryShape(request.resource.data, categoryId)
+          && neverChanged(['status', 'categoryId', 'createdAt', 'createdBy']);
 
         allow delete: if false;
       }
@@ -286,18 +513,13 @@ service cloud.firestore {
         allow list: if isActiveMember(orgId) && boundedList();
 
         allow create: if hasRole(orgId, ROLE_INVENTORY_WRITERS())
-          && keysWithin([
-            'warehouseId', 'name', 'code', 'type', 'status', 'address',
-            'createdAt', 'createdBy', 'updatedAt', 'updatedBy'
-          ])
+          && warehouseShape(request.resource.data, warehouseId)
+          && createdBySelf()
           && request.resource.data.status == 'ACTIVE';
 
         allow update: if hasRole(orgId, ROLE_INVENTORY_WRITERS())
-          && keysWithin([
-            'warehouseId', 'name', 'code', 'type', 'status', 'address',
-            'createdAt', 'createdBy', 'updatedAt', 'updatedBy'
-          ])
-          && neverChanged(['status']);
+          && warehouseShape(request.resource.data, warehouseId)
+          && neverChanged(['status', 'warehouseId', 'createdAt', 'createdBy']);
 
         allow delete: if false;
       }
@@ -332,21 +554,16 @@ service cloud.firestore {
         allow list: if hasRole(orgId, ROLE_PARTNER_WRITERS()) && boundedList();
 
         allow create: if hasRole(orgId, ROLE_PARTNER_WRITERS())
-          && keysWithin([
-            'partnerId', 'partnerTypes', 'name', 'contactPerson', 'email', 'phone',
-            'address', 'notes', 'status', 'ordersPlacedCount',
-            'createdAt', 'createdBy', 'updatedAt', 'updatedBy'
-          ])
+          && privatePartnerShape(request.resource.data, partnerId)
+          && createdBySelf()
           && request.resource.data.status == 'ACTIVE'
           && request.resource.data.ordersPlacedCount == 0;
 
         allow update: if hasRole(orgId, ROLE_PARTNER_WRITERS())
-          && keysWithin([
-            'partnerId', 'partnerTypes', 'name', 'contactPerson', 'email', 'phone',
-            'address', 'notes', 'status', 'ordersPlacedCount',
-            'createdAt', 'createdBy', 'updatedAt', 'updatedBy'
-          ])
-          && neverChanged(['status', 'ordersPlacedCount']);
+          && privatePartnerShape(request.resource.data, partnerId)
+          && neverChanged([
+            'status', 'ordersPlacedCount', 'partnerId', 'createdAt', 'createdBy'
+          ]);
 
         allow delete: if false;
       }
@@ -355,17 +572,28 @@ service cloud.firestore {
       match /purchaseOrders/{poId} {
         allow get, list: if hasRole(orgId, ROLE_NOT_VIEWER());
 
-        allow create: if hasRole(orgId, ROLE_PO_WRITERS()) && isNewPrivateDraft();
+        // A client total is never trusted: the frozen client-write shape pins a
+        // new draft at zero and every later total is recomputed server-side from
+        // the line snapshots (DB-02 §5.2).
+        allow create: if hasRole(orgId, ROLE_PO_WRITERS())
+          && isNewPrivateDraft()
+          && privateDraftShape(request.resource.data, poId)
+          && createdBySelf()
+          && request.resource.data.totalMinor == 0;
+
         allow update: if hasRole(orgId, ROLE_PO_WRITERS())
           && isEditableDraft()
-          && draftFieldsOnly();
+          && draftFieldsOnly()
+          && privateDraftShape(request.resource.data, poId)
+          && neverChanged(['purchaseOrderId', 'createdBy', 'createdAt']);
         allow delete: if false;
 
         match /items/{itemId} {
           allow get: if hasRole(orgId, ROLE_NOT_VIEWER());
           allow list: if hasRole(orgId, ROLE_NOT_VIEWER()) && boundedList();
           allow create, update: if hasRole(orgId, ROLE_PO_WRITERS())
-            && parentIsEditableDraft(orgId, poId);
+            && parentIsEditableDraft(orgId, poId)
+            && privateDraftItemShape(request.resource.data, itemId);
           allow delete: if false;
         }
 

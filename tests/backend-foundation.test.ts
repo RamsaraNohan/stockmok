@@ -170,6 +170,18 @@ describe('T-SEC-17 · the role registry agrees across all three sources', () => 
       'DRAFT',
       'DEACTIVATED',
       'CONNECTED',
+      // BACKEND-IR-001 — the validated-shape predicates bound four DB-02 §0.1
+      // enums by value, so the frozen members of those enums are now named in
+      // the ruleset. None is a role or a role alias.
+      'SUPPLIER',
+      'BUYER',
+      'STORE_ROOM',
+      'REFRIGERATED',
+      'FREEZER',
+      'KITCHEN',
+      'OTHER',
+      'EACH',
+      'PACK',
     ]);
     for (const token of suspects) {
       expect((ROLES as readonly string[]).includes(token) || knownNonRoles.has(token)).toBe(true);
