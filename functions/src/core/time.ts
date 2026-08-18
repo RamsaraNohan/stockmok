@@ -27,6 +27,16 @@ export function serverNow(): Timestamp {
   return Timestamp.now();
 }
 
-export function isFutureTimestamp(candidate: Timestamp, now: Timestamp = serverNow()): boolean {
+/**
+ * Accepts anything Firestore-timestamp-shaped, because the frozen shared
+ * `TimestampSchema` is structural (`{ seconds, nanoseconds, toDate, toMillis }`)
+ * so browser consumers need no `firebase-admin` dependency. Only `toMillis()`
+ * is read, so widening the parameter costs nothing and lets a command validate
+ * a payload timestamp without casting it first.
+ */
+export function isFutureTimestamp(
+  candidate: { toMillis(): number },
+  now: Timestamp = serverNow(),
+): boolean {
   return candidate.toMillis() > now.toMillis();
 }

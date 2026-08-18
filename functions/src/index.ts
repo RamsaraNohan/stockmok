@@ -1,6 +1,7 @@
-// B2 fills in the organization, team and master-data command bodies — the
+// B2 filled in the organization, team and master-data command bodies — the
 // first 17 of the 38 active callables (`C-01…C-12`, `C-35a`, `C-35b`, `C-36`,
-// `C-37`, `C-38`; DB-06 §1). Each is registered once through `commandRegistry`
+// `C-37`, `C-38`; DB-06 §1). B3 adds inventory, transfer and private
+// procurement (`C-13`, `C-14`, `C-15`, `C-16`, `C-17`, `C-33`) for 23. Each is registered once through `commandRegistry`
 // (which asserts its id, dot-case name and idempotency flag against
 // `commandDefinitions` — the frozen catalog) and exported individually, under
 // its camelCase deployment name, as its own `onCall` function — so Firebase
@@ -17,10 +18,20 @@ import {
 } from './commands/org.js';
 import { partnerSetStatus as partnerSetStatusDef } from './commands/partner.js';
 import {
+  poCancel as poCancelDef,
+  poOrder as poOrderDef,
+  poReceive as poReceiveDef,
+} from './commands/purchase-order.js';
+import {
   productCreate as productCreateDef,
   productSetStatus as productSetStatusDef,
   productUpdate as productUpdateDef,
 } from './commands/product.js';
+import {
+  stockAdjust as stockAdjustDef,
+  stockRecordOpeningBalance as stockRecordOpeningBalanceDef,
+  stockTransfer as stockTransferDef,
+} from './commands/stock.js';
 import {
   teamAcceptInvitation as teamAcceptInvitationDef,
   teamChangeMemberRole as teamChangeMemberRoleDef,
@@ -53,3 +64,13 @@ export const categoryRestore = toCallable(commandRegistry.register(categoryResto
 export const warehouseSetDefault = toCallable(commandRegistry.register(warehouseSetDefaultDef));
 export const warehouseRestore = toCallable(commandRegistry.register(warehouseRestoreDef));
 export const partnerSetStatus = toCallable(commandRegistry.register(partnerSetStatusDef));
+
+// ── B3 · inventory, transfer, private procurement ──────────────────────────
+export const stockRecordOpeningBalance = toCallable(
+  commandRegistry.register(stockRecordOpeningBalanceDef),
+);
+export const stockAdjust = toCallable(commandRegistry.register(stockAdjustDef));
+export const stockTransfer = toCallable(commandRegistry.register(stockTransferDef));
+export const poOrder = toCallable(commandRegistry.register(poOrderDef));
+export const poCancel = toCallable(commandRegistry.register(poCancelDef));
+export const poReceive = toCallable(commandRegistry.register(poReceiveDef));

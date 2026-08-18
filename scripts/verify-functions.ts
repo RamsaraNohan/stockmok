@@ -22,19 +22,20 @@ if (firebase.firestore?.rules !== 'firestore.rules')
 await readFile('firestore.rules', 'utf8');
 
 // B1 built the command frame only, so the deployed export surface was empty
-// and this guard asserted exactly that. B2 fills in the first 17 of the 38
-// active callables (C-01…C-12, C-35a, C-35b, C-36, C-37, C-38 — DB-06 §1);
-// B3 (+6) and B4 (+15) complete the remaining 21. The guard now asserts the
-// exact expected count per phase, so a callable added outside its owning
-// phase's id set — or one silently dropped — is still caught. Comments are
-// stripped first: the file documents the shape a later phase will add, and a
-// guard that trips on its own documentation is not a guard.
+// and this guard asserted exactly that. B2 filled in the first 17 of the 38
+// active callables (C-01…C-12, C-35a, C-35b, C-36, C-37, C-38 — DB-06 §1) and
+// B3 adds inventory, transfer and private procurement (C-13, C-14, C-15, C-16,
+// C-17, C-33) for 23; B4's remaining 15 complete the catalog. The guard
+// asserts the exact expected count per phase, so a callable added outside its
+// owning phase's id set — or one silently dropped — is still caught. Comments
+// are stripped first: the file documents the shape a later phase will add, and
+// a guard that trips on its own documentation is not a guard.
 const code = source.replaceAll(/\/\*[\s\S]*?\*\//g, '').replaceAll(/\/\/.*$/gm, '');
 const callableExports = code.match(/^export const \w+ = toCallable\(/gm) ?? [];
-const EXPECTED_CALLABLE_EXPORTS = 17; // B2: C-01…C-12, C-35a, C-35b, C-36, C-37, C-38
+const EXPECTED_CALLABLE_EXPORTS = 23; // B2's 17 + B3: C-13, C-14, C-15, C-16, C-17, C-33
 if (callableExports.length !== EXPECTED_CALLABLE_EXPORTS) {
   throw new Error(
-    `Expected ${String(EXPECTED_CALLABLE_EXPORTS)} callable exports (B2), found ${String(callableExports.length)}`,
+    `Expected ${String(EXPECTED_CALLABLE_EXPORTS)} callable exports (B3), found ${String(callableExports.length)}`,
   );
 }
 
