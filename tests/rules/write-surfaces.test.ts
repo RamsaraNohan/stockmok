@@ -364,6 +364,12 @@ describe('purchaseOrders — client write only while PRIVATE and DRAFT', () => {
       setDoc(doc(forRole('OWNER'), paths.purchaseOrderItem(ORG_A, IDS.privateDraftPo, 'item-2')), {
         itemId: 'item-2',
         buyerProductId: IDS.product,
+        // The three snapshot fields are required by DB-02 §5.3 and by
+        // `PurchaseOrderItemSchema`; the rules now enforce the whole line shape,
+        // so a legitimate positive fixture has to carry them.
+        buyerProductNameSnapshot: 'Chicken Breast',
+        buyerSkuSnapshot: 'SKU-1',
+        buyerBaseUnitSnapshot: 'KG',
         orderedBuyerBaseMilli: 5_000,
         receivedBuyerBaseMilli: 0,
         unitPriceMinor: 125_000,
