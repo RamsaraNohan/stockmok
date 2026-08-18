@@ -308,3 +308,5 @@ export function createStockmokRepositories(db: Firestore, scope: BoundReadScope)
     raw: client,
   } as const;
 }
+
+export type StockmokRepositories = ReturnType<typeof createStockmokRepositories>;
