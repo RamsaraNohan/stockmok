@@ -1,5 +1,5 @@
 import { getApps, initializeApp } from 'firebase-admin/app';
-import { getFirestore, type Firestore } from 'firebase-admin/firestore';
+import { getFirestore, Timestamp, type Firestore } from 'firebase-admin/firestore';
 import { paths } from '../../packages/shared/src/paths.js';
 import type { Role } from '../../packages/shared/src/primitives.js';
 import type { TrustedMembership } from '../../functions/src/guards/membership.js';
@@ -86,6 +86,20 @@ export async function seedMember(
     displayName: options.displayName ?? `${role} of ${orgId}`,
     email: `${uid}@stockmok.test`,
   });
+  // INV-20 — the mirror always agrees with the member document, so any command
+  // (e.g. team.changeMemberRole/setMemberStatus) that `update()`s the mirror
+  // finds it already present, just as it would for a real membership.
+  await db.doc(paths.membership(uid, orgId)).set({
+    organizationId: orgId,
+    handle: orgId,
+    organizationName: orgId,
+    monogram: 'ST',
+    monogramColor: 'blue',
+    role,
+    status: options.status ?? 'ACTIVE',
+    joinedAt: Timestamp.now(),
+    updatedAt: Timestamp.now(),
+  });
   return uid;
 }
 
@@ -104,5 +118,239 @@ export function callable(uid: string, data: unknown): { auth: { uid: string }; d
   return { auth: { uid }, data };
 }
 
+/** Like {@link callable}, but with a verified email token — for `AUTHENTICATED`/`INVITEE` commands. */
+export function callableAuthed(
+  uid: string,
+  email: string,
+  data: unknown,
+): { auth: { uid: string; token: { email: string; email_verified: boolean } }; data: unknown } {
+  return { auth: { uid, token: { email, email_verified: true } }, data };
+}
+
 export const OPERATION_ID_A = '11111111-2222-4333-8444-555555555555';
 export const OPERATION_ID_B = '66666666-7777-4888-8999-aaaaaaaaaaaa';
+
+/** B2-internal seed helpers, layered onto the B1 fixtures above. */
+
+export async function seedSettings(
+  db: Firestore,
+  orgId: string,
+  overrides: Partial<Record<string, unknown>> = {},
+): Promise<void> {
+  await db.doc(paths.settings(orgId)).set({
+    defaultWarehouseId: 'warehouse-main',
+    currency: 'USD',
+    timezone: 'Asia/Colombo',
+    lowStockNotificationsEnabled: true,
+    purchaseOrderPrefix: 'PO',
+    quantityPrecision: 3,
+    networkEnabled: true,
+    storefrontEnabled: false,
+    updatedAt: Timestamp.now(),
+    updatedBy: 'seed',
+    ...overrides,
+  });
+}
+
+export async function seedCategory(
+  db: Firestore,
+  orgId: string,
+  categoryId: string,
+  overrides: Partial<Record<string, unknown>> = {},
+): Promise<void> {
+  await db.doc(paths.category(orgId, categoryId)).set({
+    categoryId,
+    name: overrides.name ?? categoryId,
+    status: 'ACTIVE',
+    createdAt: Timestamp.now(),
+    createdBy: 'seed',
+    updatedAt: Timestamp.now(),
+    updatedBy: 'seed',
+    ...overrides,
+  });
+}
+
+export async function seedWarehouse(
+  db: Firestore,
+  orgId: string,
+  warehouseId: string,
+  overrides: Partial<Record<string, unknown>> = {},
+): Promise<void> {
+  await db.doc(paths.warehouse(orgId, warehouseId)).set({
+    warehouseId,
+    name: overrides.name ?? warehouseId,
+    type: 'STORE_ROOM',
+    status: 'ACTIVE',
+    createdAt: Timestamp.now(),
+    createdBy: 'seed',
+    updatedAt: Timestamp.now(),
+    updatedBy: 'seed',
+    ...overrides,
+  });
+}
+
+export async function seedProduct(
+  db: Firestore,
+  orgId: string,
+  productId: string,
+  overrides: Partial<Record<string, unknown>> = {},
+): Promise<void> {
+  const internalSku = (overrides.internalSku as string | undefined) ?? productId.toUpperCase();
+  await db.doc(paths.product(orgId, productId)).set({
+    productId,
+    internalSku,
+    internalSkuNormalized: internalSku,
+    name: overrides.name ?? productId,
+    categoryId: overrides.categoryId ?? 'category-1',
+    baseUnit: 'EACH',
+    purchaseCostMinor: 1000,
+    currency: 'USD',
+    minimumStockMilli: 5000,
+    reorderTargetMilli: 10_000,
+    status: 'ACTIVE',
+    partnerPublished: false,
+    storefrontPublished: false,
+    createdAt: Timestamp.now(),
+    createdBy: 'seed',
+    updatedAt: Timestamp.now(),
+    updatedBy: 'seed',
+    ...overrides,
+  });
+  const normalized = (overrides.internalSkuNormalized as string | undefined) ?? internalSku;
+  await db.doc(paths.productSkuIndex(orgId, normalized)).set({
+    productId,
+    createdAt: Timestamp.now(),
+  });
+}
+
+export async function seedProductStockSummary(
+  db: Firestore,
+  orgId: string,
+  productId: string,
+  overrides: Partial<Record<string, unknown>> = {},
+): Promise<void> {
+  await db.doc(paths.productStockSummary(orgId, productId)).set({
+    productId,
+    productName: overrides.productName ?? productId,
+    internalSku: overrides.internalSku ?? productId.toUpperCase(),
+    internalSkuNormalized: overrides.internalSkuNormalized ?? productId.toUpperCase(),
+    categoryId: overrides.categoryId ?? 'category-1',
+    productStatus: 'ACTIVE',
+    baseUnitPriceMinor: 1000,
+    productUpdatedAt: Timestamp.now(),
+    onHandMilli: 0,
+    reservedMilli: 0,
+    availableMilli: 0,
+    minimumStockMilli: 5000,
+    stockStatus: 'OUT_OF_STOCK',
+    stockValueMinor: 0,
+    shortfallMilli: 5000,
+    unit: 'EACH',
+    updatedAt: Timestamp.now(),
+    ...overrides,
+  });
+}
+
+export async function seedStockBalance(
+  db: Firestore,
+  orgId: string,
+  productId: string,
+  warehouseId: string,
+  overrides: Partial<Record<string, unknown>> = {},
+): Promise<void> {
+  await db.doc(paths.stockBalance(orgId, productId, warehouseId)).set({
+    productId,
+    warehouseId,
+    onHandMilli: 0,
+    unit: 'EACH',
+    productName: overrides.productName ?? productId,
+    internalSku: overrides.internalSku ?? productId.toUpperCase(),
+    internalSkuNormalized: overrides.internalSkuNormalized ?? productId.toUpperCase(),
+    categoryId: overrides.categoryId ?? 'category-1',
+    productStatus: 'ACTIVE',
+    baseUnitPriceMinor: 1000,
+    minimumStockMilli: 5000,
+    productUpdatedAt: Timestamp.now(),
+    stockValueMinor: 0,
+    stockStatus: 'OUT_OF_STOCK',
+    shortfallMilli: 5000,
+    updatedAt: Timestamp.now(),
+    ...overrides,
+  });
+}
+
+export async function seedPrivatePartner(
+  db: Firestore,
+  orgId: string,
+  partnerId: string,
+  overrides: Partial<Record<string, unknown>> = {},
+): Promise<void> {
+  await db.doc(paths.privatePartner(orgId, partnerId)).set({
+    partnerId,
+    partnerTypes: ['SUPPLIER'],
+    name: overrides.name ?? partnerId,
+    status: 'ACTIVE',
+    ordersPlacedCount: 0,
+    createdAt: Timestamp.now(),
+    createdBy: 'seed',
+    updatedAt: Timestamp.now(),
+    updatedBy: 'seed',
+    ...overrides,
+  });
+}
+
+export async function seedPurchaseOrder(
+  db: Firestore,
+  orgId: string,
+  purchaseOrderId: string,
+  overrides: Partial<Record<string, unknown>> = {},
+): Promise<void> {
+  await db.doc(paths.purchaseOrder(orgId, purchaseOrderId)).set({
+    purchaseOrderId,
+    viewRole: 'BUYER',
+    supplierKind: 'PRIVATE',
+    counterpartyName: 'Test Supplier',
+    status: 'ORDERED',
+    currency: 'USD',
+    totalMinor: 1000,
+    isProjection: false,
+    createdBy: 'seed',
+    createdAt: Timestamp.now(),
+    ...overrides,
+  });
+}
+
+export async function seedUser(
+  db: Firestore,
+  uid: string,
+  overrides: Partial<Record<string, unknown>> = {},
+): Promise<void> {
+  await db.doc(paths.user(uid)).set({
+    uid,
+    displayName: overrides.displayName ?? uid,
+    email: overrides.email ?? `${uid}@stockmok.test`,
+    status: 'ACTIVE',
+    createdAt: Timestamp.now(),
+    ...overrides,
+  });
+}
+
+export async function seedInvitation(
+  db: Firestore,
+  orgId: string,
+  invitationId: string,
+  overrides: Partial<Record<string, unknown>> = {},
+): Promise<void> {
+  await db.doc(paths.invitation(orgId, invitationId)).set({
+    invitationId,
+    organizationId: orgId,
+    emailNormalized: overrides.emailNormalized ?? 'invitee@stockmok.test',
+    role: overrides.role ?? 'VIEWER',
+    tokenHash: overrides.tokenHash ?? 'a'.repeat(64),
+    status: 'PENDING',
+    expiresAt: overrides.expiresAt ?? Timestamp.fromMillis(Date.now() + 7 * 24 * 60 * 60 * 1000),
+    createdBy: overrides.createdBy ?? uidFor(orgId, 'ADMIN'),
+    createdAt: Timestamp.now(),
+    ...overrides,
+  });
+}
