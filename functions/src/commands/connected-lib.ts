@@ -299,7 +299,6 @@ export interface CanonicalOrderState {
   readonly connectionId: string;
   readonly status: PoStatus;
   readonly orderNumber: string | undefined;
-  readonly receivingWarehouseId: string | undefined;
 }
 
 /**
@@ -320,7 +319,6 @@ export async function readCanonicalOrder(
     fail('RESOURCE_NOT_FOUND', 'That connected purchase order was not found.');
   }
   const orderNumber: unknown = snapshot.get('orderNumber');
-  const receivingWarehouseId: unknown = snapshot.get('receivingWarehouseId');
   return {
     ref,
     snapshot,
@@ -330,8 +328,6 @@ export async function readCanonicalOrder(
     connectionId: snapshot.get('connectionId') as string,
     status: snapshot.get('status') as PoStatus,
     orderNumber: typeof orderNumber === 'string' ? orderNumber : undefined,
-    receivingWarehouseId:
-      typeof receivingWarehouseId === 'string' ? receivingWarehouseId : undefined,
   };
 }
 
