@@ -24,6 +24,14 @@ export type SafeScalar = string | number | boolean | null;
 
 export type CommandReceiptResult = Readonly<Record<string, SafeScalar>>;
 
+/**
+ * What a command handler may return. Wider than {@link CommandReceiptResult}
+ * because the two catalog read commands return a page of items; narrowing back
+ * to safe scalars happens at the receipt boundary, which is the only place the
+ * narrower guarantee is required.
+ */
+export type CommandResultData = Readonly<Record<string, unknown>>;
+
 export interface StoredCommandReceipt {
   readonly operationId: string;
   readonly commandType: string;
@@ -137,7 +145,7 @@ export function writeCommandReceipt(
   scope: TransactionScope,
   db: Firestore,
   claim: ReceiptClaim,
-  result: CommandReceiptResult,
+  result: CommandResultData,
 ): void {
   scope.create(receiptRef(db, claim.orgId, claim.operationId), {
     operationId: claim.operationId,

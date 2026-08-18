@@ -21,21 +21,24 @@ if (firebase.firestore?.rules !== 'firestore.rules')
   throw new Error('firebase.json must point firestore.rules at the B1 ruleset');
 await readFile('firestore.rules', 'utf8');
 
-// B1 built the command frame only, so the deployed export surface was empty
-// and this guard asserted exactly that. B2 filled in the first 17 of the 38
-// active callables (C-01…C-12, C-35a, C-35b, C-36, C-37, C-38 — DB-06 §1) and
-// B3 adds inventory, transfer and private procurement (C-13, C-14, C-15, C-16,
-// C-17, C-33) for 23; B4's remaining 15 complete the catalog. The guard
-// asserts the exact expected count per phase, so a callable added outside its
-// owning phase's id set — or one silently dropped — is still caught. Comments
-// are stripped first: the file documents the shape a later phase will add, and
-// a guard that trips on its own documentation is not a guard.
+// B1 built the command frame only, so the deployed export surface was empty and
+// this guard asserted exactly that. B2 filled in the first 17 of the 38 active
+// callables (C-01…C-12, C-35a, C-35b, C-36, C-37, C-38 — DB-06 §1), B3 added
+// inventory, transfer and private procurement (C-13, C-14, C-15, C-16, C-17,
+// C-33) for 23, and B4 completes the catalog with the remaining 15 connected
+// commands (C-18…C-31, C-34) for **38**.
+//
+// The count is asserted as an equality and never as a floor: `>= 38` would pass
+// for a thirty-ninth callable that names no active command id, which is exactly
+// the drift this guard exists to catch — in both directions. Comments are
+// stripped first, because the file documents its own phase structure and a guard
+// that trips on its own documentation is not a guard.
 const code = source.replaceAll(/\/\*[\s\S]*?\*\//g, '').replaceAll(/\/\/.*$/gm, '');
 const callableExports = code.match(/^export const \w+ = toCallable\(/gm) ?? [];
-const EXPECTED_CALLABLE_EXPORTS = 23; // B2's 17 + B3: C-13, C-14, C-15, C-16, C-17, C-33
+const EXPECTED_CALLABLE_EXPORTS = 38; // the complete Release A/B surface — B2 17 + B3 6 + B4 15
 if (callableExports.length !== EXPECTED_CALLABLE_EXPORTS) {
   throw new Error(
-    `Expected ${String(EXPECTED_CALLABLE_EXPORTS)} callable exports (B3), found ${String(callableExports.length)}`,
+    `Expected ${String(EXPECTED_CALLABLE_EXPORTS)} callable exports, found ${String(callableExports.length)}`,
   );
 }
 

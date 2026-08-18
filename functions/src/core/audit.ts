@@ -113,6 +113,7 @@ export function buildAuditRecord(
   actor: TrustedMembership,
   auditId: string,
   request: AuditRequest,
+  organizationId: string = actor.orgId,
 ): AuditRecord {
   assertAuditRequest(request);
   const base = {
@@ -120,7 +121,7 @@ export function buildAuditRecord(
     actorUid: actor.uid,
     actorName: actor.displayName,
     actorRole: actor.role,
-    organizationId: actor.orgId,
+    organizationId,
     action: request.action,
     entityType: request.entityType,
     entityId: request.entityId,
@@ -143,9 +144,38 @@ export function writeAudit(
   actor: TrustedMembership,
   request: AuditRequest,
 ): string {
-  const auditId = db.collection(`${paths.organization(actor.orgId)}/auditLogs`).doc().id;
-  const record = buildAuditRecord(actor, auditId, request);
-  scope.create(db.doc(paths.auditLog(actor.orgId, auditId)), {
+  return writeAuditFor(scope, db, actor, actor.orgId, request);
+}
+
+/**
+ * The counterparty half of a cross-tenant audit pair — `connection.*` and
+ * `cpo.*` (DB-06 §4: *audit ×2*).
+ *
+ * The acting user is a verified ACTIVE member of **their own** organization and
+ * of no other, so there is no second `TrustedMembership` to pass to
+ * {@link writeAudit}. This writes the counterparty's record under
+ * `organizations/{organizationId}/auditLogs`, carrying the acting user's
+ * identity — which is exactly what DB-02 §5.4 already shares across the
+ * boundary for connected order history, *"so both parties see one timeline with
+ * correct attribution"*.
+ *
+ * It is a **separate function rather than a flag** so that every cross-tenant
+ * audit row is greppable, and so no ordinary command can write into another
+ * tenant by accident. The `summary` and `metadata` a caller passes here must
+ * carry only what the receiving organization is entitled to know — that
+ * judgement belongs to the command, which is why the two rows of a pair are
+ * always written with different text.
+ */
+export function writeAuditFor(
+  scope: TransactionScope,
+  db: Firestore,
+  actor: TrustedMembership,
+  organizationId: string,
+  request: AuditRequest,
+): string {
+  const auditId = db.collection(`${paths.organization(organizationId)}/auditLogs`).doc().id;
+  const record = buildAuditRecord(actor, auditId, request, organizationId);
+  scope.create(db.doc(paths.auditLog(organizationId, auditId)), {
     ...record,
     createdAt: serverTimestamp(),
   });

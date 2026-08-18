@@ -75,7 +75,12 @@ export const ConnectedHistorySchema = z
     actorName: z.string().min(1).max(80),
     actorOrgId: IdSchema,
     actorOrgName: z.string().min(1).max(120),
-    operationId: IdSchema,
+    // Mirrors `PurchaseOrderHistorySchema.operationId` for the identical reason
+    // (DB-06 §1): `cpo.cancel` is NON-idempotent, so its canonical history row
+    // provably has no receipt id to carry. Requiring it here could only be
+    // satisfied by fabricating one that resolves to nothing, and DB-02 §5.4
+    // requires the canonical row and both projection rows to be identical.
+    operationId: IdSchema.optional(),
     note: z.string().max(280).optional(),
     createdAt: TimestampSchema,
   })
