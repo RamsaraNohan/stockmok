@@ -86,6 +86,7 @@ describe('categories — SAFE_DIRECT_CLIENT_WRITE, status excluded (DB-CR-012)',
     const rename = updateDoc(doc(forRole(role), paths.category(ORG_A, IDS.category)), {
       name: `Meat ${role}`,
       updatedAt: NOW,
+      updatedBy: uidFor(ORG_A, role),
     });
     if (INVENTORY_WRITERS.includes(role)) await assertSucceeds(rename);
     else await assertFails(rename);
@@ -95,6 +96,8 @@ describe('categories — SAFE_DIRECT_CLIENT_WRITE, status excluded (DB-CR-012)',
     await assertFails(
       updateDoc(doc(forRole('OWNER'), paths.category(ORG_A, IDS.category)), {
         status: 'ARCHIVED',
+        updatedAt: NOW,
+        updatedBy: uidFor(ORG_A, 'OWNER'),
       }),
     );
   });
@@ -141,6 +144,7 @@ describe('warehouses — SAFE_DIRECT_CLIENT_WRITE, status immutable both ways (D
       updateDoc(doc(forRole('INVENTORY_MANAGER'), paths.warehouse(ORG_A, IDS.warehouse)), {
         name: 'Main Store Room',
         updatedAt: NOW,
+        updatedBy: uidFor(ORG_A, 'INVENTORY_MANAGER'),
       }),
     );
   });
@@ -149,6 +153,8 @@ describe('warehouses — SAFE_DIRECT_CLIENT_WRITE, status immutable both ways (D
     await assertFails(
       updateDoc(doc(forRole('OWNER'), paths.warehouse(ORG_A, IDS.warehouse)), {
         status: 'ARCHIVED',
+        updatedAt: NOW,
+        updatedBy: uidFor(ORG_A, 'OWNER'),
       }),
     );
   });
@@ -157,6 +163,8 @@ describe('warehouses — SAFE_DIRECT_CLIENT_WRITE, status immutable both ways (D
     await assertFails(
       updateDoc(doc(forRole('OWNER'), paths.warehouse(ORG_A, ARCHIVED_WAREHOUSE)), {
         status: 'ACTIVE',
+        updatedAt: NOW,
+        updatedBy: uidFor(ORG_A, 'OWNER'),
       }),
     );
   });
@@ -165,6 +173,8 @@ describe('warehouses — SAFE_DIRECT_CLIENT_WRITE, status immutable both ways (D
     await assertFails(
       updateDoc(doc(forRole('OWNER'), paths.warehouse(ORG_A, IDS.warehouse)), {
         isDefault: true,
+        updatedAt: NOW,
+        updatedBy: uidFor(ORG_A, 'OWNER'),
       }),
     );
     await assertFails(
@@ -211,6 +221,7 @@ describe('privatePartners — SAFE_DIRECT_CLIENT_WRITE, two backend-only fields 
       updateDoc(doc(forRole('PROCUREMENT_MANAGER'), paths.privatePartner(ORG_A, IDS.partner)), {
         contactPerson: 'Nimal Perera',
         updatedAt: NOW,
+        updatedBy: uidFor(ORG_A, 'PROCUREMENT_MANAGER'),
       }),
     );
   });
@@ -219,6 +230,8 @@ describe('privatePartners — SAFE_DIRECT_CLIENT_WRITE, two backend-only fields 
     await assertFails(
       updateDoc(doc(forRole('OWNER'), paths.privatePartner(ORG_A, IDS.partner)), {
         status: 'DEACTIVATED',
+        updatedAt: NOW,
+        updatedBy: uidFor(ORG_A, 'OWNER'),
       }),
     );
   });
@@ -227,6 +240,8 @@ describe('privatePartners — SAFE_DIRECT_CLIENT_WRITE, two backend-only fields 
     await assertFails(
       updateDoc(doc(forRole('OWNER'), paths.privatePartner(ORG_A, IDS.partner)), {
         ordersPlacedCount: 0,
+        updatedAt: NOW,
+        updatedBy: uidFor(ORG_A, 'OWNER'),
       }),
     );
   });
