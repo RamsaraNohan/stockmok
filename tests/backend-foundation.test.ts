@@ -312,9 +312,14 @@ describe('the B1 command coverage map', () => {
     expect(unscoped.sort()).toEqual(['C-01', 'C-03', 'C-06']);
   });
 
-  it('B1 implements no command body — the registry is empty', () => {
-    expect(commandRegistry.size()).toBe(0);
-    expect(commandRegistry.missingIds()).toHaveLength(38);
+  it('B2 registers exactly its 17 commands when index.ts is imported, and nothing else yet', async () => {
+    await import('../functions/src/index.js');
+    expect(commandRegistry.size()).toBe(17);
+    expect(commandRegistry.ids()).toEqual([...idsForPhase('B2')].sort());
+    expect(commandRegistry.missingIds()).toHaveLength(21);
+    expect(commandRegistry.missingIds()).toEqual(
+      [...idsForPhase('B3'), ...idsForPhase('B4')].sort(),
+    );
   });
 });
 
