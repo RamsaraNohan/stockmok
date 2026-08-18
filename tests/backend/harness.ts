@@ -1,6 +1,7 @@
 import { getApps, initializeApp } from 'firebase-admin/app';
 import { getFirestore, Timestamp, type Firestore } from 'firebase-admin/firestore';
 import { paths } from '../../packages/shared/src/paths.js';
+import { serverPaths } from '../../packages/shared/src/server/paths.js';
 import type { Role } from '../../packages/shared/src/primitives.js';
 import type { TrustedMembership } from '../../functions/src/guards/membership.js';
 
@@ -396,4 +397,233 @@ export async function collectionOf(
 ): Promise<FirebaseFirestore.QueryDocumentSnapshot[]> {
   const snapshot = await db.collection(`${paths.organization(orgId)}/${collection}`).get();
   return snapshot.docs;
+}
+
+/** B4-internal seed helpers — connected business, partner catalog, mappings, connected orders. */
+
+export async function seedOrganizationDirectory(
+  db: Firestore,
+  orgId: string,
+  handle: string,
+  name: string,
+): Promise<void> {
+  await db.doc(paths.organizationDirectory(handle)).set({
+    organizationId: orgId,
+    handle,
+    name,
+    logoUrl: null,
+    monogram: 'ST',
+    monogramColor: 'blue',
+    industry: 'Hospitality',
+    country: 'LK',
+    directoryStatus: 'LISTED',
+    createdAt: Timestamp.now(),
+  });
+}
+
+export function connectionIdFor(buyerOrgId: string, supplierOrgId: string): string {
+  return `${buyerOrgId}__${supplierOrgId}`;
+}
+
+/**
+ * Writes the canonical connection **and both projections** together, because a
+ * fixture that seeded only one would make `INV-19` false before a single command
+ * ran — the same reason B3's fixtures seed a real `OPENING_BALANCE` movement
+ * behind every seeded balance.
+ */
+export async function seedConnection(
+  db: Firestore,
+  buyerOrgId: string,
+  supplierOrgId: string,
+  status: 'PENDING' | 'ACTIVE' | 'REJECTED' | 'DISABLED' = 'ACTIVE',
+  overrides: Partial<Record<string, unknown>> = {},
+): Promise<string> {
+  const connectionId = connectionIdFor(buyerOrgId, supplierOrgId);
+  const record = {
+    connectionId,
+    buyerOrgId,
+    supplierOrgId,
+    buyerHandle: buyerOrgId,
+    buyerName: buyerOrgId,
+    supplierHandle: supplierOrgId,
+    supplierName: supplierOrgId,
+    status,
+    requestedByUid: uidFor(buyerOrgId, 'PROCUREMENT_MANAGER'),
+    requestedAt: Timestamp.now(),
+    updatedAt: Timestamp.now(),
+    ...overrides,
+  };
+  await db.doc(serverPaths.canonicalConnection(buyerOrgId, supplierOrgId)).set(record);
+  for (const orgId of [buyerOrgId, supplierOrgId]) {
+    await db
+      .doc(paths.connectionProjection(orgId, connectionId))
+      .set({ ...record, ordersPlacedCount: 0 });
+  }
+  return connectionId;
+}
+
+export async function seedPartnerCatalogItem(
+  db: Firestore,
+  supplierOrgId: string,
+  catalogItemId: string,
+  overrides: Partial<Record<string, unknown>> = {},
+): Promise<void> {
+  const partnerSku = (overrides.partnerSku as string | undefined) ?? 'CKN-B5';
+  await db.doc(paths.partnerCatalogItem(supplierOrgId, catalogItemId)).set({
+    catalogItemId,
+    sourceProductId: overrides.sourceProductId ?? 'product-chicken-pack',
+    internalProductNameSnapshot: 'Chicken Breast 5 KG Pack',
+    internalSkuSnapshot: 'FF-CHK-05',
+    partnerSku,
+    partnerSkuNormalized: partnerSku.toUpperCase(),
+    displayName: 'Chicken Breast 5 KG Pack',
+    orderUnit: 'PACK',
+    packDescription: '5 KG',
+    availabilityState: 'IN_STOCK',
+    published: true,
+    updatedAt: Timestamp.now(),
+    ...overrides,
+  });
+}
+
+export async function seedProductMapping(
+  db: Firestore,
+  buyerOrgId: string,
+  mappingId: string,
+  overrides: Partial<Record<string, unknown>> = {},
+): Promise<void> {
+  await db.doc(paths.productMapping(buyerOrgId, mappingId)).set({
+    mappingId,
+    connectionId: overrides.connectionId ?? connectionIdFor(buyerOrgId, ORG_B),
+    buyerOrgId,
+    buyerProductId: overrides.buyerProductId ?? 'product-chicken',
+    buyerProductNameSnapshot: 'Chicken Breast',
+    buyerSkuSnapshot: 'MEAT-001',
+    supplierOrgId: overrides.supplierOrgId ?? ORG_B,
+    supplierCatalogItemId: overrides.supplierCatalogItemId ?? 'catalog-chicken',
+    supplierPartnerSkuSnapshot: 'CKN-B5',
+    supplierDisplayNameSnapshot: 'Chicken Breast 5 KG Pack',
+    buyerBaseUnit: 'KG',
+    supplierOrderUnit: 'PACK',
+    supplierToBuyerBaseFactorMilli: 5000,
+    semanticConfirmedByUid: uidFor(buyerOrgId, 'PROCUREMENT_MANAGER'),
+    semanticConfirmedByName: 'PROCUREMENT_MANAGER',
+    semanticConfirmedAt: Timestamp.now(),
+    status: 'VERIFIED',
+    createdAt: Timestamp.now(),
+    ...overrides,
+  });
+}
+
+/**
+ * A buyer-side connected DRAFT and its lines. `cpo.draftSave` upserts the header
+ * and normalises the lines; the lines themselves are seeded the same way a
+ * private draft's are, since neither has a command that creates an individual
+ * line.
+ */
+export async function seedConnectedDraft(
+  db: Firestore,
+  buyerOrgId: string,
+  purchaseOrderId: string,
+  connectionId: string,
+  overrides: Partial<Record<string, unknown>> = {},
+): Promise<void> {
+  await db.doc(paths.purchaseOrder(buyerOrgId, purchaseOrderId)).set({
+    purchaseOrderId,
+    viewRole: 'BUYER',
+    supplierKind: 'CONNECTED',
+    counterpartyName: ORG_B,
+    counterpartyOrgId: ORG_B,
+    counterpartyHandle: ORG_B,
+    connectionId,
+    status: 'DRAFT',
+    currency: 'LKR',
+    totalMinor: 0,
+    isProjection: false,
+    createdBy: uidFor(buyerOrgId, 'PROCUREMENT_MANAGER'),
+    createdAt: Timestamp.now(),
+    ...overrides,
+  });
+}
+
+export async function seedConnectedDraftItem(
+  db: Firestore,
+  buyerOrgId: string,
+  purchaseOrderId: string,
+  itemId: string,
+  overrides: Partial<Record<string, unknown>> = {},
+): Promise<void> {
+  await db.doc(paths.purchaseOrderItem(buyerOrgId, purchaseOrderId, itemId)).set({
+    itemId,
+    buyerProductId: overrides.buyerProductId ?? 'product-chicken',
+    buyerProductNameSnapshot: 'Chicken Breast',
+    buyerSkuSnapshot: 'MEAT-001',
+    buyerBaseUnitSnapshot: 'KG',
+    orderedBuyerBaseMilli: 0,
+    receivedBuyerBaseMilli: 0,
+    unitPriceMinor: 600_000,
+    lineTotalMinor: 0,
+    currency: 'LKR',
+    mappingId: overrides.mappingId ?? 'mapping-chicken',
+    supplierCatalogItemId: overrides.supplierCatalogItemId ?? 'catalog-chicken',
+    orderedSupplierMilli: 10_000,
+    receivedSupplierMilli: 0,
+    ...overrides,
+  });
+}
+
+/** Every document under one canonical zone-4 subcollection, for write-set assertions. */
+export async function canonicalSubcollection(
+  db: Firestore,
+  purchaseOrderId: string,
+  name: 'items' | 'history',
+): Promise<FirebaseFirestore.QueryDocumentSnapshot[]> {
+  const snapshot = await db
+    .collection(`${serverPaths.connectedPurchaseOrder(purchaseOrderId)}/${name}`)
+    .get();
+  return snapshot.docs;
+}
+
+/** Every notification a user holds, for notification-grain assertions. */
+export async function notificationsOf(
+  db: Firestore,
+  uid: string,
+): Promise<FirebaseFirestore.QueryDocumentSnapshot[]> {
+  const snapshot = await db.collection(`${paths.user(uid)}/notifications`).get();
+  return snapshot.docs;
+}
+
+/**
+ * A seeded balance with no ledger entry behind it makes `INV-03` false in the
+ * fixture before a single command runs, which is the defect B3 repaired in its
+ * own concurrency fixtures. This writes the `OPENING_BALANCE` movement that a
+ * real balance would always have.
+ */
+export async function seedOpeningMovement(
+  db: Firestore,
+  orgId: string,
+  productId: string,
+  warehouseId: string,
+  quantityMilli: number,
+  unit: 'KG' | 'L' | 'EACH' | 'PACK' = 'EACH',
+): Promise<void> {
+  const movementId = `opening-${productId}-${warehouseId}`;
+  await db.doc(paths.stockMovement(orgId, movementId)).set({
+    movementId,
+    productId,
+    warehouseId,
+    productNameSnapshot: productId,
+    skuSnapshot: productId.toUpperCase(),
+    movementType: 'OPENING_BALANCE',
+    signedQuantityMilli: quantityMilli,
+    unit,
+    balanceAfterMilli: quantityMilli,
+    sourceType: 'MANUAL',
+    operationId: `opening-${productId}`,
+    actorUid: 'seed',
+    actorName: 'seed',
+    warehouseNameSnapshot: warehouseId,
+    effectiveAt: Timestamp.now(),
+    createdAt: Timestamp.now(),
+  });
 }

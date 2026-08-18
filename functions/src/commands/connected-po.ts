@@ -1047,10 +1047,18 @@ export const cpoReceive = defineCommand({
     if (order.status !== 'SHIPPED' && order.status !== 'PARTIALLY_RECEIVED') {
       fail('INVALID_TRANSITION', `A ${order.status} order cannot receive stock.`);
     }
-    if (
-      order.receivingWarehouseId !== undefined &&
-      order.receivingWarehouseId !== payload.warehouseId
-    ) {
+
+    // `receivingWarehouseId` lives on the **buyer's own projection** and nowhere
+    // else, because warehouse identity never crosses the connected boundary
+    // (DB-05 §8) — so the pin is read from there, not from the canonical record
+    // the supplier also sees. The field is singular and `warehouse.archive`'s
+    // `Q-057` guard reads it, so letting later receipts wander would silently
+    // break that guard.
+    const buyerProjection = await scope.get(
+      db.doc(paths.purchaseOrder(order.buyerOrgId, order.purchaseOrderId)),
+    );
+    const pinnedWarehouseId: unknown = buyerProjection.get('receivingWarehouseId');
+    if (typeof pinnedWarehouseId === 'string' && pinnedWarehouseId !== payload.warehouseId) {
       fail('INVALID_TRANSITION', 'This order is already being received into another store room.');
     }
 
@@ -1241,7 +1249,10 @@ export const cpoReceive = defineCommand({
         lastOperationId: opId,
         ...(complete ? { receivedAt: now } : {}),
       },
-      { receivingWarehouseId: order.receivingWarehouseId ?? warehouse.warehouseId },
+      {
+        receivingWarehouseId:
+          typeof pinnedWarehouseId === 'string' ? pinnedWarehouseId : warehouse.warehouseId,
+      },
     );
     writeConnectedHistory(scope, db, actor, buyerOrgName, order, order.status, nextStatus, opId);
 
