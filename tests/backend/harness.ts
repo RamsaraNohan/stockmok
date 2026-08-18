@@ -354,3 +354,46 @@ export async function seedInvitation(
     ...overrides,
   });
 }
+
+/** B3-internal seed helpers. */
+
+export async function seedPurchaseOrderItem(
+  db: Firestore,
+  orgId: string,
+  purchaseOrderId: string,
+  itemId: string,
+  overrides: Partial<Record<string, unknown>> = {},
+): Promise<void> {
+  await db.doc(paths.purchaseOrderItem(orgId, purchaseOrderId, itemId)).set({
+    itemId,
+    buyerProductId: overrides.buyerProductId ?? 'product-rice',
+    buyerProductNameSnapshot: overrides.buyerProductNameSnapshot ?? 'product-rice',
+    buyerSkuSnapshot: overrides.buyerSkuSnapshot ?? 'PRODUCT-RICE',
+    buyerBaseUnitSnapshot: 'EACH',
+    orderedBuyerBaseMilli: 10_000,
+    receivedBuyerBaseMilli: 0,
+    unitPriceMinor: 1000,
+    lineTotalMinor: 10_000,
+    currency: 'USD',
+    ...overrides,
+  });
+}
+
+export async function seedCounter(
+  db: Firestore,
+  orgId: string,
+  counterId: string,
+  value: number,
+): Promise<void> {
+  await db.doc(paths.counter(orgId, counterId)).set({ value, updatedAt: Timestamp.now() });
+}
+
+/** Every document under one collection of an organization, for write-set assertions. */
+export async function collectionOf(
+  db: Firestore,
+  orgId: string,
+  collection: string,
+): Promise<FirebaseFirestore.QueryDocumentSnapshot[]> {
+  const snapshot = await db.collection(`${paths.organization(orgId)}/${collection}`).get();
+  return snapshot.docs;
+}
