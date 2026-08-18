@@ -312,14 +312,12 @@ describe('the B1 command coverage map', () => {
     expect(unscoped.sort()).toEqual(['C-01', 'C-03', 'C-06']);
   });
 
-  it('B2 registers exactly its 17 commands when index.ts is imported, and nothing else yet', async () => {
+  it('B2+B3 register exactly their 23 commands when index.ts is imported, and nothing else yet', async () => {
     await import('../functions/src/index.js');
-    expect(commandRegistry.size()).toBe(17);
-    expect(commandRegistry.ids()).toEqual([...idsForPhase('B2')].sort());
-    expect(commandRegistry.missingIds()).toHaveLength(21);
-    expect(commandRegistry.missingIds()).toEqual(
-      [...idsForPhase('B3'), ...idsForPhase('B4')].sort(),
-    );
+    expect(commandRegistry.size()).toBe(23);
+    expect(commandRegistry.ids()).toEqual([...idsForPhase('B2'), ...idsForPhase('B3')].sort());
+    expect(commandRegistry.missingIds()).toHaveLength(15);
+    expect(commandRegistry.missingIds()).toEqual([...idsForPhase('B4')].sort());
   });
 });
 
