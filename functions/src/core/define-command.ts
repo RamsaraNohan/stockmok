@@ -14,7 +14,7 @@ import {
   readCommandReceipt,
   resolveReplay,
   writeCommandReceipt,
-  type CommandReceiptResult,
+  type CommandResultData,
   type ReceiptClaim,
 } from './idempotency.js';
 import { runTrustedTransaction, type TransactionScope } from './transaction.js';
@@ -96,8 +96,18 @@ export interface CommandContext<Id extends ActiveCommandId> {
 export interface CommandDefinition<Id extends ActiveCommandId> {
   readonly id: Id;
   readonly authorization: CommandAuthorization;
-  /** Runs inside the transaction, after the receipt read and before the receipt write. */
-  readonly handler: (context: CommandContext<Id>) => Promise<CommandReceiptResult>;
+  /**
+   * Runs inside the transaction, after the receipt read and before the receipt
+   * write.
+   *
+   * The return type is deliberately wider than a receipt's: `C-23
+   * partnerCatalog.list` and `C-24 lookupBySku` are catalog **reads** and return
+   * a page of items, and DB-06 §1 marks both non-idempotent, so neither ever
+   * reaches a receipt. An idempotent command that tried to return a non-scalar
+   * is still rejected — by `assertSafeResult` inside
+   * {@link writeCommandReceipt}, at the moment the receipt is written.
+   */
+  readonly handler: (context: CommandContext<Id>) => Promise<CommandResultData>;
 }
 
 export interface CommandHandler {

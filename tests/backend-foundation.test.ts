@@ -39,7 +39,7 @@ import {
   commandRegistry,
   deploymentName,
 } from '../functions/src/core/registry.js';
-import { COMMAND_PLAN, idsForPhase } from '../functions/src/commands/coverage.js';
+import { COMMAND_IDS, COMMAND_PLAN, idsForPhase } from '../functions/src/commands/coverage.js';
 import { assertOperationId, isValidOperationId } from '../functions/src/guards/operation-id.js';
 import { requireAuth, requireTrustedEmail } from '../functions/src/guards/auth.js';
 import { requireRole } from '../functions/src/guards/role.js';
@@ -312,12 +312,16 @@ describe('the B1 command coverage map', () => {
     expect(unscoped.sort()).toEqual(['C-01', 'C-03', 'C-06']);
   });
 
-  it('B2+B3 register exactly their 23 commands when index.ts is imported, and nothing else yet', async () => {
+  it('registers the complete 38-command catalog when index.ts is imported, and nothing else', async () => {
     await import('../functions/src/index.js');
-    expect(commandRegistry.size()).toBe(23);
-    expect(commandRegistry.ids()).toEqual([...idsForPhase('B2'), ...idsForPhase('B3')].sort());
-    expect(commandRegistry.missingIds()).toHaveLength(15);
-    expect(commandRegistry.missingIds()).toEqual([...idsForPhase('B4')].sort());
+    expect(commandRegistry.size()).toBe(38);
+    // The exact frozen set, not a count and not a floor: this fails both for a
+    // missing command and for one that names an id no phase owns.
+    expect(commandRegistry.ids()).toEqual(
+      [...idsForPhase('B2'), ...idsForPhase('B3'), ...idsForPhase('B4')].sort(),
+    );
+    expect(commandRegistry.ids()).toEqual([...COMMAND_IDS].sort());
+    expect(commandRegistry.missingIds()).toEqual([]);
   });
 });
 
