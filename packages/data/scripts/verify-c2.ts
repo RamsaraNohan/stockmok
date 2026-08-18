@@ -58,8 +58,39 @@ const implemented = QUERY_COVERAGE_REGISTRY.filter(({ status }) => status === 'I
 const blocked = QUERY_COVERAGE_REGISTRY.filter(
   ({ status }) => status === 'BLOCKED_PENDING_OWNER_RULING',
 );
-if (implemented.length !== 91 || blocked.length !== 1 || blocked[0]?.queryId !== 'Q-005') {
-  throw new Error('C2 implementation accounting must be 91 implemented plus blocked Q-005');
+if (implemented.length !== 92 || blocked.length !== 0) {
+  throw new Error('C2 implementation accounting must contain 92 implemented active query IDs');
+}
+
+const q005Rows = QUERY_COVERAGE_REGISTRY.filter(({ queryId }) => queryId === 'Q-005');
+const q005 = q005Rows[0];
+if (
+  q005Rows.length !== 1 ||
+  q005?.status !== 'IMPLEMENTED' ||
+  q005.scope !== 'user' ||
+  q005.path !== 'users/{uid}/notifications' ||
+  q005.filters.length !== 1 ||
+  q005.filters[0]?.field !== 'read' ||
+  q005.filters[0].operator !== '==' ||
+  q005.filters[0].value !== false ||
+  q005.indexIds.length !== 1 ||
+  q005.indexIds[0] !== 'IDX-17' ||
+  q005.transports?.length !== 2
+) {
+  throw new Error(
+    'Q-005 must remain one implemented, user-bound logical query with two transports',
+  );
+}
+const exactTransport = q005.transports.find(({ name }) => name === 'exactCount');
+const realtimeTransport = q005.transports.find(({ name }) => name === 'realtimeBadge');
+if (
+  exactTransport?.mode !== 'read-time-aggregation' ||
+  exactTransport.realtime ||
+  realtimeTransport?.mode !== 'bounded-query-listener' ||
+  !realtimeTransport.realtime ||
+  realtimeTransport.limit !== 50
+) {
+  throw new Error('Q-005 transport metadata does not match the owner ruling');
 }
 
 const realtime = QUERY_COVERAGE_REGISTRY.filter(({ realtime }) => realtime).map(
@@ -68,9 +99,9 @@ const realtime = QUERY_COVERAGE_REGISTRY.filter(({ realtime }) => realtime).map(
 assertSet('REALTIME_IDS', realtime, ['Q-005', 'Q-008', 'Q-036', 'Q-042']);
 if (
   QUERY_COVERAGE_REGISTRY.filter(({ realtime, status }) => realtime && status === 'IMPLEMENTED')
-    .length !== 3
+    .length !== 4
 ) {
-  throw new Error('Exactly three feasible realtime reads must be implemented');
+  throw new Error('Exactly four approved realtime reads must be implemented');
 }
 
 for (const record of QUERY_COVERAGE_REGISTRY) {
@@ -151,16 +182,22 @@ for (const record of QUERY_COVERAGE_REGISTRY) {
 
 console.log('ACTIVE_QUERY_IDS=92');
 console.log('ACTIVE_QUERY_IDS_ACCOUNTED_FOR=92');
-console.log('ACTIVE_QUERY_IDS_IMPLEMENTED=91');
-console.log('BLOCKED_QUERY_IDS=Q-005');
-console.log('UNIMPLEMENTED_ACTIVE_QUERY_IDS=1');
+console.log('ACTIVE_QUERY_IDS_IMPLEMENTED=92');
+console.log('BLOCKED_QUERY_IDS=[]');
+console.log('UNIMPLEMENTED_ACTIVE_QUERY_IDS=0');
 console.log('EXTRA_QUERY_IMPLEMENTATIONS=0');
 console.log('DUPLICATE_ACTIVE_QUERY_IDS=0');
 console.log('UNDEFINED_ACTIVE_QUERY_IDS=0');
 console.log('ACTIVE_INDEX_IDS=67');
 console.log('PRODUCT_LIST_MATRIX_INDEXES=32');
 console.log('REALTIME_QUERY_COUNT=4');
-console.log('REALTIME_QUERIES_IMPLEMENTED=3');
+console.log('REALTIME_QUERIES_IMPLEMENTED=4');
+console.log('EXTRA_REALTIME_QUERIES=0');
+console.log('Q005_LOGICAL_QUERY_ID_COUNT=1');
+console.log('Q005_TRANSPORT_COUNT=2');
+console.log('Q005_EXACT_COUNT_TRANSPORT=IMPLEMENTED');
+console.log('Q005_RT2_TRANSPORT=IMPLEMENTED');
+console.log('Q005_STATUS=IMPLEMENTED');
 console.log('INDEX_SET_MATCH=PASS');
 console.log('DB04_MATRIX_CONTRACT_MATCH=PASS');
 console.log('PAGINATION_CONTRACTS=PASS');
@@ -168,5 +205,7 @@ console.log('QUERY_INDEX_REFERENCES=PASS');
 console.log('TENANT_PATH_SCOPING=PASS');
 console.log('READ_SCHEMA_VALIDATION=PASS');
 console.log('Q053_DB_CR_039=PASS');
-console.log('REALTIME_QUERIES=BLOCKED_BY_Q005');
+console.log('ALL_ON_HAND_SORTS=DESC');
+console.log('IDX36=PASS');
+console.log('REALTIME_QUERIES=PASS');
 console.log('C2_CONTRACT_VERIFICATION=PASS');

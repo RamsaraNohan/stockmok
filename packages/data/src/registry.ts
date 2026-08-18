@@ -37,6 +37,7 @@ interface DefinitionOptions {
   readonly realtime?: boolean;
   readonly aggregation?: boolean;
   readonly aggregates?: QueryContractRecord['aggregates'];
+  readonly transports?: QueryContractRecord['transports'];
   readonly blocked?: boolean;
 }
 
@@ -58,6 +59,7 @@ function definition(queryId: QueryId, options: DefinitionOptions): QueryContract
     realtime: options.realtime ?? false,
     aggregation: options.aggregation ?? false,
     ...(options.aggregates ? { aggregates: options.aggregates } : {}),
+    ...(options.transports ? { transports: options.transports } : {}),
     primaryTest: `query-contracts:${queryId}`,
     status: options.blocked ? 'BLOCKED_PENDING_OWNER_RULING' : 'IMPLEMENTED',
   };
@@ -115,8 +117,8 @@ export const QUERY_COVERAGE_REGISTRY = [
     indexes: ['IDX-17', 'IDX-45'],
   }),
   definition('Q-005', {
-    purpose: 'Exact realtime unread notification count',
-    method: 'notifications.subscribeUnreadCount',
+    purpose: 'Exact unread count and bounded realtime unread badge',
+    method: 'notifications.getUnreadCount|subscribeUnreadBadge',
     scope: 'user',
     kind: 'count',
     path: 'users/{uid}/notifications',
@@ -125,7 +127,10 @@ export const QUERY_COVERAGE_REGISTRY = [
     indexes: ['IDX-17'],
     realtime: true,
     aggregation: true,
-    blocked: true,
+    transports: [
+      { name: 'exactCount', mode: 'read-time-aggregation', realtime: false },
+      { name: 'realtimeBadge', mode: 'bounded-query-listener', realtime: true, limit: 50 },
+    ],
   }),
   definition('Q-006', {
     purpose: 'Organization shell document',

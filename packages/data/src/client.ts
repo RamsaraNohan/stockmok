@@ -24,6 +24,7 @@ import {
 import { QUERY_COVERAGE_BY_ID } from './registry.js';
 import type {
   AggregateResult,
+  ExactUnreadCountResult,
   PageRequest,
   PageResult,
   QueryContractRecord,
@@ -31,6 +32,7 @@ import type {
   QueryFieldParameter,
   QueryParameters,
   QueryValueParameter,
+  RealtimeUnreadBadgeResult,
   ResolverResult,
 } from './types.js';
 import { DataReadError } from './types.js';
@@ -208,6 +210,11 @@ export function prefixBounds(prefix: string): {
 }
 
 export interface ReadClient {
+  readonly getUnreadCount: () => Promise<ExactUnreadCountResult>;
+  readonly subscribeUnreadBadge: (
+    onValue: (value: RealtimeUnreadBadgeResult) => void,
+    onError?: ErrorHandler,
+  ) => Unsubscribe;
   readonly get: <T = DocumentData>(
     queryId: QueryId,
     parameters?: QueryParameters,
@@ -231,6 +238,63 @@ export interface ReadClient {
 }
 
 export function createReadClient(db: Firestore, scope: BoundReadScope): ReadClient {
+  async function getUnreadCount(): Promise<ExactUnreadCountResult> {
+    const record = QUERY_COVERAGE_BY_ID['Q-005'];
+    assertExecutable(record);
+    const reference = collection(db, resolvePath(record.path, scope, {})).withConverter(
+      converterFor(record),
+    );
+    const snapshot = await getCountFromServer(query(reference, ...constraintsFor(record, {})));
+    const unreadCount = snapshot.data().count;
+    if (!Number.isSafeInteger(unreadCount) || unreadCount < 0) {
+      throw new DataReadError('schema-invalid', 'Q-005 returned an invalid exact unread count');
+    }
+    return { count: unreadCount, capped: false };
+  }
+
+  function subscribeUnreadBadge(
+    onValue: (value: RealtimeUnreadBadgeResult) => void,
+    onError: ErrorHandler = () => undefined,
+  ): Unsubscribe {
+    const record = QUERY_COVERAGE_BY_ID['Q-005'];
+    assertExecutable(record);
+    const reference = collection(db, resolvePath(record.path, scope, {})).withConverter(
+      converterFor(record),
+    );
+    const boundedUnreadQuery = query(
+      reference,
+      ...constraintsFor(record, {}),
+      orderBy('createdAt', 'desc'),
+      limitConstraint(50),
+    );
+    let active = true;
+    let errorDelivered = false;
+    const deliverError = (error: unknown): void => {
+      if (!active || errorDelivered) return;
+      errorDelivered = true;
+      onError(error);
+    };
+    const unsubscribe = onSnapshot(
+      boundedUnreadQuery,
+      { includeMetadataChanges: true },
+      (snapshot) => {
+        if (!active || snapshot.metadata.fromCache) return;
+        try {
+          const count = snapshot.size;
+          onValue({ count, capped: count >= 50 });
+        } catch (error) {
+          deliverError(error);
+        }
+      },
+      deliverError,
+    );
+    return () => {
+      if (!active) return;
+      active = false;
+      unsubscribe();
+    };
+  }
+
   async function get<T = DocumentData>(
     queryId: QueryId,
     parameters: QueryParameters = {},
@@ -357,5 +421,9 @@ export function createReadClient(db: Firestore, scope: BoundReadScope): ReadClie
     return { matches: page.items.slice(0, 10), overflow: page.items.length === 11 };
   }
 
-  return { get, list, aggregate, subscribe, resolve };
+  return { getUnreadCount, subscribeUnreadBadge, get, list, aggregate, subscribe, resolve };
+}
+
+export function formatUnreadBadge(value: RealtimeUnreadBadgeResult): string {
+  return value.capped ? '50+' : String(value.count);
 }

@@ -10,21 +10,35 @@ describe('C2 query coverage registry', () => {
     expect([...ids].sort()).toEqual([...ACTIVE_QUERY_IDS].sort());
   });
 
-  it('isolates Q-005 and implements every unaffected query id', () => {
+  it('implements every active query id after the Q-005 owner ruling', () => {
     expect(QUERY_COVERAGE_REGISTRY.filter(({ status }) => status === 'IMPLEMENTED')).toHaveLength(
-      91,
+      92,
     );
     expect(
       QUERY_COVERAGE_REGISTRY.filter(({ status }) => status === 'BLOCKED_PENDING_OWNER_RULING').map(
         ({ queryId }) => queryId,
       ),
-    ).toEqual(['Q-005']);
+    ).toEqual([]);
+  });
+
+  it('keeps one Q-005 logical id with the exact two ruled transports', () => {
+    const rows = QUERY_COVERAGE_REGISTRY.filter(({ queryId }) => queryId === 'Q-005');
+    expect(rows).toHaveLength(1);
+    expect(rows[0]?.transports).toEqual([
+      { name: 'exactCount', mode: 'read-time-aggregation', realtime: false },
+      { name: 'realtimeBadge', mode: 'bounded-query-listener', realtime: true, limit: 50 },
+    ]);
   });
 
   it('classifies only the exact four approved realtime query ids', () => {
     expect(
       QUERY_COVERAGE_REGISTRY.filter(({ realtime }) => realtime).map(({ queryId }) => queryId),
     ).toEqual(['Q-005', 'Q-008', 'Q-036', 'Q-042']);
+    expect(
+      QUERY_COVERAGE_REGISTRY.filter(
+        ({ realtime, status }) => realtime && status === 'IMPLEMENTED',
+      ),
+    ).toHaveLength(4);
   });
 
   it('keeps every implemented on-hand order descending', () => {

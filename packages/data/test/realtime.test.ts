@@ -12,16 +12,14 @@ vi.mock('firebase/firestore', async (importOriginal) => {
   const actual = await importOriginal<typeof FirestoreSdk>();
   return {
     ...actual,
-    onSnapshot: vi.fn(
-      (_reference: unknown, _onValue: unknown, onError: (error: Error) => void): (() => void) => {
-        listener.error = onError;
-        return listener.unsubscribe;
-      },
-    ),
+    onSnapshot: vi.fn((...args: unknown[]): (() => void) => {
+      listener.error = args.at(-1) as (error: Error) => void;
+      return listener.unsubscribe;
+    }),
   };
 });
 
-import { createReadClient } from '../src/client.js';
+import { createReadClient, formatUnreadBadge } from '../src/client.js';
 
 afterEach(() => {
   listener.error = undefined;
@@ -47,5 +45,28 @@ describe('realtime listener lifecycle', () => {
     listener.error?.(new Error('late error'));
     expect(onError).toHaveBeenCalledOnce();
     await deleteApp(app);
+  });
+
+  it('forwards a Q-005 listener error once and keeps cleanup idempotent', async () => {
+    const app = initializeApp({ projectId: 'stockmok', apiKey: 'test-only' }, 'c2-q005-error-unit');
+    const client = createReadClient(getFirestore(app), { uid: 'user-a' });
+    const onError = vi.fn();
+    const unsubscribe = client.subscribeUnreadBadge(vi.fn(), onError);
+    const denied = new Error('permission denied');
+
+    listener.error?.(denied);
+    listener.error?.(denied);
+    expect(onError).toHaveBeenCalledOnce();
+    expect(onError).toHaveBeenCalledWith(denied);
+
+    unsubscribe();
+    unsubscribe();
+    expect(listener.unsubscribe).toHaveBeenCalledOnce();
+    await deleteApp(app);
+  });
+
+  it('formats a capped badge conservatively as 50+', () => {
+    expect(formatUnreadBadge({ count: 49, capped: false })).toBe('49');
+    expect(formatUnreadBadge({ count: 50, capped: true })).toBe('50+');
   });
 });

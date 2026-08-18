@@ -18,15 +18,12 @@ function isReferencePair(value: unknown): value is readonly [DocumentReference, 
 
 afterAll(() => deleteApp(adminApp));
 
-describe('browser/server and blocked-query boundaries', () => {
-  it('does not expose any substitute execution for Q-005', async () => {
+describe('browser/server and query boundaries', () => {
+  it('exposes only the two ruled Q-005 transports', () => {
     const client = createReadClient({} as ClientFirestore, { uid: 'user-1' });
-    await expect(client.aggregate('Q-005')).rejects.toMatchObject({
-      code: 'invalid-argument',
-    });
-    expect(() => client.subscribe('Q-005', {}, () => undefined)).toThrow(
-      /blocked pending an owner ruling/,
-    );
+    expect(client.getUnreadCount).toBeTypeOf('function');
+    expect(client.subscribeUnreadBadge).toBeTypeOf('function');
+    expect(() => client.subscribe('Q-005', {}, () => undefined)).toThrow(/document listener/);
   });
 
   it('refuses server-only queries through the browser executor', async () => {

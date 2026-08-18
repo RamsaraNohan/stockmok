@@ -43,6 +43,13 @@ export interface AggregateDefinition {
   readonly field?: string;
 }
 
+export interface QueryTransportDefinition {
+  readonly name: 'exactCount' | 'realtimeBadge';
+  readonly mode: 'read-time-aggregation' | 'bounded-query-listener';
+  readonly realtime: boolean;
+  readonly limit?: number;
+}
+
 export type ConverterKey =
   | 'organizationDirectory'
   | 'user'
@@ -88,6 +95,7 @@ export interface QueryContractRecord {
   readonly realtime: boolean;
   readonly aggregation: boolean;
   readonly aggregates?: readonly AggregateDefinition[];
+  readonly transports?: readonly QueryTransportDefinition[];
   readonly primaryTest: string;
   readonly status: QueryStatus;
 }
@@ -118,6 +126,16 @@ export interface ResolverResult<T> {
 
 export interface AggregateResult {
   readonly [alias: string]: number;
+}
+
+export interface ExactUnreadCountResult {
+  readonly count: number;
+  readonly capped: false;
+}
+
+export interface RealtimeUnreadBadgeResult {
+  readonly count: number;
+  readonly capped: boolean;
 }
 
 export type QueryParameters = Readonly<Record<string, unknown>>;

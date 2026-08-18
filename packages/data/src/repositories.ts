@@ -22,7 +22,13 @@ import type {
 import type { Firestore, Unsubscribe } from 'firebase/firestore';
 import { createReadClient, prefixBounds, type BoundReadScope } from './client.js';
 import { listProductsFromMatrix, type ProductListRequest } from './product-matrix.js';
-import type { PageRequest, PageResult, QueryParameters, ResolverResult } from './types.js';
+import type {
+  PageRequest,
+  PageResult,
+  QueryParameters,
+  RealtimeUnreadBadgeResult,
+  ResolverResult,
+} from './types.js';
 import { DataReadError } from './types.js';
 
 export interface DashboardKpis {
@@ -265,6 +271,11 @@ export function createStockmokRepositories(db: Firestore, scope: BoundReadScope)
         client.list('Q-045', { published }, page),
     },
     notifications: {
+      getUnreadCount: () => client.getUnreadCount(),
+      subscribeUnreadBadge: (
+        onValue: (value: RealtimeUnreadBadgeResult) => void,
+        onError?: (error: unknown) => void,
+      ): Unsubscribe => client.subscribeUnreadBadge(onValue, onError),
       list: (
         filters: { readonly read?: boolean; readonly category?: 'STOCK' | 'ORDERS' | 'NETWORK' },
         page?: PageRequest,
