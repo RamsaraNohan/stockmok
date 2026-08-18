@@ -166,6 +166,64 @@ describe('C-15 po.order', () => {
     expect(reasonOf(await order(uidFor(ORG_A, 'OWNER')))).toBe('INVALID_TRANSITION');
   });
 
+  // DB-07 §8 draws no `receive` edge out of DRAFT and DB-06 §3.3 makes C-17 the
+  // sole writer of received quantity, pairing every increase with one
+  // PURCHASE_RECEIPT movement. A draft line claiming receipt is therefore not a
+  // valid line, and freezing it into ORDERED would hand C-16 a false
+  // `receivedTotal` and C-17 false outstanding arithmetic. Rules pin the field
+  // to zero on the client-write surface; this is the same invariant at the
+  // trusted-command boundary, which the Admin SDK does not go through rules for.
+  it('refuses a draft line that already claims received stock, and writes nothing', async () => {
+    await seedPurchaseOrderItem(db, ORG_A, PO, LINE_A, {
+      buyerProductId: PRODUCT,
+      orderedBuyerBaseMilli: 50_000,
+      receivedBuyerBaseMilli: 1,
+    });
+    expect(reasonOf(await order(uidFor(ORG_A, 'OWNER')))).toBe('INVALID_TRANSITION');
+
+    const po = await db.doc(paths.purchaseOrder(ORG_A, PO)).get();
+    expect(po.get('status')).toBe('DRAFT');
+    expect(po.get('orderNumber')).toBeUndefined();
+    const counter = await db.doc(paths.counter(ORG_A, 'purchaseOrder')).get();
+    expect(counter.get('value')).toBe(0);
+    const supplier = await db.doc(paths.privatePartner(ORG_A, SUPPLIER)).get();
+    expect(supplier.get('ordersPlacedCount')).toBe(0);
+    expect(await historyOf(PO)).toHaveLength(0);
+    expect(await collectionOf(db, ORG_A, 'auditLogs')).toHaveLength(0);
+    expect(await collectionOf(db, ORG_A, 'stockMovements')).toHaveLength(0);
+
+    // A fully received line and a partial one are refused identically.
+    await seedPurchaseOrderItem(db, ORG_A, PO, LINE_A, {
+      buyerProductId: PRODUCT,
+      orderedBuyerBaseMilli: 50_000,
+      receivedBuyerBaseMilli: 50_000,
+    });
+    expect(reasonOf(await order(uidFor(ORG_A, 'OWNER'), PO, OPERATION_ID_B))).toBe(
+      'INVALID_TRANSITION',
+    );
+
+    // The same order with the line honestly at zero is accepted, so the denial
+    // above is attributable to the received quantity and to nothing else.
+    await seedPurchaseOrderItem(db, ORG_A, PO, LINE_A, {
+      buyerProductId: PRODUCT,
+      orderedBuyerBaseMilli: 50_000,
+      receivedBuyerBaseMilli: 0,
+    });
+    const accepted = await order(uidFor(ORG_A, 'OWNER'), PO, OPERATION_ID_B);
+    expect(accepted.ok, JSON.stringify(accepted)).toBe(true);
+  });
+
+  it('refuses when only one line of several claims received stock', async () => {
+    await seedPurchaseOrderItem(db, ORG_A, PO, LINE_B, {
+      buyerProductId: PRODUCT_B,
+      orderedBuyerBaseMilli: 20_000,
+      receivedBuyerBaseMilli: 5_000,
+    });
+    expect(reasonOf(await order(uidFor(ORG_A, 'OWNER')))).toBe('INVALID_TRANSITION');
+    const po = await db.doc(paths.purchaseOrder(ORG_A, PO)).get();
+    expect(po.get('status')).toBe('DRAFT');
+  });
+
   it('refuses a purchase order belonging to another organization', async () => {
     await seedPurchaseOrder(db, ORG_B, 'po-other', { status: 'DRAFT' });
     expect(reasonOf(await order(uidFor(ORG_A, 'OWNER'), 'po-other'))).toBe(

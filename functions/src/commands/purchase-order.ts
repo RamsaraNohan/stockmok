@@ -166,6 +166,20 @@ function writeHistory(
  * **Ordering creates no stock.** No movement, no balance, no summary: goods
  * have been ordered, not received. `PURCHASE_RECEIPT` belongs to `C-17` alone.
  *
+ * For the same reason a line reaching this command must have received nothing.
+ * DB-07 §8 draws no `receive` edge out of `DRAFT`, and DB-06 §3.3 makes `C-17`
+ * the sole writer of private received quantity, pairing every increase with one
+ * `PURCHASE_RECEIPT` movement per line. So a draft line claiming receipt is not
+ * a *"valid line"* in DB-07 §8's `DRAFT → ORDERED` guard — it is received stock
+ * with no ledger entry behind it, and freezing it into `ORDERED` would poison
+ * `C-16`'s `receivedTotal == 0` cancellation guard and `C-17`'s outstanding
+ * arithmetic. DB-02 §5.2 states the obligation directly: *"every transition out
+ * of DRAFT is a command that re-validates the whole document server-side"*, and
+ * DB-05 §7 step 7 maps a state violation to `INVALID_TRANSITION`. Rules pin the
+ * field to zero on the client-write surface; this is the trusted-command half of
+ * the same invariant, and it is what stops the command trusting a client-written
+ * value it would otherwise copy forward.
+ *
  * `privatePartners.ordersPlacedCount` is incremented here and decremented by
  * `po.cancel`, so it counts non-cancelled orders **placed** (DV-13).
  */
@@ -204,6 +218,9 @@ export const poOrder = defineCommand({
     for (const item of items) {
       if (orderedMilliOf(item) <= 0) {
         fail('INVALID_QUANTITY', 'Every order line must carry a positive quantity.');
+      }
+      if (receivedMilliOf(item) !== 0) {
+        fail('INVALID_TRANSITION', 'A draft line cannot already have been received.');
       }
       const productId = item.get('buyerProductId') as string;
       if (!products.has(productId)) {

@@ -198,11 +198,32 @@ service cloud.firestore {
 
     // BACKEND-IR-001 — creation provenance is attributed to the caller, never
     // asserted by them. `createdBy` is then immutable, so the pair cannot be
-    // forged at create and cannot be rewritten afterwards. `updatedBy` is left
-    // to the document's own audit fields: any writer holding the role may make
-    // the next edit.
+    // forged at create and cannot be rewritten afterwards.
     function createdBySelf() {
       return request.resource.data.createdBy == request.auth.uid;
+    }
+
+    // BACKEND-IR-001 (second review) — edit attribution is bound to the caller.
+    //
+    // Control Pack file 11 §16 (RC-15) and DB-01 §12: *"ordinary field edits
+    // rely on `updatedBy`/`updatedAt` rather than an audit row"*. On a
+    // SAFE_DIRECT_CLIENT_WRITE surface `updatedBy` therefore IS the audit trail
+    // for an ordinary edit — and an audit actor is server-derived, never
+    // client-asserted (DB-01 §12, DB-05 §7, DB-06 §4). No trusted command runs
+    // on a direct client write, so this file is the only enforcement point and
+    // `request.auth.uid` is the only server-derived actor it has.
+    //
+    // This is the LAST writer, not the first: a different authorized writer may
+    // edit the document later, and that edit is attributed to them. `updatedBy`
+    // is never required to equal `createdBy`. `updatedAt` semantics are
+    // unchanged — it stays a timestamp in each shape and in draftFieldsOnly().
+    //
+    // Applied only where the persisted shape actually carries the field:
+    // categories (DB-02 §4.1), warehouses (§4.2) and privatePartners (§5.1).
+    // users (§2.1), notifications (§2.3), private draft PO headers (§5.2) and
+    // their items (§5.3) define no `updatedBy` and are untouched by it.
+    function updatedBySelf() {
+      return request.resource.data.updatedBy == request.auth.uid;
     }
 
     // DB-02 §0.1 enums, verbatim.
@@ -355,9 +376,19 @@ service cloud.firestore {
 
     // DB-02 §5.3 — the buyer-side line. The eight supplier/mapping snapshot
     // fields belong to CONNECTED orders, whose lines are command-only, so they
-    // are outside this allowlist. Received quantity may never exceed ordered
-    // quantity (INV-12), and on a draft no receipt has happened at all — every
-    // receipt is C-17.
+    // are outside this allowlist.
+    //
+    // DRAFT_RECEIVED_ZERO. DB-07 §8 draws no `receive` edge out of `DRAFT` —
+    // receipt is reachable only from `ORDERED`/`PARTIALLY_RECEIVED` — and
+    // `ORDERED → CANCELLED` is guarded *"only while receivedTotal == 0"*, which
+    // presupposes the draft carried nothing. DB-06 §3.3 makes `C-17 po.receive`
+    // the sole writer of private received quantity and pairs every increase with
+    // one `PURCHASE_RECEIPT` movement per line per receipt event. A client-written
+    // draft line therefore has received exactly nothing: a positive value here is
+    // received stock with no ledger entry behind it — `ATTACK-15` (DB-05 §4.9) in
+    // a new location — so the field is pinned to 0 rather than merely bounded by
+    // the ordered quantity. INV-12's `received <= ordered` follows, and is kept
+    // stated below.
     function privateDraftItemShape(data, itemId) {
       return data.keys().hasOnly([
           'itemId', 'buyerProductId', 'buyerProductNameSnapshot', 'buyerSkuSnapshot',
@@ -376,6 +407,7 @@ service cloud.firestore {
         && data.buyerBaseUnitSnapshot in UNITS()
         && isNonNegativeInt(data.orderedBuyerBaseMilli)
         && isNonNegativeInt(data.receivedBuyerBaseMilli)
+        && data.receivedBuyerBaseMilli == 0
         && data.receivedBuyerBaseMilli <= data.orderedBuyerBaseMilli
         && isNonNegativeInt(data.unitPriceMinor)
         && isNonNegativeInt(data.lineTotalMinor)
@@ -494,12 +526,17 @@ service cloud.firestore {
         allow create: if hasRole(orgId, ROLE_INVENTORY_WRITERS())
           && categoryShape(request.resource.data, categoryId)
           && createdBySelf()
+          && updatedBySelf()
           && request.resource.data.status == 'ACTIVE';
 
         // Identity and creation provenance are fixed at create: a client may
-        // rename a category, never re-point it or forge who made it.
+        // rename a category, never re-point it or forge who made it. Edit
+        // attribution is bound to whoever is making THIS edit, so a later
+        // authorized writer may rename it under their own name and no writer
+        // can sign an edit as somebody else.
         allow update: if hasRole(orgId, ROLE_INVENTORY_WRITERS())
           && categoryShape(request.resource.data, categoryId)
+          && updatedBySelf()
           && neverChanged(['status', 'categoryId', 'createdAt', 'createdBy']);
 
         allow delete: if false;
@@ -515,10 +552,12 @@ service cloud.firestore {
         allow create: if hasRole(orgId, ROLE_INVENTORY_WRITERS())
           && warehouseShape(request.resource.data, warehouseId)
           && createdBySelf()
+          && updatedBySelf()
           && request.resource.data.status == 'ACTIVE';
 
         allow update: if hasRole(orgId, ROLE_INVENTORY_WRITERS())
           && warehouseShape(request.resource.data, warehouseId)
+          && updatedBySelf()
           && neverChanged(['status', 'warehouseId', 'createdAt', 'createdBy']);
 
         allow delete: if false;
@@ -556,11 +595,13 @@ service cloud.firestore {
         allow create: if hasRole(orgId, ROLE_PARTNER_WRITERS())
           && privatePartnerShape(request.resource.data, partnerId)
           && createdBySelf()
+          && updatedBySelf()
           && request.resource.data.status == 'ACTIVE'
           && request.resource.data.ordersPlacedCount == 0;
 
         allow update: if hasRole(orgId, ROLE_PARTNER_WRITERS())
           && privatePartnerShape(request.resource.data, partnerId)
+          && updatedBySelf()
           && neverChanged([
             'status', 'ordersPlacedCount', 'partnerId', 'createdAt', 'createdBy'
           ]);

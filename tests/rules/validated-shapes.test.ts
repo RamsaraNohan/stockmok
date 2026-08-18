@@ -276,6 +276,7 @@ describe('categories — DB-02 §4.1 validated shape', () => {
       setDoc(doc(forRole('INVENTORY_MANAGER'), paths.category(ORG_A, 'cat-shape-desc')), {
         ...validCategory('cat-shape-desc'),
         createdBy: uidFor(ORG_A, 'INVENTORY_MANAGER'),
+        updatedBy: uidFor(ORG_A, 'INVENTORY_MANAGER'),
         description: 'Milk, cheese and yoghurt.',
       }),
     );
@@ -379,6 +380,7 @@ describe('warehouses — DB-02 §4.2 validated shape', () => {
       setDoc(doc(forRole('INVENTORY_MANAGER'), paths.warehouse(ORG_A, 'wh-shape-ok')), {
         ...validWarehouse('wh-shape-ok'),
         createdBy: uidFor(ORG_A, 'INVENTORY_MANAGER'),
+        updatedBy: uidFor(ORG_A, 'INVENTORY_MANAGER'),
         code: 'CR-01',
         address: '12 Marine Drive, Colombo',
       }),
@@ -387,6 +389,7 @@ describe('warehouses — DB-02 §4.2 validated shape', () => {
       updateDoc(doc(forRole('INVENTORY_MANAGER'), paths.warehouse(ORG_A, IDS.warehouse)), {
         name: 'Main Store Room',
         updatedAt: NOW,
+        updatedBy: uidFor(ORG_A, 'INVENTORY_MANAGER'),
       }),
     );
   });
@@ -496,6 +499,7 @@ describe('privatePartners — DB-02 §5.1 validated shape', () => {
       setDoc(doc(forRole('PROCUREMENT_MANAGER'), paths.privatePartner(ORG_A, 'pp-shape-ok')), {
         ...validPartner('pp-shape-ok'),
         createdBy: uidFor(ORG_A, 'PROCUREMENT_MANAGER'),
+        updatedBy: uidFor(ORG_A, 'PROCUREMENT_MANAGER'),
         partnerTypes: ['SUPPLIER', 'BUYER'],
         contactPerson: 'Nimal Perera',
         email: 'nimal@greenfarm.test',
@@ -508,6 +512,7 @@ describe('privatePartners — DB-02 §5.1 validated shape', () => {
       updateDoc(doc(forRole('PROCUREMENT_MANAGER'), paths.privatePartner(ORG_A, IDS.partner)), {
         contactPerson: 'Nimal Perera',
         updatedAt: NOW,
+        updatedBy: uidFor(ORG_A, 'PROCUREMENT_MANAGER'),
       }),
     );
   });
