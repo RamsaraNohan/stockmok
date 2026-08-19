@@ -34,6 +34,8 @@ import { ProductListScreen } from '@/features/inventory/products/ProductListScre
 import { ProductCreateScreen } from '@/features/inventory/products/ProductCreateScreen';
 import { ProductDetailScreen } from '@/features/inventory/products/ProductDetailScreen';
 import { ProductEditScreen } from '@/features/inventory/products/ProductEditScreen';
+import { CategoryListScreen } from '@/features/inventory/categories/CategoryListScreen';
+import { WarehouseListScreen } from '@/features/inventory/warehouses/WarehouseListScreen';
 
 function SectionPlaceholder({ title }: { readonly title: string }) {
   return (
@@ -170,7 +172,7 @@ export const router = createBrowserRouter([
         path: 'inventory/categories',
         element: (
           <RoleGuard allowedRoles={['OWNER', 'ADMIN', 'INVENTORY_MANAGER']}>
-            <SectionPlaceholder title="Categories" />
+            <CategoryListScreen />
           </RoleGuard>
         ),
       },
@@ -178,7 +180,7 @@ export const router = createBrowserRouter([
         path: 'inventory/warehouses',
         element: (
           <RoleGuard allowedRoles={['OWNER', 'ADMIN', 'INVENTORY_MANAGER']}>
-            <SectionPlaceholder title="Warehouses" />
+            <WarehouseListScreen />
           </RoleGuard>
         ),
       },
