@@ -9,6 +9,8 @@ import {
   cpoSubmit,
 } from '../../functions/src/commands/connected-po.js';
 import { paths } from '../../packages/shared/src/paths.js';
+import { ConnectedPurchaseOrderSchema } from '../../packages/shared/src/schemas/network.js';
+import { PurchaseOrderSchema } from '../../packages/shared/src/schemas/procurement.js';
 import { serverPaths } from '../../packages/shared/src/server/paths.js';
 import {
   callable,
@@ -968,5 +970,130 @@ describe('negative controls — a weakened implementation would be caught', () =
     expect((await receive(8000, OP.receiveOne)).ok).toBe(true);
     // …but no new draft can be built on it.
     expect(reasonOf(await draftSave())).toBe('INVALID_TRANSITION');
+  });
+});
+
+// ───────────────────────────────────────────────────────────────────────────
+/**
+ * `BACKEND-INTEGRATION-001` — the persisted connected order must satisfy the
+ * frozen read contract at **every** point of the lifecycle.
+ *
+ * The rest of this file asserts field-by-field, which is why a drifted *extra*
+ * field survived it: an assertion on `status` says nothing about a key nobody
+ * thought to look for. These cases parse the **actual persisted document**
+ * through the same strict schema `Q-036` uses, so the oracle is the whole shape
+ * rather than the fields the test happens to name.
+ *
+ * `PurchaseOrderSchema` is `.strict()` and the DB-02 §5.2 field table for
+ * `organizations/{orgId}/purchaseOrders/{poId}` carries no `updatedAt`. DB-05
+ * §4.1 admits `updatedAt` only through `draftFieldsOnly()`, which governs the
+ * **private** client-write draft surface — a connected draft is COMMAND_ONLY
+ * via `cpo.draftSave` (DB-CR-010), so that concession never reached here.
+ */
+describe('BACKEND-INTEGRATION-001 connected projections satisfy the frozen read contract', () => {
+  /** The buyer projection as `Q-036` would hand it to a reader. */
+  async function buyerProjection(): Promise<Record<string, unknown>> {
+    const snapshot = await db.doc(paths.purchaseOrder(ORG_A, PO)).get();
+    expect(snapshot.exists).toBe(true);
+    return snapshot.data() as Record<string, unknown>;
+  }
+
+  async function supplierProjection(): Promise<Record<string, unknown>> {
+    const snapshot = await db.doc(paths.purchaseOrder(ORG_B, PO)).get();
+    expect(snapshot.exists).toBe(true);
+    return snapshot.data() as Record<string, unknown>;
+  }
+
+  /**
+   * Parses the real document and reports the offending keys by name when it
+   * fails — a bare `.parse()` throw names the key but not the stage.
+   */
+  function expectStrictOrder(actual: Record<string, unknown>, stage: string): void {
+    const parsed = PurchaseOrderSchema.safeParse(actual);
+    const unknownKeys = Object.keys(actual).filter((key) => !(key in PurchaseOrderSchema.shape));
+    expect(unknownKeys, `${stage}: unauthorised field(s) on the buyer projection`).toEqual([]);
+    expect(
+      parsed.success ? [] : parsed.error.issues.map((issue) => issue.message),
+      `${stage}: PurchaseOrderSchema.parse`,
+    ).toEqual([]);
+  }
+
+  it('C-34 draftSave persists a buyer draft that strict-parses, with no updatedAt', async () => {
+    expect((await draftSave()).ok).toBe(true);
+
+    const actual = await buyerProjection();
+    expect(Object.keys(actual)).not.toContain('updatedAt');
+    expectStrictOrder(actual, 'C-34 cpo.draftSave');
+  });
+
+  it('C-27 submit leaves no unauthorised field behind on the merged buyer projection', async () => {
+    await draftSave();
+    expect((await submit()).ok).toBe(true);
+
+    // `cpo.submit` merges into the very document `cpo.draftSave` wrote, so
+    // anything unauthorised written at draft time survives into the submitted
+    // projection rather than being replaced by it.
+    const actual = await buyerProjection();
+    expect(Object.keys(actual)).not.toContain('updatedAt');
+    expectStrictOrder(actual, 'C-27 cpo.submit');
+    expect(actual.status).toBe('SUBMITTED');
+    expect(actual.isProjection).toBe(true);
+
+    expectStrictOrder(await supplierProjection(), 'C-27 cpo.submit supplier projection');
+
+    const canonical = (await canonicalOrder()).data() as Record<string, unknown>;
+    const parsedCanonical = ConnectedPurchaseOrderSchema.safeParse(canonical);
+    expect(
+      parsedCanonical.success ? [] : parsedCanonical.error.issues.map((issue) => issue.message),
+      'C-27 canonical record',
+    ).toEqual([]);
+  });
+
+  it('the buyer projection strict-parses at every step of the C-27 → C-30 chain', async () => {
+    await draftSave();
+    expectStrictOrder(await buyerProjection(), 'after C-34 cpo.draftSave');
+
+    await submit();
+    expectStrictOrder(await buyerProjection(), 'after C-27 cpo.submit');
+
+    await respond('ACCEPT');
+    expectStrictOrder(await buyerProjection(), 'after C-28 cpo.respond');
+
+    await ship();
+    expectStrictOrder(await buyerProjection(), 'after C-29 cpo.ship');
+
+    await receive(8000, OP.receiveOne);
+    const partial = await buyerProjection();
+    expect(partial.status).toBe('PARTIALLY_RECEIVED');
+    expectStrictOrder(partial, 'after C-30 cpo.receive (partial)');
+
+    await receive(2000, OP.receiveTwo);
+    const final = await buyerProjection();
+    expect(final.status).toBe('RECEIVED');
+    // `receivingWarehouseId` is pinned on the first receipt and IS authorised.
+    expect(final.receivingWarehouseId).toBe(COLD);
+    expectStrictOrder(final, 'after C-30 cpo.receive (final)');
+
+    // The supplier's side is held to the identical contract.
+    expectStrictOrder(await supplierProjection(), 'supplier projection at RECEIVED');
+  });
+
+  it('C-31 cancel leaves a strict-parsable buyer draft', async () => {
+    await draftSave();
+    expect((await cancel()).ok).toBe(true);
+    const actual = await buyerProjection();
+    expect(actual.status).toBe('CANCELLED');
+    expect(Object.keys(actual)).not.toContain('updatedAt');
+    expectStrictOrder(actual, 'C-31 cpo.cancel');
+  });
+
+  it('re-saving an existing draft does not reintroduce an unauthorised field', async () => {
+    await draftSave();
+    // The second save takes the `set(..., { merge: true })` branch rather than
+    // `create`, which is the path that would persist a drifted key.
+    expect((await draftSave()).ok).toBe(true);
+    const actual = await buyerProjection();
+    expect(Object.keys(actual)).not.toContain('updatedAt');
+    expectStrictOrder(actual, 'C-34 cpo.draftSave (re-save)');
   });
 });
