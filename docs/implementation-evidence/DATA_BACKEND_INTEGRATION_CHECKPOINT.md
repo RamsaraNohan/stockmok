@@ -89,7 +89,16 @@
 - P1 = 0
 - P2 = 0
 - CRITICAL_P2 = 0
-- P3 = 0
+- P3 = 1
+
+### Accepted P3 Details
+
+- P3: BACKEND-AUTH-001 — C-34 / SCREEN-038 connected draft-line frontend authority gap.
+- C34_GAP_PRESERVED = YES
+- CPO_DRAFT_LINE_FRONTEND_PATH = AUTHORITY_GAP
+- SCREEN_038_FULL_BACKEND_WIRING_READY = NO
+- OWNER_CONTROL_AMENDMENT_REQUIRED = YES
+- This accepted P3 does not block Frontend Integration Intake.
 
 ## Verdict
 
