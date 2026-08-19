@@ -60,7 +60,19 @@ export async function executeCreateOrgCommand(payload: {
     functions,
     'orgCreate',
   );
-  const response = await callable(payload);
+  const payloadEnvelope = {
+    orgId: crypto.randomUUID(),
+    operationId: crypto.randomUUID(),
+    payload: {
+      name: payload.name,
+      handle: payload.handle,
+      industry: payload.industry,
+      country: payload.country,
+      currency: payload.currency,
+      timezone: payload.timezone,
+    },
+  };
+  const response = await callable(payloadEnvelope);
   const result = response.data;
   return result.data as { readonly organizationId: string };
 }
@@ -73,7 +85,11 @@ export async function executeBootstrapProfileCommand(payload: {
     functions,
     'userBootstrapProfile',
   );
-  await callable(payload);
+  const payloadEnvelope = {
+    orgId: crypto.randomUUID(),
+    payload,
+  };
+  await callable(payloadEnvelope);
 }
 
 // C-06: team.acceptInvitation Command Adapter (authorization: INVITEE)
@@ -84,7 +100,11 @@ export async function executeAcceptInvitationCommand(payload: {
     functions,
     'teamAcceptInvitation',
   );
-  const response = await callable(payload);
+  const payloadEnvelope = {
+    orgId: crypto.randomUUID(),
+    payload,
+  };
+  const response = await callable(payloadEnvelope);
   const result = response.data;
   return result.data as { readonly organizationId: string };
 }
