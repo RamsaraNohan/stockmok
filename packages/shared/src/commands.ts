@@ -14,7 +14,8 @@ import {
   UuidV4Schema,
 } from './primitives.js';
 
-const byId = (key: string) => z.object({ [key]: IdSchema }).strict();
+const byId = <K extends string>(key: K) =>
+  z.object({ [key]: IdSchema } as Record<K, typeof IdSchema>).strict();
 const operationLine = z
   .object({ itemId: IdSchema, quantityMilli: MilliSchema.refine((value) => value > 0) })
   .strict();

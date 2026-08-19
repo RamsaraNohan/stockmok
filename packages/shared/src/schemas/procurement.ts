@@ -100,7 +100,11 @@ export const PurchaseOrderHistorySchema = z
     actorName: z.string().min(1).max(80),
     actorOrgId: IdSchema,
     actorOrgName: z.string().min(1).max(120),
-    operationId: IdSchema,
+    // Links the row to its command receipt where one exists. DB-06 §1 marks
+    // `po.cancel` and `cpo.cancel` NON-idempotent, so those two transitions
+    // provably have no `operationId` to carry; requiring it here could only be
+    // satisfied by fabricating a receipt id that resolves to nothing.
+    operationId: IdSchema.optional(),
     note: z.string().max(280).optional(),
     createdAt: TimestampSchema,
   })
