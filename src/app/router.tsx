@@ -15,7 +15,6 @@ import { OnboardingScreen } from '@/features/onboarding/OnboardingScreen';
 import { WorkspaceSelectorScreen } from '@/features/onboarding/WorkspaceSelectorScreen';
 import { AuthProvider } from '@/services/auth/AuthContext';
 import { isEmulatorMode } from '@/services/runtime/environment';
-import { useWorkspace } from '@/services/workspace/useWorkspace';
 import { WorkspaceProvider } from '@/services/workspace/WorkspaceContext';
 import { EmulatorRibbon } from '@/ui/EmulatorRibbon';
 import { OrgLayout } from '@/ui/shell/OrgLayout';
@@ -30,24 +29,7 @@ const queryClient = new QueryClient({
   },
 });
 
-function DashboardPlaceholder() {
-  const { activeMembership, activeRole } = useWorkspace();
-  return (
-    <div>
-      <PageHeader
-        subtitle={`Welcome back to ${activeMembership?.organizationName || 'workspace'}`}
-        title="Dashboard"
-      />
-      <div className="bg-surface border-border rounded-panel border p-8 shadow-sm">
-        <h2 className="text-text font-bold text-lg">Active Role: {activeRole}</h2>
-        <p className="text-text-muted mt-2 text-sm">
-          F1 Shell, Auth, Routing, and Workspace Dispatcher foundation is active. Product feature
-          modules unlock in Phase F2+.
-        </p>
-      </div>
-    </div>
-  );
-}
+import { DashboardScreen } from '@/features/dashboard/DashboardScreen';
 
 function SectionPlaceholder({ title }: { readonly title: string }) {
   return (
@@ -126,7 +108,7 @@ export const router = createBrowserRouter([
       },
       {
         path: 'dashboard',
-        element: <DashboardPlaceholder />,
+        element: <DashboardScreen />,
       },
       {
         path: 'inventory/products',
