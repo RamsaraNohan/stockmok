@@ -9,6 +9,9 @@ import { Skeleton } from '@/ui/primitives/Skeleton';
 import { ErrorState } from '@/ui/primitives/ErrorState';
 import { EmptyState } from '@/ui/primitives/EmptyState';
 import { executeProductSetStatusCommand } from '@/services/inventory/productService';
+import { OpeningBalanceDialog } from '@/features/stock/OpeningBalanceDialog';
+import { StockAdjustmentDialog } from '@/features/stock/StockAdjustmentDialog';
+import { StockTransferDialog } from '@/features/stock/StockTransferDialog';
 
 export function ProductDetailScreen() {
   const navigate = useNavigate();
@@ -20,6 +23,17 @@ export function ProductDetailScreen() {
     'overview',
   );
   const [isMutatingStatus, setIsMutatingStatus] = useState(false);
+  const [transferDialogOpen, setTransferDialogOpen] = useState(false);
+  const [adjustmentDialogState, setAdjustmentDialogState] = useState<{
+    isOpen: boolean;
+    warehouseId: string;
+    warehouseName: string;
+  } | null>(null);
+  const [openingBalanceDialogState, setOpeningBalanceDialogState] = useState<{
+    isOpen: boolean;
+    warehouseId: string;
+    warehouseName: string;
+  } | null>(null);
 
   const {
     data: product,
@@ -106,6 +120,11 @@ export function ProductDetailScreen() {
 
   const canWriteInventory =
     activeRole === 'OWNER' || activeRole === 'ADMIN' || activeRole === 'INVENTORY_MANAGER';
+  const canWriteTransfer =
+    activeRole === 'OWNER' ||
+    activeRole === 'ADMIN' ||
+    activeRole === 'INVENTORY_MANAGER' ||
+    activeRole === 'STOREKEEPER';
 
   const handleToggleStatus = async () => {
     if (!product || !activeOrg?.organizationId || !productId) return;
@@ -137,7 +156,7 @@ export function ProductDetailScreen() {
     );
   }
 
-  if (isError || !product) {
+  if (isError || !product || !productId) {
     return (
       <div className="p-8">
         <ErrorState title="Failed to load product" message="The product could not be found." />
@@ -187,7 +206,7 @@ export function ProductDetailScreen() {
             {canWriteInventory && (
               <Button
                 onClick={() => {
-                  void navigate(`/app/${handle ?? ''}/inventory/products/${productId ?? ''}/edit`);
+                  void navigate(`/app/${handle ?? ''}/inventory/products/${productId}/edit`);
                 }}
                 variant="primary"
               >
@@ -252,31 +271,89 @@ export function ProductDetailScreen() {
         )}
 
         {activeTab === 'stock' && (
-          <div className="bg-surface rounded-panel border border-border shadow-sm overflow-hidden">
-            {!stockRows.length ? (
-              <div className="p-12">
-                <EmptyState title="No store rooms" description="There are no active store rooms." />
-              </div>
-            ) : (
-              <table className="w-full text-left text-sm">
-                <thead>
-                  <tr className="border-b border-border bg-background/50">
-                    <th className="py-3 px-4 font-medium text-text-muted">Warehouse</th>
-                    <th className="py-3 px-4 font-medium text-text-muted text-right">On Hand</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border">
-                  {stockRows.map((row) => (
-                    <tr key={row.warehouseId}>
-                      <td className="py-3 px-4">{row.warehouseName}</td>
-                      <td className="py-3 px-4 text-right">
-                        {(row.onHandMilli / 1000).toFixed(0)} {row.unit}
-                      </td>
+          <div className="space-y-4">
+            <div className="flex justify-end gap-2">
+              {canWriteTransfer && stockRows.length > 1 && (
+                <Button
+                  onClick={() => {
+                    setTransferDialogOpen(true);
+                  }}
+                  variant="secondary"
+                >
+                  Transfer Stock
+                </Button>
+              )}
+            </div>
+            <div className="bg-surface rounded-panel border border-border shadow-sm overflow-hidden">
+              {!stockRows.length ? (
+                <div className="p-12">
+                  <EmptyState
+                    title="No store rooms"
+                    description="There are no active store rooms."
+                  />
+                </div>
+              ) : (
+                <table className="w-full text-left text-sm">
+                  <thead>
+                    <tr className="border-b border-border bg-background/50">
+                      <th className="py-3 px-4 font-medium text-text-muted">Warehouse</th>
+                      <th className="py-3 px-4 font-medium text-text-muted text-right">On Hand</th>
+                      <th className="py-3 px-4 font-medium text-text-muted text-right">Actions</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
+                  </thead>
+                  <tbody className="divide-y divide-border">
+                    {stockRows.map((row) => {
+                      const hasStockHistory =
+                        movements?.items.some((m) => m.warehouseId === row.warehouseId) ?? false;
+                      // Fallback since movements might not be fetched for all warehouses unless we specifically check it, but let's just check row.onHandMilli for simplicity if there's no history. Wait, `movements` are scoped to `productId` without warehouseId filter, so it should include all warehouses.
+
+                      return (
+                        <tr key={row.warehouseId}>
+                          <td className="py-3 px-4">{row.warehouseName}</td>
+                          <td className="py-3 px-4 text-right">
+                            {(row.onHandMilli / 1000).toFixed(0)} {row.unit}
+                          </td>
+                          <td className="py-3 px-4 text-right">
+                            <div className="flex justify-end gap-2">
+                              {canWriteInventory && !hasStockHistory && row.onHandMilli === 0 && (
+                                <Button
+                                  onClick={() => {
+                                    setOpeningBalanceDialogState({
+                                      isOpen: true,
+                                      warehouseId: row.warehouseId,
+                                      warehouseName: row.warehouseName,
+                                    });
+                                  }}
+                                  variant="secondary"
+                                  size="sm"
+                                >
+                                  Opening Balance
+                                </Button>
+                              )}
+                              {canWriteInventory && (
+                                <Button
+                                  onClick={() => {
+                                    setAdjustmentDialogState({
+                                      isOpen: true,
+                                      warehouseId: row.warehouseId,
+                                      warehouseName: row.warehouseName,
+                                    });
+                                  }}
+                                  variant="secondary"
+                                  size="sm"
+                                >
+                                  Adjust
+                                </Button>
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              )}
+            </div>
           </div>
         )}
 
@@ -371,6 +448,40 @@ export function ProductDetailScreen() {
           </div>
         )}
       </div>
+
+      {transferDialogOpen && (
+        <StockTransferDialog
+          isOpen={transferDialogOpen}
+          onClose={() => {
+            setTransferDialogOpen(false);
+          }}
+          productId={productId}
+        />
+      )}
+
+      {adjustmentDialogState && (
+        <StockAdjustmentDialog
+          isOpen={adjustmentDialogState.isOpen}
+          onClose={() => {
+            setAdjustmentDialogState(null);
+          }}
+          productId={productId}
+          warehouseId={adjustmentDialogState.warehouseId}
+          warehouseName={adjustmentDialogState.warehouseName}
+        />
+      )}
+
+      {openingBalanceDialogState && (
+        <OpeningBalanceDialog
+          isOpen={openingBalanceDialogState.isOpen}
+          onClose={() => {
+            setOpeningBalanceDialogState(null);
+          }}
+          productId={productId}
+          warehouseId={openingBalanceDialogState.warehouseId}
+          warehouseName={openingBalanceDialogState.warehouseName}
+        />
+      )}
     </div>
   );
 }

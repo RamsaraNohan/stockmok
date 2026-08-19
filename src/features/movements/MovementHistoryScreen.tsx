@@ -15,7 +15,7 @@ export function MovementHistoryScreen() {
   const [productId, setProductId] = useState('');
   const [warehouseId, setWarehouseId] = useState('');
   const [movementType, setMovementType] = useState<MovementType | ''>('');
-  
+
   const { data: productsData } = useQuery({
     queryKey: ['products'],
     queryFn: async () => {
@@ -32,7 +32,12 @@ export function MovementHistoryScreen() {
     enabled: !!repositories,
   });
 
-  const { data: page, isLoading, isError, error } = useQuery({
+  const {
+    data: page,
+    isLoading,
+    isError,
+    error,
+  } = useQuery({
     queryKey: ['movements', productId, warehouseId, movementType],
     queryFn: async () => {
       if (!repositories) return null;
@@ -85,12 +90,19 @@ export function MovementHistoryScreen() {
       <div className="p-4 md:p-6 lg:p-8 flex-1 flex flex-col gap-6">
         <div className="flex flex-col md:flex-row gap-4 bg-surface p-4 rounded-panel border border-border shadow-sm">
           <div className="flex-1 min-w-[200px]">
-            <label htmlFor="filter-product" className="block text-xs font-medium text-text-muted mb-1">Product</label>
+            <label
+              htmlFor="filter-product"
+              className="block text-xs font-medium text-text-muted mb-1"
+            >
+              Product
+            </label>
             <select
               id="filter-product"
               className="w-full h-10 px-3 rounded-control border border-border bg-surface text-text text-sm focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
               value={productId}
-              onChange={(e) => { setProductId(e.target.value); }}
+              onChange={(e) => {
+                setProductId(e.target.value);
+              }}
             >
               <option value="">All Products</option>
               {productsData?.items.map((p) => (
@@ -101,12 +113,19 @@ export function MovementHistoryScreen() {
             </select>
           </div>
           <div className="flex-1 min-w-[200px]">
-            <label htmlFor="filter-warehouse" className="block text-xs font-medium text-text-muted mb-1">Store Room</label>
+            <label
+              htmlFor="filter-warehouse"
+              className="block text-xs font-medium text-text-muted mb-1"
+            >
+              Store Room
+            </label>
             <select
               id="filter-warehouse"
               className="w-full h-10 px-3 rounded-control border border-border bg-surface text-text text-sm focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
               value={warehouseId}
-              onChange={(e) => { setWarehouseId(e.target.value); }}
+              onChange={(e) => {
+                setWarehouseId(e.target.value);
+              }}
             >
               <option value="">All Store Rooms</option>
               {warehousesData?.items.map((w) => (
@@ -117,12 +136,19 @@ export function MovementHistoryScreen() {
             </select>
           </div>
           <div className="flex-1 min-w-[200px]">
-            <label htmlFor="filter-movement-type" className="block text-xs font-medium text-text-muted mb-1">Movement Type</label>
+            <label
+              htmlFor="filter-movement-type"
+              className="block text-xs font-medium text-text-muted mb-1"
+            >
+              Movement Type
+            </label>
             <select
               id="filter-movement-type"
               className="w-full h-10 px-3 rounded-control border border-border bg-surface text-text text-sm focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
               value={movementType}
-              onChange={(e) => { setMovementType(e.target.value as MovementType | ''); }}
+              onChange={(e) => {
+                setMovementType(e.target.value as MovementType | '');
+              }}
             >
               <option value="">All Types</option>
               {movementTypes.map((t) => (
@@ -144,12 +170,18 @@ export function MovementHistoryScreen() {
           )}
           {isError && (
             <div className="p-6">
-              <ErrorState title="Could not load movements" message={error instanceof Error ? error.message : 'Unknown error'} />
+              <ErrorState
+                title="Could not load movements"
+                message={error instanceof Error ? error.message : 'Unknown error'}
+              />
             </div>
           )}
           {!isLoading && !isError && page && page.items.length === 0 && (
             <div className="flex-1 flex items-center justify-center p-12">
-              <EmptyState title="No movements found" description="Adjust your filters to see results." />
+              <EmptyState
+                title="No movements found"
+                description="Adjust your filters to see results."
+              />
             </div>
           )}
           {!isLoading && !isError && page && page.items.length > 0 && (
@@ -172,13 +204,26 @@ export function MovementHistoryScreen() {
                         {formatDate(m.effectiveAt.toDate())}
                       </td>
                       <td className="py-3 px-4">
-                        <StatusPill status={m.movementType} label={m.movementType.replace(/_/g, ' ')} variant="neutral" />
+                        <StatusPill
+                          status={m.movementType}
+                          label={m.movementType.replace(/_/g, ' ')}
+                          variant="neutral"
+                        />
                       </td>
                       <td className="py-3 px-4">{m.productNameSnapshot}</td>
                       <td className="py-3 px-4">{m.warehouseNameSnapshot}</td>
                       <td className="py-3 px-4 text-right tabular-nums font-medium">
-                        <span className={m.signedQuantityMilli > 0 ? 'text-success' : m.signedQuantityMilli < 0 ? 'text-destructive' : ''}>
-                          {m.signedQuantityMilli > 0 ? '+' : ''}{m.signedQuantityMilli / 1000} {m.unit}
+                        <span
+                          className={
+                            m.signedQuantityMilli > 0
+                              ? 'text-success'
+                              : m.signedQuantityMilli < 0
+                                ? 'text-destructive'
+                                : ''
+                          }
+                        >
+                          {m.signedQuantityMilli > 0 ? '+' : ''}
+                          {m.signedQuantityMilli / 1000} {m.unit}
                         </span>
                       </td>
                       <td className="py-3 px-4">
