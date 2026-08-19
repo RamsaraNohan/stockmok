@@ -114,10 +114,20 @@ export const router = createBrowserRouter([
         path: 'dashboard',
         element: <DashboardScreen />,
       },
-            {
+      {
         path: 'inventory/products',
         element: (
-          <RoleGuard allowedRoles={['OWNER', 'ADMIN', 'INVENTORY_MANAGER', 'PROCUREMENT_MANAGER', 'STOREKEEPER', 'ANALYST', 'VIEWER']}>
+          <RoleGuard
+            allowedRoles={[
+              'OWNER',
+              'ADMIN',
+              'INVENTORY_MANAGER',
+              'PROCUREMENT_MANAGER',
+              'STOREKEEPER',
+              'ANALYST',
+              'VIEWER',
+            ]}
+          >
             <ProductListScreen />
           </RoleGuard>
         ),
@@ -133,7 +143,17 @@ export const router = createBrowserRouter([
       {
         path: 'inventory/products/:productId',
         element: (
-          <RoleGuard allowedRoles={['OWNER', 'ADMIN', 'INVENTORY_MANAGER', 'PROCUREMENT_MANAGER', 'STOREKEEPER', 'ANALYST', 'VIEWER']}>
+          <RoleGuard
+            allowedRoles={[
+              'OWNER',
+              'ADMIN',
+              'INVENTORY_MANAGER',
+              'PROCUREMENT_MANAGER',
+              'STOREKEEPER',
+              'ANALYST',
+              'VIEWER',
+            ]}
+          >
             <ProductDetailScreen />
           </RoleGuard>
         ),
@@ -295,4 +315,3 @@ export function AppRouter() {
     </QueryClientProvider>
   );
 }
-

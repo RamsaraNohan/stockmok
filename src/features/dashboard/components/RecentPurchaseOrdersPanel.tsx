@@ -31,21 +31,11 @@ export function RecentPurchaseOrdersPanel() {
   }
 
   if (error) {
-    return (
-      <ErrorState
-        message="Please try again later."
-        title="Failed to load recent orders"
-      />
-    );
+    return <ErrorState message="Please try again later." title="Failed to load recent orders" />;
   }
 
   if (!data || data.items.length === 0) {
-    return (
-      <EmptyState
-        description="No purchase orders found."
-        title="No Orders"
-      />
-    );
+    return <EmptyState description="No purchase orders found." title="No Orders" />;
   }
 
   return (
@@ -57,7 +47,9 @@ export function RecentPurchaseOrdersPanel() {
         {data.items.slice(0, 5).map((order) => (
           <li key={order.purchaseOrderId} className="flex items-center justify-between p-4">
             <div>
-              <p className="text-text font-medium">{order.orderNumber ?? order.purchaseOrderId.slice(0, 8)}</p>
+              <p className="text-text font-medium">
+                {order.orderNumber ?? order.purchaseOrderId.slice(0, 8)}
+              </p>
               <p className="text-text-muted text-sm">{order.counterpartyName}</p>
             </div>
             <div className="flex items-center space-x-4">

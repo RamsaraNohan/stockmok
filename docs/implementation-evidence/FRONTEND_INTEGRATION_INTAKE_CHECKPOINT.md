@@ -13,7 +13,7 @@
 **FI3_FULL_REGRESSION** = PASS
 **FI4_FREEZE** = PASS
 
---------------------------------------------------
+---
 
 **F1_QUERY_IDS** = 8/8
 **Q001** = PASS
@@ -27,7 +27,7 @@
 **Q008** = PASS
 **REALTIME_LISTENERS** = 4/4
 
---------------------------------------------------
+---
 
 **C01_ORG_CREATE** = PASS
 **C03_USER_BOOTSTRAP** = PASS
@@ -36,14 +36,14 @@
 **F1_COMMAND_PLACEHOLDERS_REMAIN** = NO
 **FAKE_SUCCESS_PATHS** = []
 
---------------------------------------------------
+---
 
 **FRONTEND_C2_DUPLICATE_QUERY_IMPLEMENTATIONS** = []
 **FRONTEND_DIRECT_FIRESTORE_QUERY_EXCEPTIONS** = []
 **SAFE_DIRECT_WRITE_BOUNDARY** = PASS
 **NOTIFICATION_READ_ONLY_MUTATION** = PASS
 
---------------------------------------------------
+---
 
 **HANDLE_ORGID_TRUST_BOUNDARY** = PASS
 **WORKSPACE_0_MEMBERSHIP** = PASS
@@ -53,7 +53,7 @@
 **MEMBERSHIP_REVOCATION_REALTIME** = PASS
 **LOGOUT_SUBSCRIPTION_CLEANUP** = PASS
 
---------------------------------------------------
+---
 
 **INVITE_VALID** = PASS
 **INVITE_EXPIRED** = PASS
@@ -64,7 +64,7 @@
 **PASSWORD_RESET** = PASS
 **NOTIFICATION_FLOW** = PASS
 
---------------------------------------------------
+---
 
 **PM_PRODUCTS_SIDEBAR** = HIDDEN
 **PM_PRODUCTS_ROUTE_READ** = ALLOWED
@@ -72,13 +72,13 @@
 **DRAWER_1023_TO_1024** = PASS
 **MOBILE_BOTTOM_NAV_PRESENT** = NO
 
---------------------------------------------------
+---
 
 **BROWSER_FIREBASE_ADMIN_IMPORT** = NO
 **BROWSER_SERVER_FUNCTION_IMPORT** = NO
 **SERVER_SECRET_IN_BROWSER_BUNDLE** = NO
 
---------------------------------------------------
+---
 
 **ACTIVE_QUERY_IDS** = 92/92
 **ACTIVE_INDEX_IDS** = 67/67
@@ -89,7 +89,7 @@
 **CALLABLE_EXPORTS** = 38/38
 **PRODUCT_LIST_INDEX_MATRIX** = 32/32
 
---------------------------------------------------
+---
 
 **FORMAT** = PASS
 **TYPECHECK** = PASS
@@ -107,32 +107,32 @@
 **PAGE_ERRORS** = 0
 **HORIZONTAL_OVERFLOW_FAILURES** = 0
 
---------------------------------------------------
+---
 
 **C34_GAP_PRESERVED** = YES
 **CPO_DRAFT_LINE_FRONTEND_PATH** = AUTHORITY_GAP
 **SCREEN_038_FULL_BACKEND_WIRING_READY** = NO
 **OWNER_CONTROL_AMENDMENT_REQUIRED** = YES
 
---------------------------------------------------
+---
 
 **F2_IMPLEMENTATION_PRESENT** = NO
 **DATA_BACKEND_SEMANTICS_CHANGED** = NO
 **F1_SEMANTICS_CHANGED** = NO
 **INTEGRATION_ONLY_FILES_CHANGED** = [
-  "package.json",
-  "package-lock.json",
-  "tsconfig.json",
-  "eslint.config.js",
-  "vitest.config.ts",
-  "src/data/firebase/client.ts",
-  "src/data/adapters/authAdapter.ts",
-  "src/data/adapters/notificationAdapter.ts",
-  "src/data/adapters/workspaceAdapter.ts",
-  "tests/q005-notifications-contract.test.ts"
+"package.json",
+"package-lock.json",
+"tsconfig.json",
+"eslint.config.js",
+"vitest.config.ts",
+"src/data/firebase/client.ts",
+"src/data/adapters/authAdapter.ts",
+"src/data/adapters/notificationAdapter.ts",
+"src/data/adapters/workspaceAdapter.ts",
+"tests/q005-notifications-contract.test.ts"
 ]
 
---------------------------------------------------
+---
 
 **P0** = 0
 **P1** = 0
@@ -142,7 +142,7 @@
 **KNOWN_ACCEPTED_P3** = BACKEND-AUTH-001
 **FINDINGS** = []
 
---------------------------------------------------
+---
 
 **IMPLEMENTATION_DELTA_AFTER_FINAL_EVIDENCE_COMMIT** = ZERO
 **FINAL_WORKTREE_CLEAN** = YES
@@ -150,7 +150,7 @@
 **PUSHED** = NO
 **DEPLOYED** = NO
 
---------------------------------------------------
+---
 
 **READY_TO_REOPEN_F2** = YES
 **READY_TO_AUTHORIZE_F2_T01** = YES

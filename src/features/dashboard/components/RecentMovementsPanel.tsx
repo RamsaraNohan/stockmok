@@ -23,20 +23,12 @@ export function RecentMovementsPanel() {
   }
 
   if (error) {
-    return (
-      <ErrorState
-        message="Please try again later."
-        title="Failed to load recent movements"
-      />
-    );
+    return <ErrorState message="Please try again later." title="Failed to load recent movements" />;
   }
 
   if (!data || data.items.length === 0) {
     return (
-      <EmptyState
-        description="No stock movements recorded recently."
-        title="No Recent Movements"
-      />
+      <EmptyState description="No stock movements recorded recently." title="No Recent Movements" />
     );
   }
 
@@ -50,18 +42,21 @@ export function RecentMovementsPanel() {
           <li key={movement.movementId} className="flex items-center justify-between p-4">
             <div>
               <p className="text-text font-medium">{movement.productNameSnapshot}</p>
-              <p className="text-text-muted text-sm">{movement.createdAt.toDate().toLocaleString()}</p>
+              <p className="text-text-muted text-sm">
+                {movement.createdAt.toDate().toLocaleString()}
+              </p>
             </div>
             <div className="flex items-center space-x-4">
-              <StatusPill 
-                status={movement.movementType} 
+              <StatusPill
+                status={movement.movementType}
                 variant={
-                  movement.movementType.includes('IN') || movement.movementType === 'PURCHASE_RECEIPT'
-                    ? 'success' 
+                  movement.movementType.includes('IN') ||
+                  movement.movementType === 'PURCHASE_RECEIPT'
+                    ? 'success'
                     : movement.movementType.includes('OUT')
-                    ? 'danger' 
-                    : 'info'
-                } 
+                      ? 'danger'
+                      : 'info'
+                }
               />
               <div className="text-right w-16">
                 <p className="text-text font-medium">{movement.signedQuantityMilli / 1000}</p>

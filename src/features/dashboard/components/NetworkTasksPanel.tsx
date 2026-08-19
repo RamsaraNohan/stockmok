@@ -10,10 +10,15 @@ export function NetworkTasksPanel() {
   const { activeRole, activeSettings } = useWorkspace();
 
   const networkEnabled = activeSettings?.networkEnabled ?? false;
-  const isPartnerWriter = activeRole === 'OWNER' || activeRole === 'ADMIN' || activeRole === 'PROCUREMENT_MANAGER';
+  const isPartnerWriter =
+    activeRole === 'OWNER' || activeRole === 'ADMIN' || activeRole === 'PROCUREMENT_MANAGER';
   const shouldFetch = networkEnabled && isPartnerWriter;
 
-  const { data: pendingConnections, isLoading: loadingConnections, error: errorConnections } = useQuery({
+  const {
+    data: pendingConnections,
+    isLoading: loadingConnections,
+    error: errorConnections,
+  } = useQuery({
     queryKey: ['dashboard', 'pendingConnections'],
     queryFn: async () => {
       if (!repositories) throw new Error('No repositories');
@@ -23,7 +28,11 @@ export function NetworkTasksPanel() {
     enabled: !!repositories && shouldFetch,
   });
 
-  const { data: connectedOrders, isLoading: loadingOrders, error: errorOrders } = useQuery({
+  const {
+    data: connectedOrders,
+    isLoading: loadingOrders,
+    error: errorOrders,
+  } = useQuery({
     queryKey: ['dashboard', 'connectedOrdersAwaitingResponse'],
     queryFn: async () => {
       if (!repositories) throw new Error('No repositories');
@@ -42,12 +51,7 @@ export function NetworkTasksPanel() {
   }
 
   if (errorConnections || errorOrders) {
-    return (
-      <ErrorState
-        message="Please try again later."
-        title="Failed to load network tasks"
-      />
-    );
+    return <ErrorState message="Please try again later." title="Failed to load network tasks" />;
   }
 
   const hasTasks = (pendingConnections ?? 0) > 0 || (connectedOrders ?? 0) > 0;

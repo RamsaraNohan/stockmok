@@ -16,13 +16,19 @@ export interface ProductCreatePayload {
 }
 
 export async function executeProductCreateCommand(
+  orgId: string,
   payload: ProductCreatePayload,
 ): Promise<{ readonly productId: string }> {
   const callable = httpsCallable<unknown, Extract<CommandResult, { ok: true }>>(
     functions,
     'productCreate',
   );
-  const response = await callable(payload);
+  const payloadEnvelope = {
+    orgId,
+    operationId: crypto.randomUUID(),
+    payload,
+  };
+  const response = await callable(payloadEnvelope);
   const result = response.data;
   return result.data as { readonly productId: string };
 }
@@ -40,13 +46,19 @@ export interface ProductUpdatePayload {
 }
 
 export async function executeProductUpdateCommand(
+  orgId: string,
   payload: ProductUpdatePayload,
 ): Promise<void> {
   const callable = httpsCallable<unknown, Extract<CommandResult, { ok: true }>>(
     functions,
     'productUpdate',
   );
-  await callable(payload);
+  const payloadEnvelope = {
+    orgId,
+    operationId: crypto.randomUUID(),
+    payload,
+  };
+  await callable(payloadEnvelope);
 }
 
 export interface ProductSetStatusPayload {
@@ -55,11 +67,17 @@ export interface ProductSetStatusPayload {
 }
 
 export async function executeProductSetStatusCommand(
+  orgId: string,
   payload: ProductSetStatusPayload,
 ): Promise<void> {
   const callable = httpsCallable<unknown, Extract<CommandResult, { ok: true }>>(
     functions,
     'productSetStatus',
   );
-  await callable(payload);
+  const payloadEnvelope = {
+    orgId,
+    operationId: crypto.randomUUID(),
+    payload,
+  };
+  await callable(payloadEnvelope);
 }

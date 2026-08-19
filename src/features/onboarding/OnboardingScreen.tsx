@@ -93,9 +93,7 @@ export function OnboardingScreen() {
         void navigate(`/app/${data.handle}/dashboard`);
       }
     } catch (error) {
-      setSubmitError(
-        error instanceof Error ? error.message : String(error),
-      );
+      setSubmitError(error instanceof Error ? error.message : String(error));
     }
   };
 
