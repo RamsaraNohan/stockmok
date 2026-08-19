@@ -333,7 +333,6 @@ async function seedOrganization(db: Firestore, orgId: string, handle: string): P
     isProjection: supplierKind === 'CONNECTED',
     createdBy: uidFor(orgId, 'OWNER'),
     createdAt: NOW,
-    updatedAt: NOW,
   });
 
   await write(paths.purchaseOrder(orgId, IDS.privateDraftPo), {
