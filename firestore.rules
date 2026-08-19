@@ -348,16 +348,30 @@ service cloud.firestore {
     // DB-02 §5.2 and the strict schema define no such field. The two agree once
     // stated precisely: one bounds the change set, the other bounds the
     // document, and `notes` is therefore not persistable.
+    //
+    // `updatedAt` is the same case and was missed. draftFieldsOnly() names it
+    // too, but DB-02 §5.2 defines no such field either, and the strict
+    // `PurchaseOrderSchema` behind the `Q-036` converter refuses to read a
+    // document carrying it — so requiring it here made every private draft
+    // writable and then unreadable, the defect the connected projection hit
+    // first. Nor is it attribution: this surface defines no `updatedBy`
+    // (see `updatedBySelf()` above), so the field named no actor and served
+    // no query. It is therefore not persistable, exactly as `notes` is not.
+    //
+    // NOTE: `PrivatePurchaseOrderDraftClientWriteSchema` (packages/shared) still
+    // extends the domain schema with `updatedAt` and now disagrees with this
+    // predicate. It has no consumer in this repository; correcting it is a
+    // shared-foundation patch, which AGENTS.md forbids raising from this lane.
     function privateDraftShape(data, poId) {
       return data.keys().hasOnly([
           'purchaseOrderId', 'viewRole', 'supplierKind', 'counterpartyName',
           'privateSupplierId', 'status', 'currency', 'expectedDate',
-          'totalMinor', 'isProjection', 'createdBy', 'createdAt', 'updatedAt'
+          'totalMinor', 'isProjection', 'createdBy', 'createdAt'
         ])
         && data.keys().hasAll([
           'purchaseOrderId', 'viewRole', 'supplierKind', 'counterpartyName',
           'status', 'currency', 'totalMinor', 'isProjection',
-          'createdBy', 'createdAt', 'updatedAt'
+          'createdBy', 'createdAt'
         ])
         && data.purchaseOrderId == poId
         && data.viewRole == 'BUYER'
@@ -370,8 +384,7 @@ service cloud.firestore {
         && isNonNegativeInt(data.totalMinor)
         && data.isProjection == false
         && isId(data.createdBy)
-        && data.createdAt is timestamp
-        && data.updatedAt is timestamp;
+        && data.createdAt is timestamp;
     }
 
     // DB-02 §5.3 — the buyer-side line. The eight supplier/mapping snapshot
