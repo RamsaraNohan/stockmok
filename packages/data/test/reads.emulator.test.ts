@@ -4,18 +4,13 @@ import {
   type Member,
   type PurchaseOrder,
 } from '@stockmok/shared';
+import { initializeTestEnvironment, type RulesTestEnvironment } from '@firebase/rules-unit-testing';
 import {
   deleteApp as deleteAdminApp,
   initializeApp as initializeAdminApp,
 } from 'firebase-admin/app';
 import { getFirestore as getAdminFirestore, Timestamp } from 'firebase-admin/firestore';
-import { deleteApp, initializeApp } from 'firebase/app';
-import {
-  connectFirestoreEmulator,
-  initializeFirestore,
-  terminate,
-  type Unsubscribe,
-} from 'firebase/firestore';
+import { type Firestore, type Unsubscribe } from 'firebase/firestore';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { aConnection, aMember, aPrivatePO } from '../../../tests/factories/index.js';
 import { createStockmokRepositories } from '../src/repositories.js';
@@ -28,19 +23,14 @@ const NOW = Timestamp.fromMillis(1_700_000_000_000);
 
 const adminApp = initializeAdminApp({ projectId: PROJECT_ID }, 'c2-data-emulator-admin');
 const adminDb = getAdminFirestore(adminApp);
-const clientApp = initializeApp(
-  { projectId: PROJECT_ID, apiKey: 'emulator-only' },
-  'c2-data-client',
-);
-const clientDb = initializeFirestore(clientApp, { experimentalForceLongPolling: true });
 
 const emulatorHost = process.env.FIRESTORE_EMULATOR_HOST;
 if (!emulatorHost) throw new Error('FIRESTORE_EMULATOR_HOST is required');
 const [host, portText] = emulatorHost.split(':');
 if (!host || !portText) throw new Error('FIRESTORE_EMULATOR_HOST must be host:port');
-connectFirestoreEmulator(clientDb, host, Number.parseInt(portText, 10));
 
-const repositoriesA = createStockmokRepositories(clientDb, { orgId: ORG_A, uid: UID });
+let rulesEnvironment: RulesTestEnvironment;
+let repositoriesA: ReturnType<typeof createStockmokRepositories>;
 
 function summary(index: number, organizationMarker = 'A') {
   const productId = `product-${String(index).padStart(2, '0')}`;
@@ -136,11 +126,20 @@ function delay(milliseconds: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, milliseconds));
 }
 
-beforeAll(seed);
+beforeAll(async () => {
+  rulesEnvironment = await initializeTestEnvironment({
+    projectId: PROJECT_ID,
+    firestore: { host, port: Number.parseInt(portText, 10) },
+  });
+  const clientDb = rulesEnvironment
+    .authenticatedContext(UID, { email: `${UID}@stockmok.test` })
+    .firestore() as unknown as Firestore;
+  repositoriesA = createStockmokRepositories(clientDb, { orgId: ORG_A, uid: UID });
+  await seed();
+});
 
 afterAll(async () => {
-  await terminate(clientDb);
-  await deleteApp(clientApp);
+  await rulesEnvironment.cleanup();
   await deleteAdminApp(adminApp);
 });
 
@@ -244,7 +243,9 @@ describe('C2 emulator-backed read layer', () => {
     });
     await memberInitial;
 
-    await adminDb.doc(`organizations/${ORG_B}/members/${UID}`).update({ status: 'SUSPENDED' });
+    await adminDb
+      .doc(`organizations/${ORG_B}/members/${UID}`)
+      .update({ displayName: 'Other tenant member updated' });
     await delay(250);
     expect(memberEvents).toHaveLength(1);
 
@@ -253,10 +254,13 @@ describe('C2 emulator-backed read layer', () => {
       resolveMemberUpdate = resolve;
     });
     const unsubscribeUpdatedMember = repositoriesA.shell.subscribeMember((member) => {
-      if (member?.status === 'SUSPENDED') resolveMemberUpdate?.();
+      if (member?.displayName === 'Current tenant member updated') resolveMemberUpdate?.();
     });
-    await adminDb.doc(`organizations/${ORG_A}/members/${UID}`).update({ status: 'SUSPENDED' });
+    await adminDb
+      .doc(`organizations/${ORG_A}/members/${UID}`)
+      .update({ displayName: 'Current tenant member updated' });
     await memberUpdate;
+    unsubscribeUpdatedMember();
 
     const orderEvents: PurchaseOrder[] = [];
     let resolveOrderInitial: (() => void) | undefined;
@@ -326,13 +330,14 @@ describe('C2 emulator-backed read layer', () => {
     unsubscribeUpdatedConnection();
     unsubscribeMember();
     unsubscribeMember();
-    unsubscribeUpdatedMember();
     const orderCount = orderEvents.length;
     const memberCount = memberEvents.length;
     await adminDb
       .doc(`organizations/${ORG_A}/purchaseOrders/po-live`)
       .update({ status: 'RECEIVED' });
-    await adminDb.doc(`organizations/${ORG_A}/members/${UID}`).update({ status: 'ACTIVE' });
+    await adminDb
+      .doc(`organizations/${ORG_A}/members/${UID}`)
+      .update({ displayName: 'After unsubscribe' });
     await delay(250);
     expect(orderEvents).toHaveLength(orderCount);
     expect(memberEvents).toHaveLength(memberCount);
