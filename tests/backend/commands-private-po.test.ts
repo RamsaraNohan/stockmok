@@ -1,6 +1,7 @@
 import type { Firestore } from 'firebase-admin/firestore';
 import { beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { paths } from '../../packages/shared/src/paths.js';
+import { PurchaseOrderSchema } from '../../packages/shared/src/schemas/procurement.js';
 import { poCancel, poOrder, poReceive } from '../../functions/src/commands/purchase-order.js';
 import {
   callable,
@@ -621,5 +622,142 @@ describe('C-17 po.receive', () => {
       );
       expect(result.ok, `${role}: ${JSON.stringify(result)}`).toBe(true);
     }
+  });
+});
+
+// ───────────────────────────────────────────────────────────────────────────
+/**
+ * The private purchase order must stay readable through the frozen `Q-036`
+ * converter at every stage of its lifecycle, not merely at the moment a client
+ * writes the draft.
+ *
+ * `tests/rules/private-po-read-contract.test.ts` proves the rules-enforced
+ * write path persists a strict-parsable draft. These cases carry that proof
+ * through the commands: `C-15 po.order` and `C-17 po.receive` both use
+ * `scope.update(...)`, so any unauthorised key present on the draft would
+ * survive every transition rather than being replaced.
+ *
+ * As in the connected suite, the oracle is the **actual persisted document**
+ * parsed by `PurchaseOrderSchema`, not a hand-built expected object.
+ */
+describe('private purchase orders satisfy the frozen strict read contract', () => {
+  beforeEach(async () => {
+    await seedBase();
+    await seedPurchaseOrder(db, ORG_A, PO, {
+      status: 'DRAFT',
+      privateSupplierId: SUPPLIER,
+      counterpartyName: 'Green Farm Poultry',
+      totalMinor: 0,
+    });
+    await seedPurchaseOrderItem(db, ORG_A, PO, LINE_A, {
+      buyerProductId: PRODUCT,
+      orderedBuyerBaseMilli: 50_000,
+      receivedBuyerBaseMilli: 0,
+      unitPriceMinor: 250,
+    });
+    await seedStockBalance(db, ORG_A, PRODUCT, MAIN, { onHandMilli: 0 });
+  });
+
+  async function persistedOrder(): Promise<Record<string, unknown>> {
+    const snapshot = await db.doc(paths.purchaseOrder(ORG_A, PO)).get();
+    expect(snapshot.exists).toBe(true);
+    return snapshot.data() as Record<string, unknown>;
+  }
+
+  function expectStrictOrder(actual: Record<string, unknown>, stage: string): void {
+    const unknownKeys = Object.keys(actual).filter((key) => !(key in PurchaseOrderSchema.shape));
+    expect(unknownKeys, `${stage}: unauthorised field(s) on the private order`).toEqual([]);
+    const parsed = PurchaseOrderSchema.safeParse(actual);
+    expect(
+      parsed.success ? [] : parsed.error.issues.map((issue) => issue.message),
+      `${stage}: PurchaseOrderSchema.parse`,
+    ).toEqual([]);
+  }
+
+  it('strict-parses through DRAFT → C-15 ORDERED → C-17 partial → C-17 final', async () => {
+    expectStrictOrder(await persistedOrder(), 'DRAFT');
+
+    const ordered = await poOrder.execute(
+      callable(uidFor(ORG_A, 'PROCUREMENT_MANAGER'), {
+        orgId: ORG_A,
+        operationId: OPERATION_ID_A,
+        payload: { purchaseOrderId: PO },
+      }),
+      db,
+    );
+    expect(ordered.ok, JSON.stringify(ordered)).toBe(true);
+    const afterOrder = await persistedOrder();
+    expect(afterOrder.status).toBe('ORDERED');
+    // The order number and `orderedAt` are authorised additions; nothing else is.
+    expectStrictOrder(afterOrder, 'C-15 po.order');
+
+    const partial = await poReceive.execute(
+      callable(uidFor(ORG_A, 'STOREKEEPER'), {
+        orgId: ORG_A,
+        operationId: OPERATION_ID_B,
+        payload: {
+          purchaseOrderId: PO,
+          warehouseId: MAIN,
+          lines: [{ itemId: LINE_A, quantityMilli: 20_000 }],
+        },
+      }),
+      db,
+    );
+    expect(partial.ok, JSON.stringify(partial)).toBe(true);
+    const afterPartial = await persistedOrder();
+    expect(afterPartial.status).toBe('PARTIALLY_RECEIVED');
+    // `receivingWarehouseId` is pinned on the first receipt and IS authorised.
+    expect(afterPartial.receivingWarehouseId).toBe(MAIN);
+    expectStrictOrder(afterPartial, 'C-17 po.receive (partial)');
+
+    const final = await poReceive.execute(
+      callable(uidFor(ORG_A, 'STOREKEEPER'), {
+        orgId: ORG_A,
+        operationId: '99999999-9999-4999-8999-999999999999',
+        payload: {
+          purchaseOrderId: PO,
+          warehouseId: MAIN,
+          lines: [{ itemId: LINE_A, quantityMilli: 30_000 }],
+        },
+      }),
+      db,
+    );
+    expect(final.ok, JSON.stringify(final)).toBe(true);
+    const afterFinal = await persistedOrder();
+    expect(afterFinal.status).toBe('RECEIVED');
+    expectStrictOrder(afterFinal, 'C-17 po.receive (final)');
+
+    // No required field was lost on the way through.
+    for (const key of [
+      'purchaseOrderId',
+      'viewRole',
+      'supplierKind',
+      'counterpartyName',
+      'status',
+      'currency',
+      'totalMinor',
+      'isProjection',
+      'createdBy',
+      'createdAt',
+      'orderNumber',
+      'orderedAt',
+      'receivedAt',
+    ]) {
+      expect(Object.keys(afterFinal), `required field ${key}`).toContain(key);
+    }
+  });
+
+  it('a cancelled order still strict-parses', async () => {
+    const cancelled = await poCancel.execute(
+      callable(uidFor(ORG_A, 'PROCUREMENT_MANAGER'), {
+        orgId: ORG_A,
+        payload: { purchaseOrderId: PO },
+      }),
+      db,
+    );
+    expect(cancelled.ok, JSON.stringify(cancelled)).toBe(true);
+    const actual = await persistedOrder();
+    expect(actual.status).toBe('CANCELLED');
+    expectStrictOrder(actual, 'C-16 po.cancel');
   });
 });

@@ -535,7 +535,6 @@ describe('private purchase-order drafts — DB-02 §5.2 validated shape', () => 
     isProjection: false,
     createdBy: OWNER_A,
     createdAt: NOW,
-    updatedAt: NOW,
   });
 
   it('denies a create whose path id differs from purchaseOrderId', async () => {
@@ -653,7 +652,6 @@ describe('private purchase-order drafts — DB-02 §5.2 validated shape', () => 
         isProjection: false,
         createdBy: OWNER_A,
         createdAt: NOW,
-        updatedAt: NOW,
       }),
     );
   });
@@ -688,7 +686,6 @@ describe('private purchase-order drafts — DB-02 §5.2 validated shape', () => 
         {
           counterpartyName: 'Green Farm Poultry Ltd',
           totalMinor: 1_300_000,
-          updatedAt: NOW,
         },
       ),
     );

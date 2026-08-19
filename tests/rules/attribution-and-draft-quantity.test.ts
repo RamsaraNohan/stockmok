@@ -353,7 +353,6 @@ describe('surfaces that carry no updatedBy — DB-02 §§2.1, 2.3, 5.2, 5.3', ()
       isProjection: false,
       createdBy: PM_A,
       createdAt: NOW,
-      updatedAt: NOW,
     };
     await assertSucceeds(
       setDoc(doc(db(PM_A), paths.purchaseOrder(ORG_A, 'po-attr-header')), header),
@@ -363,6 +362,16 @@ describe('surfaces that carry no updatedBy — DB-02 §§2.1, 2.3, 5.2, 5.3', ()
         ...header,
         purchaseOrderId: 'po-attr-header-forged',
         updatedBy: PM_A,
+      }),
+    );
+    // `updatedAt` is undeclared here for the same reason `updatedBy` is: DB-02
+    // §5.2 defines neither, and the strict `PurchaseOrderSchema` behind `Q-036`
+    // would refuse to read the document back.
+    await assertFails(
+      setDoc(doc(db(PM_A), paths.purchaseOrder(ORG_A, 'po-attr-header-touched')), {
+        ...header,
+        purchaseOrderId: 'po-attr-header-touched',
+        updatedAt: NOW,
       }),
     );
     await assertFails(

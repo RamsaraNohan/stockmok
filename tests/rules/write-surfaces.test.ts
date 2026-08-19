@@ -289,7 +289,6 @@ describe('purchaseOrders — client write only while PRIVATE and DRAFT', () => {
     isProjection: false,
     createdBy: uidFor(ORG_A, role),
     createdAt: NOW,
-    updatedAt: NOW,
   });
 
   it.each(ROLES.map((role) => [role]))('create a private draft · %s', async (role) => {
@@ -326,7 +325,6 @@ describe('purchaseOrders — client write only while PRIVATE and DRAFT', () => {
         {
           counterpartyName: 'Green Farm Poultry Ltd',
           totalMinor: 1_300_000,
-          updatedAt: NOW,
         },
       ),
     );

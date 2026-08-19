@@ -284,7 +284,15 @@ export const cpoDraftSave = defineCommand({
       // A draft is not yet a projection of anything — there is no canonical
       // record until `cpo.submit` creates one (DB-02 §5.2).
       isProjection: false,
-      updatedAt: now,
+      // No `updatedAt`. The DB-02 §5.2 field table for
+      // `organizations/{orgId}/purchaseOrders/{poId}` does not carry one, and
+      // `PurchaseOrderSchema` is strict — an extra key makes the document
+      // unreadable to every consumer that parses it (`Q-036`). DB-05 §4.1 lists
+      // `updatedAt` only in `draftFieldsOnly()`, which governs the **private**
+      // client-write draft surface; a connected draft is COMMAND_ONLY via
+      // `cpo.draftSave` (DB-CR-010), so that concession never applied here.
+      // `cpo.submit` merges into this same document, so a value written here
+      // would survive into the submitted buyer projection.
     };
     if (existing.exists) {
       scope.set(orderRef, header, { merge: true });
