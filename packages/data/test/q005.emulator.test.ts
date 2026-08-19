@@ -1,17 +1,12 @@
 import { NotificationSchema } from '@stockmok/shared';
+import { initializeTestEnvironment, type RulesTestEnvironment } from '@firebase/rules-unit-testing';
 import {
   deleteApp as deleteAdminApp,
   initializeApp as initializeAdminApp,
 } from 'firebase-admin/app';
 import { getFirestore as getAdminFirestore, Timestamp } from 'firebase-admin/firestore';
-import { deleteApp, initializeApp } from 'firebase/app';
-import {
-  connectFirestoreEmulator,
-  initializeFirestore,
-  terminate,
-  type Unsubscribe,
-} from 'firebase/firestore';
-import { afterAll, beforeEach, describe, expect, it } from 'vitest';
+import { type Firestore, type Unsubscribe } from 'firebase/firestore';
+import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { formatUnreadBadge } from '../src/client.js';
 import { createStockmokRepositories } from '../src/repositories.js';
 
@@ -20,19 +15,14 @@ const UID = 'q005-user-a';
 const OTHER_UID = 'q005-user-b';
 const adminApp = initializeAdminApp({ projectId: PROJECT_ID }, 'c2-q005-emulator-admin');
 const adminDb = getAdminFirestore(adminApp);
-const clientApp = initializeApp(
-  { projectId: PROJECT_ID, apiKey: 'emulator-only' },
-  'c2-q005-client',
-);
-const clientDb = initializeFirestore(clientApp, { experimentalForceLongPolling: true });
 
 const emulatorHost = process.env.FIRESTORE_EMULATOR_HOST;
 if (!emulatorHost) throw new Error('FIRESTORE_EMULATOR_HOST is required');
 const [host, portText] = emulatorHost.split(':');
 if (!host || !portText) throw new Error('FIRESTORE_EMULATOR_HOST must be host:port');
-connectFirestoreEmulator(clientDb, host, Number.parseInt(portText, 10));
 
-const repositories = createStockmokRepositories(clientDb, { uid: UID });
+let rulesEnvironment: RulesTestEnvironment;
+let repositories: ReturnType<typeof createStockmokRepositories>;
 
 function notification(index: number, read = false) {
   return NotificationSchema.parse({
@@ -72,6 +62,17 @@ function delay(milliseconds: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, milliseconds));
 }
 
+beforeAll(async () => {
+  rulesEnvironment = await initializeTestEnvironment({
+    projectId: PROJECT_ID,
+    firestore: { host, port: Number.parseInt(portText, 10) },
+  });
+  const clientDb = rulesEnvironment
+    .authenticatedContext(UID, { email: `${UID}@stockmok.test` })
+    .firestore() as unknown as Firestore;
+  repositories = createStockmokRepositories(clientDb, { uid: UID });
+});
+
 async function readBadgeOnce(): Promise<{ readonly count: number; readonly capped: boolean }> {
   return new Promise((resolve, reject) => {
     const state: { unsubscribe?: Unsubscribe } = {};
@@ -100,8 +101,7 @@ beforeEach(async () => {
 });
 
 afterAll(async () => {
-  await terminate(clientDb);
-  await deleteApp(clientApp);
+  await rulesEnvironment.cleanup();
   await deleteAdminApp(adminApp);
 });
 
