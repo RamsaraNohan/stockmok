@@ -92,9 +92,9 @@ export function OnboardingScreen() {
         await setActiveHandle(data.handle);
         void navigate(`/app/${data.handle}/dashboard`);
       }
-    } catch {
+    } catch (error) {
       setSubmitError(
-        'C-01 org.create backend command execution pending promotion. Frontend onboarding structure validated successfully.',
+        error instanceof Error ? error.message : String(error),
       );
     }
   };
