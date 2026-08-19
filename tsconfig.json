@@ -33,6 +33,7 @@
     "vite.config.ts",
     "scripts/**/*.ts",
     "tests/**/*.ts",
+    "tests/**/*.tsx",
     "vitest.config.ts",
     "eslint.config.js"
   ]

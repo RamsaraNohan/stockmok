@@ -16,6 +16,7 @@ import {
   Warehouse,
   X,
 } from 'lucide-react';
+import { useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
 
 import { useWorkspace } from '@/services/workspace/useWorkspace';
@@ -28,6 +29,26 @@ export interface MobileDrawerProps {
 
 export function MobileDrawer({ isOpen, onClose }: MobileDrawerProps) {
   const { activeMembership, activeRole, activeSettings } = useWorkspace();
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const mediaQuery = window.matchMedia('(min-width: 1024px)');
+    const handleMediaChange = (e: MediaQueryListEvent | MediaQueryList) => {
+      if (e.matches) {
+        onClose();
+      }
+    };
+
+    if (mediaQuery.matches) {
+      onClose();
+    }
+
+    mediaQuery.addEventListener('change', handleMediaChange);
+    return () => {
+      mediaQuery.removeEventListener('change', handleMediaChange);
+    };
+  }, [isOpen, onClose]);
 
   if (!activeMembership) return null;
 

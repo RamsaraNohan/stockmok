@@ -1,5 +1,6 @@
 import type { Notification } from '@stockmok/shared';
 import {
+  fetchUnreadNotificationCount as fetchUnreadCountAdapter,
   fetchUserNotifications as fetchNotifsAdapter,
   markNotificationRead as markReadAdapter,
   subscribeToUnreadNotifications as subscribeUnreadAdapter,
@@ -10,6 +11,12 @@ export async function fetchUserNotifications(
   maxResults = 50,
 ): Promise<readonly Notification[]> {
   return fetchNotifsAdapter(uid, maxResults);
+}
+
+export async function fetchUnreadNotificationCount(
+  uid: string,
+): Promise<{ readonly count: number; readonly isCapped: false }> {
+  return fetchUnreadCountAdapter(uid);
 }
 
 export function subscribeToUnreadNotifications(

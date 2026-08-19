@@ -136,6 +136,7 @@ export const router = createBrowserRouter([
               'OWNER',
               'ADMIN',
               'INVENTORY_MANAGER',
+              'PROCUREMENT_MANAGER',
               'STOREKEEPER',
               'ANALYST',
               'VIEWER',

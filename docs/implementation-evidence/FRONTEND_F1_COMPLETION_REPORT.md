@@ -3,7 +3,7 @@
 **Phase:** Phase F1 — Shell, Auth, Workspace, and Onboarding Implementation  
 **Status:** COMPLETED & VERIFIED  
 **Date:** 2026-08-19  
-**Worktree Path:** `c:\Users\ramsa\stockflow-worktrees\frontend`  
+**Worktree Path:** `c:\Users\ramsa\stockflow-worktrees\frontend`
 
 ---
 
@@ -45,14 +45,14 @@ UNACCOUNTED_F1_COMPONENT_IDS = []
 
 ## 2. Quality Gate Execution Evidence
 
-| Quality Gate | Command | Result | Metrics / Notes |
-| :--- | :--- | :--- | :--- |
-| **Code Formatting** | `npm run format:check` | **PASS** | 100% formatted via Prettier |
-| **Strict Typecheck** | `npm run typecheck` | **PASS** | `tsc --noEmit` 0 errors |
-| **ESLint Compliance** | `npm run lint` | **PASS** | `eslint .` 0 errors, 0 warnings (strict layer boundaries enforced) |
-| **Unit Tests** | `npm run test:unit` | **PASS** | 11 test files passed, 32 unit tests passed |
-| **Workspace Build** | `npm run build` | **PASS** | @stockmok/shared, @stockmok/functions, and frontend client build succeeded |
-| **E2E Browser Verification** | `npm run test:e2e` | **PASS** | 10 tests passed across `chromium-390` (390px) and `chromium-1280` (1280px) |
+| Quality Gate                 | Command                | Result   | Metrics / Notes                                                            |
+| :--------------------------- | :--------------------- | :------- | :------------------------------------------------------------------------- |
+| **Code Formatting**          | `npm run format:check` | **PASS** | 100% formatted via Prettier                                                |
+| **Strict Typecheck**         | `npm run typecheck`    | **PASS** | `tsc --noEmit` 0 errors                                                    |
+| **ESLint Compliance**        | `npm run lint`         | **PASS** | `eslint .` 0 errors, 0 warnings (strict layer boundaries enforced)         |
+| **Unit Tests**               | `npm run test:unit`    | **PASS** | 11 test files passed, 32 unit tests passed                                 |
+| **Workspace Build**          | `npm run build`        | **PASS** | @stockmok/shared, @stockmok/functions, and frontend client build succeeded |
+| **E2E Browser Verification** | `npm run test:e2e`     | **PASS** | 10 tests passed across `chromium-390` (390px) and `chromium-1280` (1280px) |
 
 ---
 
