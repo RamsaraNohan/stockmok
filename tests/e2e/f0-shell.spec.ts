@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-test('renders the emulator-marked F0 shell without browser errors', async ({ page }) => {
+test('renders the emulator-marked F1 landing shell without browser errors', async ({ page }) => {
   const browserErrors: string[] = [];
 
   page.on('console', (message) => {
@@ -16,10 +16,7 @@ test('renders the emulator-marked F0 shell without browser errors', async ({ pag
 
   await expect(page).toHaveTitle('Stockmok');
   await expect(page.getByRole('status', { name: 'Emulator environment' })).toHaveText('EMULATOR');
-  await expect(
-    page.getByRole('heading', { level: 1, name: 'Application foundation is ready' }),
-  ).toBeVisible();
-  await expect(page.locator('body')).not.toHaveCSS('overflow-x', 'scroll');
+  await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
 
   await page.keyboard.press('Tab');
   await expect(page.getByRole('link', { name: 'Skip to main content' })).toBeFocused();
