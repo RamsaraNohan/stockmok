@@ -36,6 +36,7 @@ import { ProductDetailScreen } from '@/features/inventory/products/ProductDetail
 import { ProductEditScreen } from '@/features/inventory/products/ProductEditScreen';
 import { CategoryListScreen } from '@/features/inventory/categories/CategoryListScreen';
 import { WarehouseListScreen } from '@/features/inventory/warehouses/WarehouseListScreen';
+import { MovementHistoryScreen } from '@/features/movements/MovementHistoryScreen';
 
 function SectionPlaceholder({ title }: { readonly title: string }) {
   return (
@@ -188,9 +189,16 @@ export const router = createBrowserRouter([
         path: 'inventory/movements',
         element: (
           <RoleGuard
-            allowedRoles={['OWNER', 'ADMIN', 'INVENTORY_MANAGER', 'STOREKEEPER', 'ANALYST']}
+            allowedRoles={[
+              'OWNER',
+              'ADMIN',
+              'INVENTORY_MANAGER',
+              'PROCUREMENT_MANAGER',
+              'STOREKEEPER',
+              'ANALYST',
+            ]}
           >
-            <SectionPlaceholder title="Stock Movements" />
+            <MovementHistoryScreen />
           </RoleGuard>
         ),
       },
