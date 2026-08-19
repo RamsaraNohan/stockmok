@@ -30,6 +30,10 @@ const queryClient = new QueryClient({
 });
 
 import { DashboardScreen } from '@/features/dashboard/DashboardScreen';
+import { ProductListScreen } from '@/features/inventory/products/ProductListScreen';
+import { ProductCreateScreen } from '@/features/inventory/products/ProductCreateScreen';
+import { ProductDetailScreen } from '@/features/inventory/products/ProductDetailScreen';
+import { ProductEditScreen } from '@/features/inventory/products/ProductEditScreen';
 
 function SectionPlaceholder({ title }: { readonly title: string }) {
   return (
@@ -110,21 +114,35 @@ export const router = createBrowserRouter([
         path: 'dashboard',
         element: <DashboardScreen />,
       },
-      {
+            {
         path: 'inventory/products',
         element: (
-          <RoleGuard
-            allowedRoles={[
-              'OWNER',
-              'ADMIN',
-              'INVENTORY_MANAGER',
-              'PROCUREMENT_MANAGER',
-              'STOREKEEPER',
-              'ANALYST',
-              'VIEWER',
-            ]}
-          >
-            <SectionPlaceholder title="Products" />
+          <RoleGuard allowedRoles={['OWNER', 'ADMIN', 'INVENTORY_MANAGER', 'PROCUREMENT_MANAGER', 'STOREKEEPER', 'ANALYST', 'VIEWER']}>
+            <ProductListScreen />
+          </RoleGuard>
+        ),
+      },
+      {
+        path: 'inventory/products/new',
+        element: (
+          <RoleGuard allowedRoles={['OWNER', 'ADMIN', 'INVENTORY_MANAGER']}>
+            <ProductCreateScreen />
+          </RoleGuard>
+        ),
+      },
+      {
+        path: 'inventory/products/:productId',
+        element: (
+          <RoleGuard allowedRoles={['OWNER', 'ADMIN', 'INVENTORY_MANAGER', 'PROCUREMENT_MANAGER', 'STOREKEEPER', 'ANALYST', 'VIEWER']}>
+            <ProductDetailScreen />
+          </RoleGuard>
+        ),
+      },
+      {
+        path: 'inventory/products/:productId/edit',
+        element: (
+          <RoleGuard allowedRoles={['OWNER', 'ADMIN', 'INVENTORY_MANAGER']}>
+            <ProductEditScreen />
           </RoleGuard>
         ),
       },
@@ -277,3 +295,4 @@ export function AppRouter() {
     </QueryClientProvider>
   );
 }
+
