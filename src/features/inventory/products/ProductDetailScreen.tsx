@@ -303,10 +303,6 @@ export function ProductDetailScreen() {
                   </thead>
                   <tbody className="divide-y divide-border">
                     {stockRows.map((row) => {
-                      const hasStockHistory =
-                        movements?.items.some((m) => m.warehouseId === row.warehouseId) ?? false;
-                      // Fallback since movements might not be fetched for all warehouses unless we specifically check it, but let's just check row.onHandMilli for simplicity if there's no history. Wait, `movements` are scoped to `productId` without warehouseId filter, so it should include all warehouses.
-
                       return (
                         <tr key={row.warehouseId}>
                           <td className="py-3 px-4">{row.warehouseName}</td>
@@ -315,7 +311,7 @@ export function ProductDetailScreen() {
                           </td>
                           <td className="py-3 px-4 text-right">
                             <div className="flex justify-end gap-2">
-                              {canWriteInventory && !hasStockHistory && row.onHandMilli === 0 && (
+                              {canWriteInventory && row.onHandMilli === 0 && (
                                 <Button
                                   onClick={() => {
                                     setOpeningBalanceDialogState({
