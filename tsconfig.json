@@ -13,7 +13,6 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "verbatimModuleSyntax": true,
-    "erasableSyntaxOnly": true,
     "resolveJsonModule": true,
     "allowImportingTsExtensions": true,
     "types": ["node", "vitest/globals"],
@@ -21,7 +20,9 @@
     "paths": {
       "@/*": ["src/*"],
       "@stockmok/shared": ["packages/shared/src/index.ts"],
-      "@stockmok/shared/*": ["packages/shared/src/*"]
+      "@stockmok/shared/*": ["packages/shared/src/*"],
+      "@stockmok/data": ["packages/data/src/index.ts"],
+      "@stockmok/data/*": ["packages/data/src/*"]
     }
   },
   "include": [

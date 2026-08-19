@@ -1,16 +1,6 @@
 import type { Notification } from '@stockmok/shared';
-import {
-  collection,
-  doc,
-  getCountFromServer,
-  getDocs,
-  limit,
-  onSnapshot,
-  orderBy,
-  query,
-  updateDoc,
-  where,
-} from 'firebase/firestore';
+import { createReadClient } from '@stockmok/data';
+import { doc, updateDoc } from 'firebase/firestore';
 
 import { db } from '../firebase/client';
 
@@ -19,25 +9,19 @@ export async function fetchUserNotifications(
   uid: string,
   maxResults = 50,
 ): Promise<readonly Notification[]> {
-  const notifRef = collection(db, 'users', uid, 'notifications');
-  const q = query(notifRef, orderBy('createdAt', 'desc'), limit(maxResults));
-  const snap = await getDocs(q);
-  const items: Notification[] = [];
-  snap.forEach((docSnap) => {
-    items.push(docSnap.data() as Notification);
-  });
-  return items;
+  const client = createReadClient(db, { uid });
+  const result = await client.list<Notification>('Q-004', undefined, { limit: maxResults });
+  return result.items;
 }
 
 // Q-005 Transport A: Exact one-shot count from server via getCountFromServer
 export async function fetchUnreadNotificationCount(
   uid: string,
 ): Promise<{ readonly count: number; readonly isCapped: false }> {
-  const notifRef = collection(db, 'users', uid, 'notifications');
-  const q = query(notifRef, where('read', '==', false));
-  const snap = await getCountFromServer(q);
+  const client = createReadClient(db, { uid });
+  const result = await client.getUnreadCount();
   return {
-    count: snap.data().count,
+    count: result.count,
     isCapped: false,
   };
 }
@@ -48,24 +32,15 @@ export function subscribeToUnreadNotifications(
   onUpdate: (payload: { readonly count: number; readonly isCapped: boolean }) => void,
   onError?: (err: Error) => void,
 ): () => void {
-  const notifRef = collection(db, 'users', uid, 'notifications');
-  const q = query(notifRef, where('read', '==', false), orderBy('createdAt', 'desc'), limit(50));
-
-  return onSnapshot(
-    q,
-    (snap) => {
-      // Suppress stale cache-only snapshots to enforce server-backed metadata
-      if (snap.metadata.fromCache) {
-        return;
-      }
-      const size = snap.size;
-      onUpdate({
-        count: size,
-        isCapped: size >= 50,
-      });
+  const client = createReadClient(db, { uid });
+  return client.subscribeUnreadBadge(
+    (value) => {
+      onUpdate({ count: value.count, isCapped: value.capped });
     },
-    (err) => {
-      if (onError) onError(err);
+    (error) => {
+      if (onError) {
+        onError(error instanceof Error ? error : new Error(String(error)));
+      }
     },
   );
 }

@@ -1,4 +1,5 @@
 import type { User as SharedUser, UserMembership } from '@stockmok/shared';
+import { createReadClient } from '@stockmok/data';
 import type { User as FirebaseUser } from 'firebase/auth';
 import {
   createUserWithEmailAndPassword,
@@ -7,7 +8,7 @@ import {
   signInWithEmailAndPassword,
   signOut,
 } from 'firebase/auth';
-import { collection, doc, getDoc, getDocs, query, updateDoc, where } from 'firebase/firestore';
+import { doc, updateDoc } from 'firebase/firestore';
 
 import { auth, db } from '../firebase/client';
 
@@ -58,10 +59,8 @@ export async function logoutUser(): Promise<void> {
 
 // Q-002: Fetch current user self document users/{uid}
 export async function fetchUserSelfDoc(uid: string): Promise<SharedUser | null> {
-  const userRef = doc(db, 'users', uid);
-  const snap = await getDoc(userRef);
-  if (!snap.exists()) return null;
-  return snap.data() as SharedUser;
+  const client = createReadClient(db, { uid });
+  return await client.get<SharedUser>('Q-002');
 }
 
 // Safe direct write: Update self user document fields (displayName, photoUrl)
@@ -75,12 +74,7 @@ export async function updateUserSelfProfile(
 
 // Q-003: Fetch ACTIVE user memberships from users/{uid}/memberships
 export async function fetchUserMemberships(uid: string): Promise<readonly UserMembership[]> {
-  const membershipsRef = collection(db, 'users', uid, 'memberships');
-  const q = query(membershipsRef, where('status', '==', 'ACTIVE'));
-  const snap = await getDocs(q);
-  const results: UserMembership[] = [];
-  snap.forEach((docSnap) => {
-    results.push(docSnap.data() as UserMembership);
-  });
-  return results;
+  const client = createReadClient(db, { uid });
+  const result = await client.list<UserMembership>('Q-003');
+  return result.items;
 }

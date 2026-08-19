@@ -9,7 +9,7 @@ vi.mock('firebase/firestore', async (importOriginal) => {
   const actual = await importOriginal<typeof firestore>();
   return {
     ...actual,
-    collection: vi.fn(() => ({ type: 'collection' })),
+    collection: vi.fn(() => ({ type: 'collection', withConverter: vi.fn().mockReturnThis() })),
     query: vi.fn((...args: unknown[]) => ({ type: 'query', args })),
     where: vi.fn((field: string, op: string, val: unknown) => ({ type: 'where', field, op, val })),
     orderBy: vi.fn((field: string, dir?: string) => ({ type: 'orderBy', field, dir })),
@@ -36,9 +36,7 @@ describe('Q-005 Notifications Contract', () => {
     expect(result).toEqual({ count: 127, isCapped: false });
     expect(firestore.collection).toHaveBeenCalledWith(
       expect.anything(),
-      'users',
-      'user-123',
-      'notifications',
+      'users/user-123/notifications',
     );
     expect(firestore.where).toHaveBeenCalledWith('read', '==', false);
   });
@@ -57,8 +55,12 @@ describe('Q-005 Notifications Contract', () => {
 
   it('Transport B: maps count and isCapped correctly for 0, 1, 49, 50', () => {
     let snapshotCallback: (snap: unknown) => void = () => {};
-    vi.mocked(firestore.onSnapshot).mockImplementation((_q, cb: unknown) => {
-      snapshotCallback = cb as (snap: unknown) => void;
+    vi.mocked(firestore.onSnapshot).mockImplementation((_q, arg1: unknown, arg2: unknown) => {
+      if (typeof arg1 === 'function') {
+        snapshotCallback = arg1 as (snap: unknown) => void;
+      } else if (typeof arg2 === 'function') {
+        snapshotCallback = arg2 as (snap: unknown) => void;
+      }
       return vi.fn();
     });
 
@@ -84,8 +86,12 @@ describe('Q-005 Notifications Contract', () => {
 
   it('Transport B: suppresses stale cache-only snapshots', () => {
     let snapshotCallback: (snap: unknown) => void = () => {};
-    vi.mocked(firestore.onSnapshot).mockImplementation((_q, cb: unknown) => {
-      snapshotCallback = cb as (snap: unknown) => void;
+    vi.mocked(firestore.onSnapshot).mockImplementation((_q, arg1: unknown, arg2: unknown) => {
+      if (typeof arg1 === 'function') {
+        snapshotCallback = arg1 as (snap: unknown) => void;
+      } else if (typeof arg2 === 'function') {
+        snapshotCallback = arg2 as (snap: unknown) => void;
+      }
       return vi.fn();
     });
 

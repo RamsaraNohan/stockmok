@@ -3,37 +3,33 @@ import type {
   Organization,
   OrganizationDirectory,
   OrganizationSettings,
+  CommandResult,
 } from '@stockmok/shared';
-import { doc, getDoc, onSnapshot } from 'firebase/firestore';
+import { createReadClient } from '@stockmok/data';
+import { httpsCallable } from 'firebase/functions';
 
-import { db } from '../firebase/client';
+import { db, functions } from '../firebase/client';
 
 // Q-001: Public handle lookup from organizationDirectory/{handle}
 export async function fetchDirectoryByHandle(
   handle: string,
 ): Promise<OrganizationDirectory | null> {
-  const dirRef = doc(db, 'organizationDirectory', handle.toLowerCase());
-  const snap = await getDoc(dirRef);
-  if (!snap.exists()) return null;
-  return snap.data() as OrganizationDirectory;
+  const client = createReadClient(db, {});
+  return await client.get<OrganizationDirectory>('Q-001', { handle: handle.toLowerCase() });
 }
 
 // Q-006: Organization document organizations/{orgId}
 export async function fetchOrganization(orgId: string): Promise<Organization | null> {
-  const orgRef = doc(db, 'organizations', orgId);
-  const snap = await getDoc(orgRef);
-  if (!snap.exists()) return null;
-  return snap.data() as Organization;
+  const client = createReadClient(db, { orgId });
+  return await client.get<Organization>('Q-006');
 }
 
 // Q-007: Organization settings organizations/{orgId}/settings/main
 export async function fetchOrganizationSettings(
   orgId: string,
 ): Promise<OrganizationSettings | null> {
-  const settingsRef = doc(db, 'organizations', orgId, 'settings', 'main');
-  const snap = await getDoc(settingsRef);
-  if (!snap.exists()) return null;
-  return snap.data() as OrganizationSettings;
+  const client = createReadClient(db, { orgId });
+  return await client.get<OrganizationSettings>('Q-007');
 }
 
 // Q-008: Realtime member document organizations/{orgId}/members/{uid}
@@ -43,24 +39,14 @@ export function subscribeToMemberDoc(
   onUpdate: (member: Member | null) => void,
   onError?: (err: Error) => void,
 ): () => void {
-  const memberRef = doc(db, 'organizations', orgId, 'members', uid);
-  return onSnapshot(
-    memberRef,
-    (snap) => {
-      if (!snap.exists()) {
-        onUpdate(null);
-      } else {
-        onUpdate(snap.data() as Member);
-      }
-    },
-    (err) => {
-      if (onError) onError(err);
-    },
-  );
+  const client = createReadClient(db, { orgId, uid });
+  return client.subscribe<Member>('Q-008', {}, onUpdate, (error) => {
+    if (onError) onError(error instanceof Error ? error : new Error(String(error)));
+  });
 }
 
 // C-01: org.create Command Adapter (authorization: AUTHENTICATED)
-export function executeCreateOrgCommand(payload: {
+export async function executeCreateOrgCommand(payload: {
   readonly name: string;
   readonly handle: string;
   readonly industry: string;
@@ -70,34 +56,35 @@ export function executeCreateOrgCommand(payload: {
   readonly warehouseName: string;
   readonly warehouseType: string;
 }): Promise<{ readonly organizationId: string }> {
-  void payload;
-  return Promise.reject(
-    new Error(
-      'C-01 org.create backend command execution pending promotion. Contract boundary verified.',
-    ),
+  const callable = httpsCallable<unknown, Extract<CommandResult, { ok: true }>>(
+    functions,
+    'orgCreate',
   );
+  const response = await callable(payload);
+  const result = response.data;
+  return result.data as { readonly organizationId: string };
 }
 
 // C-03: user.bootstrapProfile Command Adapter (authorization: SELF)
-export function executeBootstrapProfileCommand(payload: {
+export async function executeBootstrapProfileCommand(payload: {
   readonly displayName: string;
 }): Promise<void> {
-  void payload;
-  return Promise.reject(
-    new Error(
-      'C-03 user.bootstrapProfile backend command execution pending promotion. Contract boundary verified.',
-    ),
+  const callable = httpsCallable<unknown, Extract<CommandResult, { ok: true }>>(
+    functions,
+    'userBootstrapProfile',
   );
+  await callable(payload);
 }
 
 // C-06: team.acceptInvitation Command Adapter (authorization: INVITEE)
-export function executeAcceptInvitationCommand(payload: {
+export async function executeAcceptInvitationCommand(payload: {
   readonly token: string;
 }): Promise<{ readonly organizationId: string }> {
-  void payload;
-  return Promise.reject(
-    new Error(
-      'C-06 team.acceptInvitation backend command execution pending promotion. Contract boundary verified.',
-    ),
+  const callable = httpsCallable<unknown, Extract<CommandResult, { ok: true }>>(
+    functions,
+    'teamAcceptInvitation',
   );
+  const response = await callable(payload);
+  const result = response.data;
+  return result.data as { readonly organizationId: string };
 }
