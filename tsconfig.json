@@ -27,6 +27,7 @@
     "tests/**/*.ts",
     "vitest.config.ts",
     "vitest.security.config.ts",
+    "vitest.integration.config.ts",
     "eslint.config.js"
   ]
 }
