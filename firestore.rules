@@ -1,0 +1,709 @@
+rules_version = '2';
+
+// Stockmok Firestore Security Rules.
+//
+// Authority: docs/database-final/DB_05_FINAL_DATABASE_SECURITY_AND_TENANT_MATRIX.md.
+// Supporting: DB-02 (field sets), FIREBASE_PATH_CONTRACT (the path registry).
+//
+// Two rules govern every line below.
+//
+//   1. PATH CONSTANCY (DB-05 §1). A rule only ever get()s or exists()s
+//      organizations/{orgId}/members/{request.auth.uid}, where orgId comes from the
+//      matched path. No rule reads a path derived from resource.data.
+//      DATA_DERIVED_RULE_READS = 0.
+//
+//   2. THESE RULES ARE NOT COMMAND AUTHORIZATION (DB-05 §7). The Admin SDK bypasses
+//      this file completely, so every trusted command re-verifies auth, ACTIVE
+//      membership, role, tenant, input and state in its own body. This file protects
+//      the direct client SDK surface only.
+//
+// Client delete is denied on every path, without exception (INV-21, SEC-019).
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // Role registry — DB-05 §0.2, verbatim.
+    // T-SEC-17 asserts these lists equal the backend permission table
+    // (functions/src/guards/roles.ts) and DB-05 §0.2, per role.
+    // ─────────────────────────────────────────────────────────────────────────
+
+    function ROLE_ADMINS() {
+      return ['OWNER', 'ADMIN'];
+    }
+
+    function ROLE_INVENTORY_WRITERS() {
+      return ['OWNER', 'ADMIN', 'INVENTORY_MANAGER'];
+    }
+
+    function ROLE_PARTNER_WRITERS() {
+      return ['OWNER', 'ADMIN', 'PROCUREMENT_MANAGER'];
+    }
+
+    function ROLE_PO_WRITERS() {
+      return ['OWNER', 'ADMIN', 'PROCUREMENT_MANAGER'];
+    }
+
+    function ROLE_RECEIVERS() {
+      return ['OWNER', 'ADMIN', 'INVENTORY_MANAGER', 'PROCUREMENT_MANAGER', 'STOREKEEPER'];
+    }
+
+    function ROLE_TRANSFER_WRITERS() {
+      return ['OWNER', 'ADMIN', 'INVENTORY_MANAGER'];
+    }
+
+    function ROLE_NOT_VIEWER() {
+      return ['OWNER', 'ADMIN', 'INVENTORY_MANAGER', 'PROCUREMENT_MANAGER', 'STOREKEEPER', 'ANALYST'];
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // Principals
+    // ─────────────────────────────────────────────────────────────────────────
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isSelf(uid) {
+      return isSignedIn() && request.auth.uid == uid;
+    }
+
+    // The one constant path any rule is permitted to read.
+    function memberPath(orgId) {
+      return /databases/$(database)/documents/organizations/$(orgId)/members/$(request.auth.uid);
+    }
+
+    function memberExists(orgId) {
+      return isSignedIn() && exists(memberPath(orgId));
+    }
+
+    function memberData(orgId) {
+      return get(memberPath(orgId)).data;
+    }
+
+    // SUSP (suspended or removed) is denied everywhere, at both layers.
+    function isActiveMember(orgId) {
+      return memberExists(orgId) && memberData(orgId).status == 'ACTIVE';
+    }
+
+    function hasRole(orgId, roles) {
+      return isActiveMember(orgId) && memberData(orgId).role in roles;
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // Write predicates
+    // ─────────────────────────────────────────────────────────────────────────
+
+    // DB-05 §4.0.1 / §4.9 — the nine bounded client-listed collections.
+    // "Denies any query without a limit or with a limit greater than N."
+    function boundedList() {
+      return request.query.limit <= 100;
+    }
+
+    function changedKeys() {
+      return request.resource.data.diff(resource.data).affectedKeys();
+    }
+
+    function onlyChanged(fields) {
+      return changedKeys().hasOnly(fields);
+    }
+
+    function neverChanged(fields) {
+      return !changedKeys().hasAny(fields);
+    }
+
+    function keysWithin(allowed) {
+      return request.resource.data.keys().hasOnly(allowed);
+    }
+
+    function keysInclude(required) {
+      return request.resource.data.keys().hasAll(required);
+    }
+
+    // DB-05 §4.1 — the exact private-purchase-order draft predicates.
+    function isNewPrivateDraft() {
+      return request.resource.data.supplierKind == 'PRIVATE'
+        && request.resource.data.status == 'DRAFT'
+        && request.resource.data.isProjection == false;
+    }
+
+    function isEditableDraft() {
+      return resource.data.supplierKind == 'PRIVATE'
+        && resource.data.status == 'DRAFT'
+        && request.resource.data.supplierKind == 'PRIVATE'
+        && request.resource.data.status == 'DRAFT';
+    }
+
+    function draftFieldsOnly() {
+      return onlyChanged([
+        'counterpartyName',
+        'privateSupplierId',
+        'expectedDate',
+        'notes',
+        'totalMinor',
+        'updatedAt'
+      ]);
+    }
+
+    // orgId and poId both come from the matched path, so this stays constant-path.
+    function parentPurchaseOrder(orgId, poId) {
+      return /databases/$(database)/documents/organizations/$(orgId)/purchaseOrders/$(poId);
+    }
+
+    function parentIsEditableDraft(orgId, poId) {
+      return exists(parentPurchaseOrder(orgId, poId))
+        && get(parentPurchaseOrder(orgId, poId)).data.supplierKind == 'PRIVATE'
+        && get(parentPurchaseOrder(orgId, poId)).data.status == 'DRAFT';
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // Validated shapes (BACKEND-IR-001)
+    //
+    // Client-side Zod validation is NOT a security boundary — the client SDK
+    // persists whatever the caller hands it. Every SAFE_DIRECT_CLIENT_WRITE
+    // surface therefore re-derives its frozen document shape here: required
+    // keys, allowed keys, primitive types, enum bounds, safe-integer ranges,
+    // path/document-id equality and immutable identity/provenance.
+    //
+    // Authority: DB-02 §§2.1, 2.3, 4.1, 4.2, 5.1–5.3 · DB-03 §6 safe-direct-write
+    // register · DB-05 §§3, 4, 4.1 · the strict shared schemas
+    // (packages/shared/src/schemas/client-writes.ts and the domain schemas it
+    // derives from). No predicate below reads a document, so PATH CONSTANCY
+    // holds and DATA_DERIVED_RULE_READS stays 0.
+    // ─────────────────────────────────────────────────────────────────────────
+
+    // Quantities are integer milli-units and money is integer minor units —
+    // `SafeIntegerSchema`, bounded by Number.MAX_SAFE_INTEGER at both ends.
+    function isSafeInt(value) {
+      return value is int && value >= -9007199254740991 && value <= 9007199254740991;
+    }
+
+    function isNonNegativeInt(value) {
+      return isSafeInt(value) && value >= 0;
+    }
+
+    function isBoundedString(value, minLength, maxLength) {
+      return value is string && value.size() >= minLength && value.size() <= maxLength;
+    }
+
+    // IdSchema — 1…200 characters, exactly one path segment.
+    function isId(value) {
+      return isBoundedString(value, 1, 200) && !value.matches('.*/.*');
+    }
+
+    // CurrencySchema persists an upper-case ISO-4217 alpha-3 code.
+    function isCurrency(value) {
+      return value is string && value.matches('[A-Z]{3}');
+    }
+
+    // BACKEND-IR-001 — creation provenance is attributed to the caller, never
+    // asserted by them. `createdBy` is then immutable, so the pair cannot be
+    // forged at create and cannot be rewritten afterwards.
+    function createdBySelf() {
+      return request.resource.data.createdBy == request.auth.uid;
+    }
+
+    // BACKEND-IR-001 (second review) — edit attribution is bound to the caller.
+    //
+    // Control Pack file 11 §16 (RC-15) and DB-01 §12: *"ordinary field edits
+    // rely on `updatedBy`/`updatedAt` rather than an audit row"*. On a
+    // SAFE_DIRECT_CLIENT_WRITE surface `updatedBy` therefore IS the audit trail
+    // for an ordinary edit — and an audit actor is server-derived, never
+    // client-asserted (DB-01 §12, DB-05 §7, DB-06 §4). No trusted command runs
+    // on a direct client write, so this file is the only enforcement point and
+    // `request.auth.uid` is the only server-derived actor it has.
+    //
+    // This is the LAST writer, not the first: a different authorized writer may
+    // edit the document later, and that edit is attributed to them. `updatedBy`
+    // is never required to equal `createdBy`. `updatedAt` semantics are
+    // unchanged — it stays a timestamp in each shape and in draftFieldsOnly().
+    //
+    // Applied only where the persisted shape actually carries the field:
+    // categories (DB-02 §4.1), warehouses (§4.2) and privatePartners (§5.1).
+    // users (§2.1), notifications (§2.3), private draft PO headers (§5.2) and
+    // their items (§5.3) define no `updatedBy` and are untouched by it.
+    function updatedBySelf() {
+      return request.resource.data.updatedBy == request.auth.uid;
+    }
+
+    // DB-02 §0.1 enums, verbatim.
+    function LIFECYCLE_STATUSES() {
+      return ['ACTIVE', 'ARCHIVED'];
+    }
+
+    function PARTNER_STATUSES() {
+      return ['ACTIVE', 'DEACTIVATED'];
+    }
+
+    function PARTNER_TYPES() {
+      return ['SUPPLIER', 'BUYER'];
+    }
+
+    function WAREHOUSE_TYPES() {
+      return ['STORE_ROOM', 'REFRIGERATED', 'FREEZER', 'KITCHEN', 'OTHER'];
+    }
+
+    function UNITS() {
+      return ['KG', 'L', 'EACH', 'PACK'];
+    }
+
+    // DB-02 §2.1 · UserClientWriteSchema. `email` and `status` are backend-only:
+    // the create allowlist and onlyChanged() on update keep them out, and `uid`
+    // is the document id.
+    function userShape(data, uid) {
+      return data.keys().hasAll(['uid', 'displayName', 'createdAt'])
+        && data.uid == uid
+        && isBoundedString(data.displayName, 1, 80)
+        && data.createdAt is timestamp
+        && (!('photoUrl' in data) || isBoundedString(data.photoUrl, 1, 2000))
+        && (!('lastSeenAt' in data) || data.lastSeenAt is timestamp);
+    }
+
+    // DB-02 §4.1 · CategoryClientWriteSchema. `status` is command-only
+    // (DB-CR-012) but is part of the persisted document, so it is bounded to the
+    // enum here and pinned by the create/update rules.
+    function categoryShape(data, categoryId) {
+      return data.keys().hasOnly([
+          'categoryId', 'name', 'description', 'status',
+          'createdAt', 'createdBy', 'updatedAt', 'updatedBy'
+        ])
+        && data.keys().hasAll([
+          'categoryId', 'name', 'status',
+          'createdAt', 'createdBy', 'updatedAt', 'updatedBy'
+        ])
+        && data.categoryId == categoryId
+        && isBoundedString(data.name, 1, 80)
+        && (!('description' in data) || isBoundedString(data.description, 0, 400))
+        && data.status in LIFECYCLE_STATUSES()
+        && data.createdAt is timestamp
+        && isId(data.createdBy)
+        && data.updatedAt is timestamp
+        && isId(data.updatedBy);
+    }
+
+    // DB-02 §4.2 · WarehouseClientWriteSchema. There is no `isDefault` field
+    // (DB-CR-013) — the key allowlist is what denies it.
+    function warehouseShape(data, warehouseId) {
+      return data.keys().hasOnly([
+          'warehouseId', 'name', 'code', 'type', 'status', 'address',
+          'createdAt', 'createdBy', 'updatedAt', 'updatedBy'
+        ])
+        && data.keys().hasAll([
+          'warehouseId', 'name', 'type', 'status',
+          'createdAt', 'createdBy', 'updatedAt', 'updatedBy'
+        ])
+        && data.warehouseId == warehouseId
+        && isBoundedString(data.name, 1, 80)
+        && (!('code' in data) || isBoundedString(data.code, 0, 40))
+        && data.type in WAREHOUSE_TYPES()
+        && data.status in LIFECYCLE_STATUSES()
+        && (!('address' in data) || isBoundedString(data.address, 0, 400))
+        && data.createdAt is timestamp
+        && isId(data.createdBy)
+        && data.updatedAt is timestamp
+        && isId(data.updatedBy);
+    }
+
+    // DB-02 §5.1 · PrivatePartnerClientWriteSchema. `partnerTypes` is the only
+    // array in the schema, bounded at 1…2 members drawn from the enum — an empty
+    // list satisfies hasOnly() on its own, which is why the floor is asserted
+    // separately.
+    function privatePartnerShape(data, partnerId) {
+      return data.keys().hasOnly([
+          'partnerId', 'partnerTypes', 'name', 'contactPerson', 'email', 'phone',
+          'address', 'notes', 'status', 'ordersPlacedCount',
+          'createdAt', 'createdBy', 'updatedAt', 'updatedBy'
+        ])
+        && data.keys().hasAll([
+          'partnerId', 'partnerTypes', 'name', 'status', 'ordersPlacedCount',
+          'createdAt', 'createdBy', 'updatedAt', 'updatedBy'
+        ])
+        && data.partnerId == partnerId
+        && data.partnerTypes is list
+        && data.partnerTypes.size() >= 1
+        && data.partnerTypes.size() <= 2
+        && data.partnerTypes.hasOnly(PARTNER_TYPES())
+        && isBoundedString(data.name, 1, 120)
+        && (!('contactPerson' in data) || isBoundedString(data.contactPerson, 0, 120))
+        && (!('email' in data) || (isBoundedString(data.email, 3, 320)
+          && data.email.matches('[^@]+@[^@]+')))
+        && (!('phone' in data) || isBoundedString(data.phone, 0, 40))
+        && (!('address' in data) || isBoundedString(data.address, 0, 400))
+        && (!('notes' in data) || isBoundedString(data.notes, 0, 1000))
+        && data.status in PARTNER_STATUSES()
+        && isNonNegativeInt(data.ordersPlacedCount)
+        && data.createdAt is timestamp
+        && isId(data.createdBy)
+        && data.updatedAt is timestamp
+        && isId(data.updatedBy);
+    }
+
+    // DB-02 §5.2 · PrivatePurchaseOrderDraftClientWriteSchema — the exact
+    // private-draft header. Every connected-only and command-only field
+    // (`orderNumber`, `counterpartyOrgId`, `counterpartyHandle`, `connectionId`,
+    // `receivingWarehouseId`, `lastOperationId` and every transition timestamp)
+    // sits outside the allowlist, so a buyer cannot forge one onto a draft.
+    //
+    // DB-05 §4.1's draftFieldsOnly() names `notes` as a changeable key while
+    // DB-02 §5.2 and the strict schema define no such field. The two agree once
+    // stated precisely: one bounds the change set, the other bounds the
+    // document, and `notes` is therefore not persistable.
+    function privateDraftShape(data, poId) {
+      return data.keys().hasOnly([
+          'purchaseOrderId', 'viewRole', 'supplierKind', 'counterpartyName',
+          'privateSupplierId', 'status', 'currency', 'expectedDate',
+          'totalMinor', 'isProjection', 'createdBy', 'createdAt', 'updatedAt'
+        ])
+        && data.keys().hasAll([
+          'purchaseOrderId', 'viewRole', 'supplierKind', 'counterpartyName',
+          'status', 'currency', 'totalMinor', 'isProjection',
+          'createdBy', 'createdAt', 'updatedAt'
+        ])
+        && data.purchaseOrderId == poId
+        && data.viewRole == 'BUYER'
+        && data.supplierKind == 'PRIVATE'
+        && isBoundedString(data.counterpartyName, 1, 120)
+        && (!('privateSupplierId' in data) || isId(data.privateSupplierId))
+        && data.status == 'DRAFT'
+        && isCurrency(data.currency)
+        && (!('expectedDate' in data) || data.expectedDate is timestamp)
+        && isNonNegativeInt(data.totalMinor)
+        && data.isProjection == false
+        && isId(data.createdBy)
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    // DB-02 §5.3 — the buyer-side line. The eight supplier/mapping snapshot
+    // fields belong to CONNECTED orders, whose lines are command-only, so they
+    // are outside this allowlist.
+    //
+    // DRAFT_RECEIVED_ZERO. DB-07 §8 draws no `receive` edge out of `DRAFT` —
+    // receipt is reachable only from `ORDERED`/`PARTIALLY_RECEIVED` — and
+    // `ORDERED → CANCELLED` is guarded *"only while receivedTotal == 0"*, which
+    // presupposes the draft carried nothing. DB-06 §3.3 makes `C-17 po.receive`
+    // the sole writer of private received quantity and pairs every increase with
+    // one `PURCHASE_RECEIPT` movement per line per receipt event. A client-written
+    // draft line therefore has received exactly nothing: a positive value here is
+    // received stock with no ledger entry behind it — `ATTACK-15` (DB-05 §4.9) in
+    // a new location — so the field is pinned to 0 rather than merely bounded by
+    // the ordered quantity. INV-12's `received <= ordered` follows, and is kept
+    // stated below.
+    function privateDraftItemShape(data, itemId) {
+      return data.keys().hasOnly([
+          'itemId', 'buyerProductId', 'buyerProductNameSnapshot', 'buyerSkuSnapshot',
+          'buyerBaseUnitSnapshot', 'orderedBuyerBaseMilli', 'receivedBuyerBaseMilli',
+          'unitPriceMinor', 'lineTotalMinor', 'currency'
+        ])
+        && data.keys().hasAll([
+          'itemId', 'buyerProductId', 'buyerProductNameSnapshot', 'buyerSkuSnapshot',
+          'buyerBaseUnitSnapshot', 'orderedBuyerBaseMilli', 'receivedBuyerBaseMilli',
+          'unitPriceMinor', 'lineTotalMinor', 'currency'
+        ])
+        && data.itemId == itemId
+        && isId(data.buyerProductId)
+        && isBoundedString(data.buyerProductNameSnapshot, 1, 120)
+        && isBoundedString(data.buyerSkuSnapshot, 1, 80)
+        && data.buyerBaseUnitSnapshot in UNITS()
+        && isNonNegativeInt(data.orderedBuyerBaseMilli)
+        && isNonNegativeInt(data.receivedBuyerBaseMilli)
+        && data.receivedBuyerBaseMilli == 0
+        && data.receivedBuyerBaseMilli <= data.orderedBuyerBaseMilli
+        && isNonNegativeInt(data.unitPriceMinor)
+        && isNonNegativeInt(data.lineTotalMinor)
+        && isCurrency(data.currency);
+    }
+
+    // ═════════════════════════════════════════════════════════════════════════
+    // ZONE 1 — PUBLIC (DB-05 §2)
+    // ═════════════════════════════════════════════════════════════════════════
+
+    // get public / list denied is the whole anti-enumeration control (T-SEC-20).
+    match /organizationDirectory/{handle} {
+      allow get: if true;
+      allow list: if false;
+      allow write: if false;
+    }
+
+    // Release C — declared and inert so no agent reintroduces it (DB-02 §1.2).
+    match /storefrontCatalog/{handle} {
+      allow read, write: if false;
+
+      match /{document=**} {
+        allow read, write: if false;
+      }
+    }
+
+    // ═════════════════════════════════════════════════════════════════════════
+    // ZONE 2 — USER-PRIVATE (DB-05 §3)
+    // ═════════════════════════════════════════════════════════════════════════
+
+    match /users/{uid} {
+      allow get: if isSelf(uid);
+      allow list: if false;
+
+      // email and status are backend-written and are absent from a client create.
+      allow create: if isSelf(uid)
+        && keysWithin(['uid', 'displayName', 'photoUrl', 'createdAt', 'lastSeenAt'])
+        && userShape(request.resource.data, uid);
+
+      allow update: if isSelf(uid)
+        && onlyChanged(['displayName', 'photoUrl', 'lastSeenAt'])
+        && userShape(request.resource.data, uid);
+      allow delete: if false;
+
+      // A3 · F-H-10 — the ninth bounded path.
+      match /memberships/{orgId} {
+        allow get: if isSelf(uid);
+        allow list: if isSelf(uid) && boundedList();
+        allow write: if false;
+      }
+
+      // Self may flip `read` and nothing else. create/delete denied to everyone,
+      // so a user cannot fabricate their own notification (T-SEC-23).
+      match /notifications/{notificationId} {
+        allow get: if isSelf(uid);
+        allow list: if isSelf(uid);
+        allow create: if false;
+        allow update: if isSelf(uid)
+          && onlyChanged(['read'])
+          && keysInclude(['read'])
+          && request.resource.data.read is bool;
+        allow delete: if false;
+      }
+    }
+
+    // ═════════════════════════════════════════════════════════════════════════
+    // ZONE 3 — ORGANIZATION-PRIVATE (DB-05 §4)
+    //
+    // Every principal outside the organization — PUB, AUTH, CONN, SUSP — is
+    // denied at every path below by isActiveMember() plus the catch-all.
+    // CONN has no rule-level privilege anywhere.
+    // ═════════════════════════════════════════════════════════════════════════
+
+    match /organizations/{orgId} {
+      allow get: if isActiveMember(orgId);
+      allow list: if false;
+      allow write: if false;
+
+      match /settings/{settingsId} {
+        allow get: if isActiveMember(orgId);
+        allow list: if false;
+        allow write: if false;
+      }
+
+      // BACKEND_ONLY — no client access at all.
+      match /counters/{counterId} {
+        allow read, write: if false;
+      }
+
+      match /commandReceipts/{operationId} {
+        allow read, write: if false;
+      }
+
+      match /productSkuIndex/{skuNormalized} {
+        allow read, write: if false;
+      }
+
+      // get: self or ADMINS · list: ADMINS (T-SEC-31).
+      match /members/{memberUid} {
+        allow get: if (isSelf(memberUid) && isActiveMember(orgId)) || hasRole(orgId, ROLE_ADMINS());
+        allow list: if hasRole(orgId, ROLE_ADMINS());
+        allow write: if false;
+      }
+
+      match /invitations/{invitationId} {
+        allow get, list: if hasRole(orgId, ROLE_ADMINS());
+        allow write: if false;
+      }
+
+      // SAFE_DIRECT_CLIENT_WRITE 3/6. `status` is command-only (DB-CR-012):
+      // archive is C-35a, restore is C-35b.
+      match /categories/{categoryId} {
+        allow get: if isActiveMember(orgId);
+        allow list: if isActiveMember(orgId) && boundedList();
+
+        allow create: if hasRole(orgId, ROLE_INVENTORY_WRITERS())
+          && categoryShape(request.resource.data, categoryId)
+          && createdBySelf()
+          && updatedBySelf()
+          && request.resource.data.status == 'ACTIVE';
+
+        // Identity and creation provenance are fixed at create: a client may
+        // rename a category, never re-point it or forge who made it. Edit
+        // attribution is bound to whoever is making THIS edit, so a later
+        // authorized writer may rename it under their own name and no writer
+        // can sign an edit as somebody else.
+        allow update: if hasRole(orgId, ROLE_INVENTORY_WRITERS())
+          && categoryShape(request.resource.data, categoryId)
+          && updatedBySelf()
+          && neverChanged(['status', 'categoryId', 'createdAt', 'createdBy']);
+
+        allow delete: if false;
+      }
+
+      // SAFE_DIRECT_CLIENT_WRITE 4/6. `status` is immutable to clients in BOTH
+      // directions (A3 · DB-CR-033): archive is C-12, restore is C-37.
+      // There is no `isDefault` field (DB-CR-013) — the key allowlist denies it.
+      match /warehouses/{warehouseId} {
+        allow get: if isActiveMember(orgId);
+        allow list: if isActiveMember(orgId) && boundedList();
+
+        allow create: if hasRole(orgId, ROLE_INVENTORY_WRITERS())
+          && warehouseShape(request.resource.data, warehouseId)
+          && createdBySelf()
+          && updatedBySelf()
+          && request.resource.data.status == 'ACTIVE';
+
+        allow update: if hasRole(orgId, ROLE_INVENTORY_WRITERS())
+          && warehouseShape(request.resource.data, warehouseId)
+          && updatedBySelf()
+          && neverChanged(['status', 'warehouseId', 'createdAt', 'createdBy']);
+
+        allow delete: if false;
+      }
+
+      match /products/{productId} {
+        allow get, list: if isActiveMember(orgId);
+        allow write: if false;
+      }
+
+      match /stockBalances/{balanceId} {
+        allow get, list: if isActiveMember(orgId);
+        allow write: if false;
+      }
+
+      match /productStockSummaries/{productId} {
+        allow get, list: if isActiveMember(orgId);
+        allow write: if false;
+      }
+
+      // The ledger. Immutable, and denied to VIEWER entirely (T-SEC-26).
+      match /stockMovements/{movementId} {
+        allow get: if hasRole(orgId, ROLE_NOT_VIEWER());
+        allow list: if hasRole(orgId, ROLE_NOT_VIEWER()) && boundedList();
+        allow write: if false;
+      }
+
+      // SAFE_DIRECT_CLIENT_WRITE 5/6, field-restricted.
+      // `status` (T-SEC-40 · ATTACK-16) and `ordersPlacedCount` (T-SEC-36) are
+      // backend-write-only: a guard the client evaluates is not a guard.
+      match /privatePartners/{partnerId} {
+        allow get: if hasRole(orgId, ROLE_PARTNER_WRITERS());
+        allow list: if hasRole(orgId, ROLE_PARTNER_WRITERS()) && boundedList();
+
+        allow create: if hasRole(orgId, ROLE_PARTNER_WRITERS())
+          && privatePartnerShape(request.resource.data, partnerId)
+          && createdBySelf()
+          && updatedBySelf()
+          && request.resource.data.status == 'ACTIVE'
+          && request.resource.data.ordersPlacedCount == 0;
+
+        allow update: if hasRole(orgId, ROLE_PARTNER_WRITERS())
+          && privatePartnerShape(request.resource.data, partnerId)
+          && updatedBySelf()
+          && neverChanged([
+            'status', 'ordersPlacedCount', 'partnerId', 'createdAt', 'createdBy'
+          ]);
+
+        allow delete: if false;
+      }
+
+      // SAFE_DIRECT_CLIENT_WRITE 6/6 — only while PRIVATE and DRAFT.
+      match /purchaseOrders/{poId} {
+        allow get, list: if hasRole(orgId, ROLE_NOT_VIEWER());
+
+        // A client total is never trusted: the frozen client-write shape pins a
+        // new draft at zero and every later total is recomputed server-side from
+        // the line snapshots (DB-02 §5.2).
+        allow create: if hasRole(orgId, ROLE_PO_WRITERS())
+          && isNewPrivateDraft()
+          && privateDraftShape(request.resource.data, poId)
+          && createdBySelf()
+          && request.resource.data.totalMinor == 0;
+
+        allow update: if hasRole(orgId, ROLE_PO_WRITERS())
+          && isEditableDraft()
+          && draftFieldsOnly()
+          && privateDraftShape(request.resource.data, poId)
+          && neverChanged(['purchaseOrderId', 'createdBy', 'createdAt']);
+        allow delete: if false;
+
+        match /items/{itemId} {
+          allow get: if hasRole(orgId, ROLE_NOT_VIEWER());
+          allow list: if hasRole(orgId, ROLE_NOT_VIEWER()) && boundedList();
+          allow create, update: if hasRole(orgId, ROLE_PO_WRITERS())
+            && parentIsEditableDraft(orgId, poId)
+            && privateDraftItemShape(request.resource.data, itemId);
+          allow delete: if false;
+        }
+
+        match /history/{historyId} {
+          allow get: if hasRole(orgId, ROLE_NOT_VIEWER());
+          allow list: if hasRole(orgId, ROLE_NOT_VIEWER()) && boundedList();
+          allow write: if false;
+        }
+      }
+
+      // Own-org PARTNER_WRITERS only (T-SEC-30). A connected buyer reads this
+      // exclusively through partnerCatalog.list / lookupBySku, each of which
+      // verifies an ACTIVE connection server-side (T-SEC-38).
+      match /partnerCatalog/{catalogItemId} {
+        allow get: if hasRole(orgId, ROLE_PARTNER_WRITERS());
+        allow list: if hasRole(orgId, ROLE_PARTNER_WRITERS()) && boundedList();
+        allow write: if false;
+      }
+
+      match /productMappings/{mappingId} {
+        allow get: if hasRole(orgId, ROLE_PARTNER_WRITERS());
+        allow list: if hasRole(orgId, ROLE_PARTNER_WRITERS()) && boundedList();
+        allow write: if false;
+      }
+
+      // The tenant projection of the zone-4 canonical connection.
+      match /connections/{connectionId} {
+        allow get, list: if hasRole(orgId, ROLE_PARTNER_WRITERS());
+        allow write: if false;
+      }
+
+      // Owner/Admin read only. create, update and delete are denied to every
+      // client including the Owner — immutability is structural.
+      match /auditLogs/{auditId} {
+        allow get, list: if hasRole(orgId, ROLE_ADMINS());
+        allow write: if false;
+      }
+    }
+
+    // ═════════════════════════════════════════════════════════════════════════
+    // ZONE 4 — CROSS-TENANT CANONICAL (DB-05 §5)
+    //
+    // Denied for EVERY principal, including the Owner of a participating
+    // organization. Each party reads its own zone-3 projection instead, so a
+    // third organization sees nothing (T-SEC-12).
+    // ═════════════════════════════════════════════════════════════════════════
+
+    match /handleReservations/{handle} {
+      allow read, write: if false;
+    }
+
+    match /connections/{connectionId} {
+      allow read, write: if false;
+    }
+
+    match /connectedPurchaseOrders/{poId} {
+      allow read, write: if false;
+
+      match /{document=**} {
+        allow read, write: if false;
+      }
+    }
+
+    // ═════════════════════════════════════════════════════════════════════════
+    // CATCH-ALL (DB-05 §6) — an invented path is denied (T-SEC-18).
+    // ═════════════════════════════════════════════════════════════════════════
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

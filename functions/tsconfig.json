@@ -5,7 +5,10 @@
     "outDir": "lib",
     "declaration": true,
     "noEmit": false,
-    "allowImportingTsExtensions": false
+    "allowImportingTsExtensions": false,
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "paths": {}
   },
   "include": ["src/**/*.ts"]
 }

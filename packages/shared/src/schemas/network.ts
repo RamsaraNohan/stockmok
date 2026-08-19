@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { ActiveCommandNameSchema } from '../commands.js';
 import {
   ConnectionStatusSchema,
   IdSchema,
@@ -49,7 +50,13 @@ export const AuditLogSchema = z
     actorName: z.string().min(1).max(80),
     actorRole: RoleSchema,
     organizationId: IdSchema,
-    action: z.string().regex(/^[a-z][a-z0-9]*(\.[a-z][a-z0-9]*)+$/),
+    // Bound to the frozen 38-id active command catalog (DB-06 §1) rather than to a
+    // shape. `action` is always the command's own dot-case name (DB-02 §6.4), and the
+    // catalog already carries the camelCase segments a bare `/[a-z0-9]*/` shape cannot
+    // represent (e.g. `team.createInvitation`) — narrower than either regex, and it
+    // cannot drift from `commandDefinitions` because there is no second registry to
+    // drift from.
+    action: ActiveCommandNameSchema,
     entityType: z.string().min(1).max(80),
     entityId: IdSchema,
     operationId: IdSchema.optional(),
@@ -68,7 +75,12 @@ export const ConnectedHistorySchema = z
     actorName: z.string().min(1).max(80),
     actorOrgId: IdSchema,
     actorOrgName: z.string().min(1).max(120),
-    operationId: IdSchema,
+    // Mirrors `PurchaseOrderHistorySchema.operationId` for the identical reason
+    // (DB-06 §1): `cpo.cancel` is NON-idempotent, so its canonical history row
+    // provably has no receipt id to carry. Requiring it here could only be
+    // satisfied by fabricating one that resolves to nothing, and DB-02 §5.4
+    // requires the canonical row and both projection rows to be identical.
+    operationId: IdSchema.optional(),
     note: z.string().max(280).optional(),
     createdAt: TimestampSchema,
   })
