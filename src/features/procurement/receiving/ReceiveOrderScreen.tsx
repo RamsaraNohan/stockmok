@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useWorkspace } from '@/services/workspace/useWorkspace';
 import { useRepositories } from '@/services/data/useRepositories';
@@ -73,21 +73,11 @@ export function ReceiveOrderScreen() {
     })),
   });
 
-  // Automatically select order's receiving warehouse if set, or the first active warehouse
-  useEffect(() => {
-    if (!selectedWarehouseId && order && warehouses?.items.length) {
-      if (order.receivingWarehouseId) {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
-        setSelectedWarehouseId(order.receivingWarehouseId);
-      } else if (warehouses.items.length > 0) {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion, react-hooks/set-state-in-effect
-        setSelectedWarehouseId(warehouses.items[0]!.warehouseId);
-      }
-    }
-  }, [order, warehouses, selectedWarehouseId]);
+  const effectiveWarehouseId =
+    selectedWarehouseId || order?.receivingWarehouseId || warehouses?.items[0]?.warehouseId || '';
 
   const handleReceive = async () => {
-    if (!activeOrg?.organizationId || !poId || !items || !selectedWarehouseId) return;
+    if (!activeOrg?.organizationId || !poId || !items || !effectiveWarehouseId) return;
 
     const receiveItems = items.items
       .map((item) => {
@@ -108,7 +98,7 @@ export function ReceiveOrderScreen() {
       await executePoReceiveCommand(
         activeOrg.organizationId,
         poId,
-        selectedWarehouseId,
+        effectiveWarehouseId,
         receiveItems,
       );
       await queryClient.invalidateQueries({ queryKey: ['order', poId] });
@@ -157,7 +147,7 @@ export function ReceiveOrderScreen() {
                 void handleReceive();
               }}
               variant="primary"
-              disabled={isSubmitting || !selectedWarehouseId}
+              disabled={isSubmitting || !effectiveWarehouseId}
             >
               Receive
             </Button>
@@ -178,7 +168,7 @@ export function ReceiveOrderScreen() {
             </label>
             <select
               id="warehouse-select"
-              value={selectedWarehouseId}
+              value={effectiveWarehouseId}
               onChange={(e) => {
                 setSelectedWarehouseId(e.target.value);
               }}
@@ -212,7 +202,7 @@ export function ReceiveOrderScreen() {
 
                 const balancesData = balanceQueries[index]?.data;
                 const whBalance = balancesData?.items.find(
-                  (b) => b.warehouseId === selectedWarehouseId,
+                  (b) => b.warehouseId === effectiveWarehouseId,
                 );
                 const currentStock = whBalance ? whBalance.onHandMilli / 1000 : 0;
 

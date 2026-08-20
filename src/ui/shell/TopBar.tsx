@@ -20,7 +20,7 @@ export function TopBar({ onOpenMobileDrawer }: TopBarProps) {
     <header className="border-border bg-surface sticky top-0 z-40 border-b">
       <EmulatorRibbon enabled={emulatorMode} />
 
-      <div className="mx-auto flex min-h-16 w-[min(calc(100%-2rem),90rem)] items-center gap-4 max-md:w-[min(calc(100%-1.5rem),90rem)] max-md:gap-2">
+      <div className="mx-auto flex min-h-16 w-[min(calc(100%-2rem),90rem)] items-center gap-4 max-md:w-[min(calc(100%-1.5rem),90rem)] max-md:gap-1">
         {/* Mobile menu trigger LINK-025 below 1024px */}
         <button
           aria-label="Open navigation menu"
@@ -45,13 +45,13 @@ export function TopBar({ onOpenMobileDrawer }: TopBarProps) {
 
         {/* Workspace Dropdown */}
         {activeMembership && (
-          <div className="ml-2">
+          <div className="ml-2 max-md:ml-0">
             <WorkspaceDropdown />
           </div>
         )}
 
         {/* Utilities: Notifications & User Menu */}
-        <div className="ml-auto flex items-center gap-3">
+        <div className="ml-auto flex items-center gap-3 max-md:gap-1">
           <NotificationFlyout />
           <UserMenu />
         </div>

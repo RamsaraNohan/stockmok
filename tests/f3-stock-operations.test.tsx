@@ -121,8 +121,8 @@ describe('F3 Stock Operations Frontend Certification Tests', () => {
   });
 
   describe('OPENING BALANCE', () => {
-    it('1. Opening Balance visibility is NOT derived from onHandMilli === 0 (visible when non-zero)', async () => {
-      // Mock the listProductBalances to return a non-zero onHandMilli (e.g. 18000)
+    it('1. An existing balance offers Adjustment and never a second Opening Balance', async () => {
+      // A balance document proves initialization regardless of its current quantity.
       vi.mocked(useQuery).mockImplementation(({ queryKey }: any) => {
         const key = queryKey[0];
         if (key === 'productBalances') {
@@ -156,9 +156,8 @@ describe('F3 Stock Operations Frontend Certification Tests', () => {
       const stockTab = screen.getByRole('button', { name: /Stock by store room/i });
       fireEvent.click(stockTab);
 
-      // Verify that the "Opening Balance" button is still visible even when quantity is non-zero (18 KG)
-      const buttons = screen.getAllByRole('button', { name: /Opening Balance/i });
-      expect(buttons.length).toBeGreaterThan(0);
+      expect(screen.getByRole('button', { name: 'Adjust' })).toBeTruthy();
+      expect(screen.queryByRole('button', { name: /Opening Balance/i })).toBeNull();
     });
 
     it('2. A product/warehouse with non-zero onHandMilli is not rejected by an invented frontend quantity eligibility rule', () => {
@@ -186,6 +185,32 @@ describe('F3 Stock Operations Frontend Certification Tests', () => {
 
     it('5. Authorized role can reach the governed C13 action according to final UI authority', async () => {
       mockActiveRole = 'OWNER';
+      vi.mocked(useQuery).mockImplementation(({ queryKey }: any) => {
+        const key = queryKey[0];
+        if (key === 'product') {
+          return {
+            data: { productId: 'prod-123', name: 'Rice', status: 'ACTIVE', baseUnit: 'KG', categoryId: 'cat-1' },
+            isLoading: false,
+            isError: false,
+          } as any;
+        }
+        if (key === 'productSummary') {
+          return { data: { onHandMilli: 0 }, isLoading: false } as any;
+        }
+        if (key === 'categories') {
+          return { data: { items: [{ categoryId: 'cat-1', name: 'Food' }] }, isLoading: false } as any;
+        }
+        if (key === 'warehouses') {
+          return {
+            data: { items: [{ warehouseId: 'wh-1', name: 'Main Store', status: 'ACTIVE' }] },
+            isLoading: false,
+          } as any;
+        }
+        if (key === 'productBalances') {
+          return { data: { items: [] }, isLoading: false } as any;
+        }
+        return { data: null, isLoading: false, isError: false } as any;
+      });
       render(<ProductDetailScreen />);
 
       // Navigate to Stock tab

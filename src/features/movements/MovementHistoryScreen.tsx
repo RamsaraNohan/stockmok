@@ -6,6 +6,7 @@ import { EmptyState } from '@/ui/primitives/EmptyState';
 import { ErrorState } from '@/ui/primitives/ErrorState';
 import { Skeleton } from '@/ui/primitives/Skeleton';
 import { StatusPill } from '@/ui/primitives/StatusPill';
+import { Input } from '@/ui/primitives/Input';
 import type { MovementType } from '@stockmok/shared';
 
 type QueryId = 'Q-022' | 'Q-023' | 'Q-024' | 'Q-025' | 'Q-026' | 'Q-027' | 'Q-028' | 'Q-029';
@@ -15,6 +16,8 @@ export function MovementHistoryScreen() {
   const [productId, setProductId] = useState('');
   const [warehouseId, setWarehouseId] = useState('');
   const [movementType, setMovementType] = useState<MovementType | ''>('');
+  const [searchTerm, setSearchTerm] = useState('');
+  const normalizedSearch = searchTerm.trim();
 
   const { data: productsData } = useQuery({
     queryKey: ['products'],
@@ -38,9 +41,20 @@ export function MovementHistoryScreen() {
     isError,
     error,
   } = useQuery({
-    queryKey: ['movements', productId, warehouseId, movementType],
+    queryKey: ['movements', productId, warehouseId, movementType, normalizedSearch],
     queryFn: async () => {
       if (!repositories) return null;
+      if (normalizedSearch.length >= 2) {
+        const searchField = /[0-9-]/.test(normalizedSearch)
+          ? 'internalSkuNormalized'
+          : 'productName';
+        const result = await repositories.movements.search(normalizedSearch, searchField);
+        if (result.status === 'NARROW_SEARCH') {
+          return { items: [], nextCursor: null, narrowSearch: true };
+        }
+        return { ...result.page, narrowSearch: false };
+      }
+
       let q: QueryId = 'Q-022';
       const p = !!productId;
       const w = !!warehouseId;
@@ -58,7 +72,8 @@ export function MovementHistoryScreen() {
       if (w) params.warehouseId = warehouseId;
       if (m) params.movementTypes = [movementType];
 
-      return repositories.movements.list(q, params);
+      const result = await repositories.movements.list(q, params);
+      return { ...result, narrowSearch: false };
     },
     enabled: !!repositories,
   });
@@ -88,7 +103,23 @@ export function MovementHistoryScreen() {
     <div className="flex flex-col h-full">
       <PageHeader title="Movement History" />
       <div className="p-4 md:p-6 lg:p-8 flex-1 flex flex-col gap-6">
-        <div className="flex flex-col md:flex-row gap-4 bg-surface p-4 rounded-panel border border-border shadow-sm">
+        <div className="flex flex-col md:flex-row md:flex-wrap gap-4 bg-surface p-4 rounded-panel border border-border shadow-sm">
+          <div className="flex-1 min-w-[200px]">
+            <label
+              htmlFor="movement-search"
+              className="block text-xs font-medium text-text-muted mb-1"
+            >
+              Search
+            </label>
+            <Input
+              id="movement-search"
+              placeholder="Search product or SKU"
+              value={searchTerm}
+              onChange={(event) => {
+                setSearchTerm(event.target.value);
+              }}
+            />
+          </div>
           <div className="flex-1 min-w-[200px]">
             <label
               htmlFor="filter-product"
@@ -100,6 +131,7 @@ export function MovementHistoryScreen() {
               id="filter-product"
               className="w-full h-10 px-3 rounded-control border border-border bg-surface text-text text-sm focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
               value={productId}
+              disabled={normalizedSearch.length >= 2}
               onChange={(e) => {
                 setProductId(e.target.value);
               }}
@@ -123,6 +155,7 @@ export function MovementHistoryScreen() {
               id="filter-warehouse"
               className="w-full h-10 px-3 rounded-control border border-border bg-surface text-text text-sm focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
               value={warehouseId}
+              disabled={normalizedSearch.length >= 2}
               onChange={(e) => {
                 setWarehouseId(e.target.value);
               }}
@@ -146,6 +179,7 @@ export function MovementHistoryScreen() {
               id="filter-movement-type"
               className="w-full h-10 px-3 rounded-control border border-border bg-surface text-text text-sm focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
               value={movementType}
+              disabled={normalizedSearch.length >= 2}
               onChange={(e) => {
                 setMovementType(e.target.value as MovementType | '');
               }}
@@ -180,7 +214,11 @@ export function MovementHistoryScreen() {
             <div className="flex-1 flex items-center justify-center p-12">
               <EmptyState
                 title="No movements found"
-                description="Adjust your filters to see results."
+                description={
+                  page.narrowSearch
+                    ? 'Narrow the product search to ten or fewer matches.'
+                    : 'Adjust your filters to see results.'
+                }
               />
             </div>
           )}

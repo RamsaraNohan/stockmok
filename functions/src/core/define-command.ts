@@ -6,7 +6,7 @@ import {
   type CommandResult,
   type Role,
 } from '@stockmok/shared';
-import type { Firestore } from 'firebase-admin/firestore';
+import { Timestamp, type Firestore } from 'firebase-admin/firestore';
 import { fail, toCommandResult } from './errors.js';
 import { getDb } from './firestore.js';
 import {
@@ -125,6 +125,21 @@ interface ValidatedEnvelope {
   readonly payload: unknown;
 }
 
+function normalizeCallablePayload(id: ActiveCommandId, payload: unknown): unknown {
+  if (id !== 'C-13' || typeof payload !== 'object' || payload === null) return payload;
+  const candidate = payload as Record<string, unknown>;
+  const effectiveAt = candidate.effectiveAt;
+  if (typeof effectiveAt !== 'object' || effectiveAt === null) return payload;
+  const encoded = effectiveAt as Record<string, unknown>;
+  const seconds = encoded.seconds ?? encoded._seconds;
+  const nanoseconds = encoded.nanoseconds ?? encoded._nanoseconds;
+  if (typeof seconds !== 'number' || typeof nanoseconds !== 'number') return payload;
+  return {
+    ...candidate,
+    effectiveAt: new Timestamp(seconds, nanoseconds),
+  };
+}
+
 function parseEnvelope(idempotent: boolean, data: unknown): ValidatedEnvelope {
   const schema = idempotent
     ? CommandRequestEnvelopeSchema
@@ -159,7 +174,9 @@ export function defineCommand<Id extends ActiveCommandId>(
 
       // 2 · INPUT — the envelope, then the same Zod object the browser form used.
       const envelope = parseEnvelope(idempotent, request.data);
-      const payloadResult = contract.payload.safeParse(envelope.payload);
+      const payloadResult = contract.payload.safeParse(
+        normalizeCallablePayload(definition.id, envelope.payload),
+      );
       if (!payloadResult.success) {
         fail('SCHEMA_INVALID', 'The command payload is invalid.', {
           path: payloadResult.error.issues[0]?.path.join('.') ?? '',

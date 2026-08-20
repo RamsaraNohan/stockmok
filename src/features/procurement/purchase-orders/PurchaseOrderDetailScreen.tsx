@@ -13,7 +13,9 @@ export function PurchaseOrderDetailScreen() {
   const { poId } = useParams<{ handle: string; poId: string }>();
   const repositories = useRepositories();
   const queryClient = useQueryClient();
-  const { activeOrg } = useWorkspace();
+  const { activeOrg, activeRole } = useWorkspace();
+  const canWritePurchaseOrders =
+    activeRole === 'OWNER' || activeRole === 'ADMIN' || activeRole === 'PROCUREMENT_MANAGER';
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
 
@@ -96,7 +98,7 @@ export function PurchaseOrderDetailScreen() {
         title={order.orderNumber || 'Draft PO'}
         actions={
           <div className="flex gap-2">
-            {order.status === 'DRAFT' && (
+            {canWritePurchaseOrders && order.status === 'DRAFT' && (
               <>
                 <Button
                   onClick={() => {
@@ -118,7 +120,7 @@ export function PurchaseOrderDetailScreen() {
                 </Button>
               </>
             )}
-            {order.status === 'ORDERED' && (
+            {canWritePurchaseOrders && order.status === 'ORDERED' && (
               <Button
                 onClick={() => {
                   void handleCancel();

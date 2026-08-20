@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+import type { PoStatus } from '@stockmok/shared';
 
 import { useRepositories } from '@/services/data/useRepositories';
 import { useWorkspace } from '@/services/workspace/useWorkspace';
@@ -6,6 +7,18 @@ import { EmptyState } from '@/ui/primitives/EmptyState';
 import { ErrorState } from '@/ui/primitives/ErrorState';
 import { Skeleton } from '@/ui/primitives/Skeleton';
 import { StatusPill } from '@/ui/primitives/StatusPill';
+
+const ALL_PO_STATUSES: readonly PoStatus[] = [
+  'DRAFT',
+  'ORDERED',
+  'SUBMITTED',
+  'ACCEPTED',
+  'REJECTED',
+  'SHIPPED',
+  'PARTIALLY_RECEIVED',
+  'RECEIVED',
+  'CANCELLED',
+];
 
 export function RecentPurchaseOrdersPanel() {
   const repositories = useRepositories();
@@ -17,7 +30,7 @@ export function RecentPurchaseOrdersPanel() {
     queryKey: ['dashboard', 'recentOrders'],
     queryFn: async () => {
       if (!repositories) throw new Error('No repositories');
-      return repositories.procurement.listOrders([], { limit: 5 });
+      return repositories.procurement.listOrders(ALL_PO_STATUSES, { limit: 5 });
     },
     enabled: !!repositories && !isViewer,
   });

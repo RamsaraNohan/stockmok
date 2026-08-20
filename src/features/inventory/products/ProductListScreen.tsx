@@ -1,21 +1,33 @@
+import type { LifecycleStatus, StockStatus } from '@stockmok/shared';
+import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
+
 import { useRepositories } from '@/services/data/useRepositories';
-import { useQuery } from '@tanstack/react-query';
-import { PageHeader } from '@/ui/shell/PageHeader';
+import { useWorkspace } from '@/services/workspace/useWorkspace';
 import { Button } from '@/ui/primitives/Button';
 import { EmptyState } from '@/ui/primitives/EmptyState';
 import { ErrorState } from '@/ui/primitives/ErrorState';
 import { Skeleton } from '@/ui/primitives/Skeleton';
-import type { LifecycleStatus } from '@stockmok/shared';
+import { PageHeader } from '@/ui/shell/PageHeader';
+
+type ProductSort = 'name' | 'sku' | 'onHand' | 'updated';
 
 export function ProductListScreen() {
   const navigate = useNavigate();
   const { handle } = useParams<{ handle: string }>();
   const repositories = useRepositories();
+  const { activeRole } = useWorkspace();
   const [productStatus, setProductStatus] = useState<LifecycleStatus>('ACTIVE');
   const [categoryId, setCategoryId] = useState<string>('');
   const [warehouseId, setWarehouseId] = useState<string>('');
+  const [stockStatus, setStockStatus] = useState<StockStatus | ''>('');
+  const [sort, setSort] = useState<ProductSort>('name');
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const normalizedSearch = searchTerm.trim();
+  const canWriteInventory =
+    activeRole === 'OWNER' || activeRole === 'ADMIN' || activeRole === 'INVENTORY_MANAGER';
 
   const {
     data: page,
@@ -23,15 +35,30 @@ export function ProductListScreen() {
     isError,
     error,
   } = useQuery({
-    queryKey: ['products', productStatus, categoryId, warehouseId],
+    queryKey: [
+      'products',
+      productStatus,
+      categoryId,
+      warehouseId,
+      stockStatus,
+      sort,
+      normalizedSearch,
+    ],
     queryFn: async () => {
       if (!repositories) return null;
+      if (normalizedSearch) {
+        const searchField = /[0-9-]/.test(normalizedSearch)
+          ? 'internalSkuNormalized'
+          : 'productName';
+        return repositories.inventory.searchProducts(normalizedSearch, searchField, productStatus);
+      }
       type ListReq = Parameters<typeof repositories.inventory.listProducts>[0];
       const req: ListReq = {
         productStatus,
-        sort: 'name',
+        sort,
         ...(categoryId ? { categoryId } : {}),
         ...(warehouseId ? { warehouseId } : {}),
+        ...(stockStatus ? { stockStatus } : {}),
       };
       return repositories.inventory.listProducts(req);
     },
@@ -56,19 +83,40 @@ export function ProductListScreen() {
       <PageHeader
         title="Products"
         actions={
-          <Button
-            onClick={() => {
-              void navigate(`/app/${handle ?? ''}/inventory/products/new`);
-            }}
-            variant="primary"
-          >
-            Create Product
-          </Button>
+          canWriteInventory ? (
+            <Button
+              onClick={() => {
+                void navigate(`/app/${handle ?? ''}/inventory/products/new`);
+              }}
+              variant="primary"
+            >
+              Create Product
+            </Button>
+          ) : undefined
         }
       />
 
       <div className="p-4 md:p-6 lg:p-8 flex-1 flex flex-col gap-6">
-        <div className="flex flex-col md:flex-row gap-4 bg-surface p-4 rounded-panel border border-border shadow-sm">
+        <div className="grid gap-4 bg-surface p-4 rounded-panel border border-border shadow-sm md:grid-cols-2 xl:grid-cols-6">
+          <div className="md:col-span-2 xl:col-span-2">
+            <label
+              className="block text-xs font-medium text-text-muted mb-1"
+              htmlFor="product-search"
+            >
+              Search products
+            </label>
+            <input
+              id="product-search"
+              className="w-full h-10 px-3 rounded-control border border-border bg-surface text-text text-sm focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
+              placeholder="Search products by name or SKU"
+              type="search"
+              value={searchTerm}
+              onChange={(event) => {
+                setSearchTerm(event.target.value);
+              }}
+            />
+          </div>
+
           <div className="flex-1 min-w-[200px]">
             <label
               className="block text-xs font-medium text-text-muted mb-1"
@@ -80,6 +128,7 @@ export function ProductListScreen() {
               id="filter-category"
               className="w-full h-10 px-3 rounded-control border border-border bg-surface text-text text-sm focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
               value={categoryId}
+              disabled={Boolean(normalizedSearch)}
               onChange={(e) => {
                 setCategoryId(e.target.value);
               }}
@@ -104,6 +153,7 @@ export function ProductListScreen() {
               id="filter-warehouse"
               className="w-full h-10 px-3 rounded-control border border-border bg-surface text-text text-sm focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
               value={warehouseId}
+              disabled={Boolean(normalizedSearch)}
               onChange={(e) => {
                 setWarehouseId(e.target.value);
               }}
@@ -120,20 +170,66 @@ export function ProductListScreen() {
           <div className="flex-1 min-w-[200px]">
             <label
               className="block text-xs font-medium text-text-muted mb-1"
-              htmlFor="filter-status"
+              htmlFor="filter-archived"
             >
-              Status
+              Archived
             </label>
             <select
-              id="filter-status"
+              id="filter-archived"
               className="w-full h-10 px-3 rounded-control border border-border bg-surface text-text text-sm focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
               value={productStatus}
               onChange={(e) => {
                 setProductStatus(e.target.value as LifecycleStatus);
               }}
             >
-              <option value="ACTIVE">Active Only</option>
-              <option value="ARCHIVED">Archived Only</option>
+              <option value="ACTIVE">Excluded</option>
+              <option value="ARCHIVED">Only</option>
+            </select>
+          </div>
+
+          <div className="flex-1 min-w-[200px]">
+            <label
+              className="block text-xs font-medium text-text-muted mb-1"
+              htmlFor="filter-stock-status"
+            >
+              Status
+            </label>
+            <select
+              id="filter-stock-status"
+              className="w-full h-10 px-3 rounded-control border border-border bg-surface text-text text-sm focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
+              value={stockStatus}
+              disabled={Boolean(normalizedSearch)}
+              onChange={(event) => {
+                setStockStatus(event.target.value as StockStatus | '');
+              }}
+            >
+              <option value="">All</option>
+              <option value="IN_STOCK">In stock</option>
+              <option value="LOW_STOCK">Low stock</option>
+              <option value="OUT_OF_STOCK">Out of stock</option>
+            </select>
+          </div>
+
+          <div className="flex-1 min-w-[200px]">
+            <label
+              className="block text-xs font-medium text-text-muted mb-1"
+              htmlFor="sort-products"
+            >
+              Sort
+            </label>
+            <select
+              id="sort-products"
+              className="w-full h-10 px-3 rounded-control border border-border bg-surface text-text text-sm focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
+              value={normalizedSearch ? 'name' : sort}
+              disabled={Boolean(normalizedSearch)}
+              onChange={(event) => {
+                setSort(event.target.value as ProductSort);
+              }}
+            >
+              <option value="name">Product name</option>
+              <option value="sku">SKU</option>
+              <option value="onHand">On hand</option>
+              <option value="updated">Recently updated</option>
             </select>
           </div>
         </div>

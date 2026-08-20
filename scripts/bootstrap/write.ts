@@ -18,7 +18,12 @@ export async function upsertAuthUser(
 ): Promise<void> {
   try {
     await auth.getUser(user.uid);
-    await auth.updateUser(user.uid, { ...user, emailVerified: true, disabled: false });
+    await auth.updateUser(user.uid, {
+      ...user,
+      password: 'password123',
+      emailVerified: true,
+      disabled: false,
+    });
   } catch (error) {
     if (
       typeof error !== 'object' ||
@@ -28,6 +33,11 @@ export async function upsertAuthUser(
     ) {
       throw error;
     }
-    await auth.createUser({ ...user, emailVerified: true, disabled: false });
+    await auth.createUser({
+      ...user,
+      password: 'password123',
+      emailVerified: true,
+      disabled: false,
+    });
   }
 }
