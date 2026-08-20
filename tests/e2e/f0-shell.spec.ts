@@ -1,4 +1,6 @@
-import { expect, test } from '@playwright/test';
+import { expect } from '@playwright/test';
+
+import { test } from './a10/test';
 
 test('renders the emulator-marked F1 landing shell without browser errors', async ({ page }) => {
   const browserErrors: string[] = [];

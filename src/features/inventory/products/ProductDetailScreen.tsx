@@ -120,11 +120,7 @@ export function ProductDetailScreen() {
 
   const canWriteInventory =
     activeRole === 'OWNER' || activeRole === 'ADMIN' || activeRole === 'INVENTORY_MANAGER';
-  const canWriteTransfer =
-    activeRole === 'OWNER' ||
-    activeRole === 'ADMIN' ||
-    activeRole === 'INVENTORY_MANAGER' ||
-    activeRole === 'STOREKEEPER';
+  const canWriteTransfer = canWriteInventory;
 
   const handleToggleStatus = async () => {
     if (!product || !activeOrg?.organizationId || !productId) return;
@@ -167,8 +163,8 @@ export function ProductDetailScreen() {
   const tabs = [
     { id: 'overview', label: 'Overview' },
     { id: 'stock', label: 'Stock by store room' },
-    { id: 'movements', label: 'Movement history' },
-    { id: 'purchaseOrders', label: 'Purchase orders' },
+    ...(canViewMovements ? ([{ id: 'movements', label: 'Movement history' }] as const) : []),
+    ...(canViewPO ? ([{ id: 'purchaseOrders', label: 'Purchase orders' }] as const) : []),
   ] as const;
 
   const categoryName =
@@ -183,6 +179,7 @@ export function ProductDetailScreen() {
       warehouseName: w.name,
       onHandMilli: bal ? bal.onHandMilli : 0,
       unit: bal ? bal.unit : product.baseUnit,
+      hasBalance: Boolean(bal),
     };
   });
 
@@ -311,7 +308,7 @@ export function ProductDetailScreen() {
                           </td>
                           <td className="py-3 px-4 text-right">
                             <div className="flex justify-end gap-2">
-                              {canWriteInventory && (
+                              {canWriteInventory && !row.hasBalance && (
                                 <Button
                                   onClick={() => {
                                     setOpeningBalanceDialogState({
@@ -326,7 +323,7 @@ export function ProductDetailScreen() {
                                   Opening Balance
                                 </Button>
                               )}
-                              {canWriteInventory && (
+                              {canWriteInventory && row.hasBalance && (
                                 <Button
                                   onClick={() => {
                                     setAdjustmentDialogState({

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useRepositories } from '@/services/data/useRepositories';
+import { useWorkspace } from '@/services/workspace/useWorkspace';
 import { useQuery } from '@tanstack/react-query';
 import { PageHeader } from '@/ui/shell/PageHeader';
 import { Button } from '@/ui/primitives/Button';
@@ -13,6 +14,9 @@ import type { PoStatus, PurchaseOrder } from '@stockmok/shared';
 export function PurchaseOrderListScreen() {
   const navigate = useNavigate();
   const repositories = useRepositories();
+  const { activeRole } = useWorkspace();
+  const canWritePurchaseOrders =
+    activeRole === 'OWNER' || activeRole === 'ADMIN' || activeRole === 'PROCUREMENT_MANAGER';
   const [status, setStatus] = useState<PoStatus>('DRAFT');
   const [supplierKind, setSupplierKind] = useState<'ALL' | 'PRIVATE' | 'CONNECTED'>('ALL');
   const [searchMode, setSearchMode] = useState<'NUMBER' | 'SUPPLIER'>('NUMBER');
@@ -54,14 +58,16 @@ export function PurchaseOrderListScreen() {
       <PageHeader
         title="Purchase Orders"
         actions={
-          <Button
-            onClick={() => {
-              void navigate('new');
-            }}
-            variant="primary"
-          >
-            Create Order
-          </Button>
+          canWritePurchaseOrders ? (
+            <Button
+              onClick={() => {
+                void navigate('new');
+              }}
+              variant="primary"
+            >
+              Create Order
+            </Button>
+          ) : undefined
         }
       />
       <div className="p-4 md:p-8">
@@ -130,7 +136,7 @@ export function PurchaseOrderListScreen() {
                 : 'Get started by creating your first purchase order.'
             }
             action={
-              !searchQuery.trim().length ? (
+              canWritePurchaseOrders && !searchQuery.trim().length ? (
                 <Button
                   onClick={() => {
                     void navigate('new');

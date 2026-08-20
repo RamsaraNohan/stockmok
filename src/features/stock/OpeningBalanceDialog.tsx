@@ -9,7 +9,7 @@ import { Input } from '@/ui/primitives/Input';
 import { Modal } from '@/ui/primitives/Modal';
 
 const schema = z.object({
-  quantity: z.number().positive('Quantity must be greater than 0'),
+  quantity: z.number().nonnegative('Quantity cannot be negative'),
 });
 
 type FormData = z.infer<typeof schema>;

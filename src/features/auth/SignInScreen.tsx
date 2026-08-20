@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router-dom';
 import { z } from 'zod';
 
-import { loginWithEmail } from '@/services/auth/authService';
+import { fetchMembershipsForUser, loginWithEmail } from '@/services/auth/authService';
 import { useWorkspace } from '@/services/workspace/useWorkspace';
 import { Button } from '@/ui/primitives/Button';
 import { Input } from '@/ui/primitives/Input';
@@ -35,8 +35,9 @@ export function SignInScreen() {
   const onSubmit = async (data: SignInFormData) => {
     setAuthError(null);
     try {
-      await loginWithEmail(data.email, data.password);
-      const list = await refreshMemberships();
+      const user = await loginWithEmail(data.email, data.password);
+      const list = await fetchMembershipsForUser(user.uid);
+      void refreshMemberships();
       const first = list[0];
       if (list.length === 0 || !first) {
         void navigate('/onboarding');

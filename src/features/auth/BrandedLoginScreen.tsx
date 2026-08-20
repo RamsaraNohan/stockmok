@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { z } from 'zod';
 
-import { loginWithEmail } from '@/services/auth/authService';
+import { fetchMembershipsForUser, loginWithEmail } from '@/services/auth/authService';
 import { fetchDirectoryByHandle } from '@/services/workspace/workspaceService';
 import { useWorkspace } from '@/services/workspace/useWorkspace';
 import { Button } from '@/ui/primitives/Button';
@@ -78,8 +78,9 @@ export function BrandedLoginScreen() {
   const onSubmit = async (data: BrandedLoginFormData) => {
     setAuthError(null);
     try {
-      await loginWithEmail(data.email, data.password);
-      const list = await refreshMemberships();
+      const user = await loginWithEmail(data.email, data.password);
+      const list = await fetchMembershipsForUser(user.uid);
+      void refreshMemberships();
       const match = list.find((m) => m.handle.toLowerCase() === handle.toLowerCase());
       if (match) {
         void navigate(`/app/${match.handle}/dashboard`);

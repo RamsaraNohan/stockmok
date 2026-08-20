@@ -31,7 +31,7 @@ export function WorkspaceDropdown() {
             text={activeMembership.monogram}
           />
           <span className="max-w-[140px] truncate">{activeMembership.organizationName}</span>
-          <ChevronDown className="text-text-muted size-4" />
+          <ChevronDown className="text-text-muted size-4 max-md:hidden" />
         </button>
       </DropdownMenu.Trigger>
 

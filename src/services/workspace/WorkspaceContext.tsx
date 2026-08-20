@@ -7,7 +7,7 @@ import type {
 } from '@stockmok/shared';
 import { useQueryClient } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 
 import { fetchUserMemberships } from '@/data/adapters/authAdapter';
 import {
@@ -42,7 +42,7 @@ export function WorkspaceProvider({ children }: { readonly children: ReactNode }
   const [activeMemberDoc, setActiveMemberDoc] = useState<Member | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  const loadMemberships = async (uid: string) => {
+  const loadMemberships = useCallback(async (uid: string) => {
     try {
       const list = await fetchUserMemberships(uid);
       setMemberships(list);
@@ -51,7 +51,7 @@ export function WorkspaceProvider({ children }: { readonly children: ReactNode }
       setMemberships([]);
       return [];
     }
-  };
+  }, []);
 
   useEffect(() => {
     let isMounted = true;
@@ -84,7 +84,7 @@ export function WorkspaceProvider({ children }: { readonly children: ReactNode }
     return () => {
       isMounted = false;
     };
-  }, [user]);
+  }, [loadMemberships, user]);
 
   useEffect(() => {
     let isMounted = true;
@@ -138,30 +138,35 @@ export function WorkspaceProvider({ children }: { readonly children: ReactNode }
     };
   }, [activeMembership, user]);
 
-  const setActiveHandle = async (targetHandle: string): Promise<boolean> => {
-    if (!user) return false;
+  const setActiveHandle = useCallback(
+    async (targetHandle: string): Promise<boolean> => {
+      if (!user) return false;
 
-    // Purge private cached queries before exposing new organization surface
-    queryClient.clear();
+      // Purge private cached queries before exposing new organization surface.
+      queryClient.clear();
 
-    const freshMemberships = await loadMemberships(user.uid);
-    const target = freshMemberships.find(
-      (m) => m.handle.toLowerCase() === targetHandle.toLowerCase() && m.status === 'ACTIVE',
-    );
+      const freshMemberships = await loadMemberships(user.uid);
+      const target = freshMemberships.find(
+        (membership) =>
+          membership.handle.toLowerCase() === targetHandle.toLowerCase() &&
+          membership.status === 'ACTIVE',
+      );
 
-    if (target) {
-      setActiveMembership(target);
-      return true;
-    } else {
+      if (target) {
+        setActiveMembership(target);
+        return true;
+      }
+
       setActiveMembership(null);
       return false;
-    }
-  };
+    },
+    [loadMemberships, queryClient, user],
+  );
 
-  const refreshMemberships = async (): Promise<readonly UserMembership[]> => {
+  const refreshMemberships = useCallback(async (): Promise<readonly UserMembership[]> => {
     if (!user) return [];
     return loadMemberships(user.uid);
-  };
+  }, [loadMemberships, user]);
 
   const activeRole = activeMemberDoc?.role ?? activeMembership?.role ?? null;
 

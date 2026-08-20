@@ -54,6 +54,7 @@ vi.mock('@/services/auth/useAuth', () => ({
 vi.mock('@/services/workspace/useWorkspace', () => ({
   useWorkspace: () => ({
     activeOrg: mockOrg,
+    activeRole: 'OWNER',
     activeSettings: mockSettings,
     user: mockUser,
     activeMembership: { organizationId: 'org-123' },

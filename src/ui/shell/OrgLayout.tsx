@@ -26,7 +26,7 @@ export function OrgLayout() {
       <div className="mx-auto flex w-full flex-1 max-w-[90rem]">
         <DesktopSidebar />
 
-        <main id="main-content" className="flex-1 p-8 max-md:p-4" tabIndex={-1}>
+        <main id="main-content" className="min-w-0 flex-1 p-8 max-md:p-4" tabIndex={-1}>
           <Outlet />
         </main>
       </div>
