@@ -311,7 +311,7 @@ export function ProductDetailScreen() {
                           </td>
                           <td className="py-3 px-4 text-right">
                             <div className="flex justify-end gap-2">
-                              {canWriteInventory && row.onHandMilli === 0 && (
+                              {canWriteInventory && (
                                 <Button
                                   onClick={() => {
                                     setOpeningBalanceDialogState({

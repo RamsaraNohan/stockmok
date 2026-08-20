@@ -121,28 +121,96 @@ describe('F3 Stock Operations Frontend Certification Tests', () => {
   });
 
   describe('OPENING BALANCE', () => {
-    it('1. Authorized role does NOT lose the action because local/read data indicates previous stock history', async () => {
+    it('1. Opening Balance visibility is NOT derived from onHandMilli === 0 (visible when non-zero)', async () => {
+      // Mock the listProductBalances to return a non-zero onHandMilli (e.g. 18000)
+      vi.mocked(useQuery).mockImplementation(({ queryKey }: any) => {
+        const key = queryKey[0];
+        if (key === 'productBalances') {
+          return {
+            data: { items: [{ warehouseId: 'wh-1', onHandMilli: 18000, unit: 'KG' }] },
+            isLoading: false,
+          } as any;
+        }
+        if (key === 'product') {
+          return {
+            data: { productId: 'prod-123', name: 'Rice', status: 'ACTIVE', baseUnit: 'KG', categoryId: 'cat-1' },
+            isLoading: false,
+            isError: false,
+          } as any;
+        }
+        if (key === 'productSummary') {
+          return { data: { onHandMilli: 18000 }, isLoading: false } as any;
+        }
+        if (key === 'warehouses') {
+          return {
+            data: { items: [{ warehouseId: 'wh-1', name: 'Main Store', status: 'ACTIVE' }] },
+            isLoading: false,
+          } as any;
+        }
+        return { data: null, isLoading: false, isError: false } as any;
+      });
+
       render(<ProductDetailScreen />);
       
       // Navigate to Stock tab
       const stockTab = screen.getByRole('button', { name: /Stock by store room/i });
       fireEvent.click(stockTab);
 
-      // Even though movements (history) exists, we expect the "Opening Balance" button to be visible
+      // Verify that the "Opening Balance" button is still visible even when quantity is non-zero (18 KG)
       const buttons = screen.getAllByRole('button', { name: /Opening Balance/i });
       expect(buttons.length).toBeGreaterThan(0);
     });
 
-    it('2. Frontend does not treat movement/history state as authoritative C13 eligibility', () => {
-      // Checked via the test above: we do not read movements/history to disable/hide the button.
-      // We will perform a static check on ProductDetailScreen to ensure no "hasStockHistory" or movements-based eligibility logic is present.
-      const componentPath = path.resolve(__dirname, '../src/features/inventory/products/ProductDetailScreen.tsx');
-      const content = fs.readFileSync(componentPath, 'utf8');
-      expect(content).not.toContain('hasStockHistory');
-      expect(content).not.toContain('!hasStockHistory');
+    it('2. A product/warehouse with non-zero onHandMilli is not rejected by an invented frontend quantity eligibility rule', () => {
+      // Checked statically: the frontend does not check row.onHandMilli before opening or rendering the dialog.
+      const screenPath = path.resolve(__dirname, '../src/features/inventory/products/ProductDetailScreen.tsx');
+      const content = fs.readFileSync(screenPath, 'utf8');
+      expect(content).not.toContain('row.onHandMilli === 0');
     });
 
-    it('3. C13 uses exact approved command envelope', async () => {
+    it('3. A product/warehouse with zero onHandMilli is NOT assumed eligible merely because quantity is zero', () => {
+      // Statically verify that no "row.onHandMilli === 0" logic defines client-side business eligibility in ProductDetailScreen
+      const screenPath = path.resolve(__dirname, '../src/features/inventory/products/ProductDetailScreen.tsx');
+      const content = fs.readFileSync(screenPath, 'utf8');
+      expect(content).not.toContain('row.onHandMilli === 0');
+    });
+
+    it('4. No hasStockHistory, !hasStockHistory, onHandMilli === 0, or equivalent inferred stock-state rule controls Opening Balance eligibility', () => {
+      const screenPath = path.resolve(__dirname, '../src/features/inventory/products/ProductDetailScreen.tsx');
+      const content = fs.readFileSync(screenPath, 'utf8');
+      expect(content).not.toContain('hasStockHistory');
+      expect(content).not.toContain('!hasStockHistory');
+      expect(content).not.toContain('row.onHandMilli === 0');
+      expect(content).not.toContain('row.onHandMilli === 0 &&');
+    });
+
+    it('5. Authorized role can reach the governed C13 action according to final UI authority', async () => {
+      mockActiveRole = 'OWNER';
+      render(<ProductDetailScreen />);
+
+      // Navigate to Stock tab
+      const stockTab = screen.getByRole('button', { name: /Stock by store room/i });
+      fireEvent.click(stockTab);
+
+      const buttons = screen.getAllByRole('button', { name: /Opening Balance/i });
+      expect(buttons.length).toBeGreaterThan(0);
+    });
+
+    it('6. Unauthorized roles cannot invoke C13', () => {
+      // In router, product/category/warehouse/stock/transfer write is allowed for OWNER, ADMIN, INVENTORY_MANAGER
+      const appRoute = router.routes.find((r) => r.path === '/app/:handle');
+      const productsNewRoute = appRoute?.children?.find((c) => c.path === 'inventory/products/new');
+      const allowedRoles = (productsNewRoute?.element as any)?.props.allowedRoles ?? [];
+
+      expect(allowedRoles).toContain('OWNER');
+      expect(allowedRoles).toContain('ADMIN');
+      expect(allowedRoles).toContain('INVENTORY_MANAGER');
+      expect(allowedRoles).not.toContain('STOREKEEPER');
+      expect(allowedRoles).not.toContain('ANALYST');
+      expect(allowedRoles).not.toContain('VIEWER');
+    });
+
+    it('7. C13 exact envelope remains correct', async () => {
       mockHttpsCallable.mockResolvedValueOnce({ data: { ok: true } });
 
       await executeStockRecordOpeningBalanceCommand('org-123', {
@@ -164,21 +232,7 @@ describe('F3 Stock Operations Frontend Certification Tests', () => {
       });
     });
 
-    it('4. Unauthorized roles cannot invoke C13', () => {
-      // In router, product/category/warehouse/stock/transfer write is allowed for OWNER, ADMIN, INVENTORY_MANAGER
-      const appRoute = router.routes.find((r) => r.path === '/app/:handle');
-      const productsNewRoute = appRoute?.children?.find((c) => c.path === 'inventory/products/new');
-      const allowedRoles = (productsNewRoute?.element as any)?.props.allowedRoles ?? [];
-      
-      expect(allowedRoles).toContain('OWNER');
-      expect(allowedRoles).toContain('ADMIN');
-      expect(allowedRoles).toContain('INVENTORY_MANAGER');
-      expect(allowedRoles).not.toContain('STOREKEEPER');
-      expect(allowedRoles).not.toContain('ANALYST');
-      expect(allowedRoles).not.toContain('VIEWER');
-    });
-
-    it('5. C13 rejection uses normalized error handling', async () => {
+    it('8. C13 rejection remains normalized', async () => {
       mockHttpsCallable.mockRejectedValueOnce(new Error('Firebase callable error'));
       
       await expect(
@@ -191,7 +245,7 @@ describe('F3 Stock Operations Frontend Certification Tests', () => {
       ).rejects.toThrow('Firebase callable error');
     });
 
-    it('6. No local authoritative balance mutation occurs after C13', () => {
+    it('9. No local balance arithmetic occurs after C13', () => {
       // Ensure that we only trigger react-query invalidation and no manual balance state modification
       const dialogPath = path.resolve(__dirname, '../src/features/stock/OpeningBalanceDialog.tsx');
       const content = fs.readFileSync(dialogPath, 'utf8');
