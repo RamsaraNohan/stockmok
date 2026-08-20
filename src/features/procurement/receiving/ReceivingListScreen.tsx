@@ -35,7 +35,9 @@ export function ReceivingListScreen() {
           <select
             className="h-10 px-3 rounded-control border border-border bg-surface text-text text-sm focus:ring-2 focus:ring-primary outline-none"
             value={status}
-            onChange={(e) => { setStatus(e.target.value as PoStatus); }}
+            onChange={(e) => {
+              setStatus(e.target.value as PoStatus);
+            }}
           >
             <option value="ORDERED">Ordered</option>
             <option value="PARTIALLY_RECEIVED">Partially Received</option>
@@ -70,13 +72,16 @@ export function ReceivingListScreen() {
                   <tr
                     key={order.purchaseOrderId}
                     className="hover:bg-background cursor-pointer transition-colors"
-                    onClick={() => { void navigate(order.purchaseOrderId); }}
+                    onClick={() => {
+                      void navigate(order.purchaseOrderId);
+                    }}
                   >
                     <td className="p-4 text-sm font-medium">{order.orderNumber || '-'}</td>
                     <td className="p-4 text-sm text-text-muted">{order.counterpartyName}</td>
                     <td className="p-4 text-sm text-text-muted">{order.status}</td>
-                    {/* eslint-disable-next-line @typescript-eslint/no-base-to-string */}
-                    <td className="p-4 text-sm text-text-muted">{order.expectedDate ? String(order.expectedDate) : '-'}</td>
+                    <td className="p-4 text-sm text-text-muted">
+                      {order.expectedDate ? (order.expectedDate as unknown as string) : '-'}
+                    </td>
                   </tr>
                 ))}
               </tbody>

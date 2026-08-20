@@ -19,14 +19,32 @@ export function PurchaseOrderDetailScreen() {
 
   const {
     data: order,
-    isLoading,
-    isError,
+    isLoading: orderLoading,
+    isError: isOrderError,
     error: loadError,
   } = useQuery({
     queryKey: ['order', poId],
     queryFn: async () => {
       if (!repositories || !poId) return null;
       return repositories.procurement.getOrder(poId);
+    },
+    enabled: !!repositories && !!poId,
+  });
+
+  const { data: items, isLoading: itemsLoading } = useQuery({
+    queryKey: ['order-items', poId],
+    queryFn: async () => {
+      if (!repositories || !poId) return null;
+      return repositories.procurement.listOrderItems(poId);
+    },
+    enabled: !!repositories && !!poId,
+  });
+
+  const { data: history, isLoading: historyLoading } = useQuery({
+    queryKey: ['order-history', poId],
+    queryFn: async () => {
+      if (!repositories || !poId) return null;
+      return repositories.procurement.listOrderHistory(poId);
     },
     enabled: !!repositories && !!poId,
   });
@@ -38,6 +56,7 @@ export function PurchaseOrderDetailScreen() {
       await executePoOrderCommand(activeOrg.organizationId, poId);
       await queryClient.invalidateQueries({ queryKey: ['order', poId] });
       await queryClient.invalidateQueries({ queryKey: ['purchaseOrders'] });
+      await queryClient.invalidateQueries({ queryKey: ['order-history', poId] });
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to order PO');
     } finally {
@@ -52,6 +71,7 @@ export function PurchaseOrderDetailScreen() {
       await executePoCancelCommand(activeOrg.organizationId, poId);
       await queryClient.invalidateQueries({ queryKey: ['order', poId] });
       await queryClient.invalidateQueries({ queryKey: ['purchaseOrders'] });
+      await queryClient.invalidateQueries({ queryKey: ['order-history', poId] });
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to cancel PO');
     } finally {
@@ -59,8 +79,16 @@ export function PurchaseOrderDetailScreen() {
     }
   };
 
-  if (isLoading) return <div className="p-8"><Skeleton className="h-64 w-full" /></div>;
-  if (isError || !order) return <ErrorState title="Failed to load order" message={String(loadError)} />;
+  const isLoading = orderLoading || itemsLoading || historyLoading;
+
+  if (isLoading)
+    return (
+      <div className="p-8">
+        <Skeleton className="h-64 w-full" />
+      </div>
+    );
+  if (isOrderError || !order)
+    return <ErrorState title="Failed to load order" message={String(loadError)} />;
 
   return (
     <div className="flex flex-col h-full max-w-5xl mx-auto w-full">
@@ -70,16 +98,34 @@ export function PurchaseOrderDetailScreen() {
           <div className="flex gap-2">
             {order.status === 'DRAFT' && (
               <>
-                <Button onClick={() => { void handleCancel(); }} variant="secondary" disabled={isSubmitting}>
+                <Button
+                  onClick={() => {
+                    void handleCancel();
+                  }}
+                  variant="secondary"
+                  disabled={isSubmitting}
+                >
                   Cancel
                 </Button>
-                <Button onClick={() => { void handleOrder(); }} variant="primary" disabled={isSubmitting}>
+                <Button
+                  onClick={() => {
+                    void handleOrder();
+                  }}
+                  variant="primary"
+                  disabled={isSubmitting}
+                >
                   Order
                 </Button>
               </>
             )}
             {order.status === 'ORDERED' && (
-              <Button onClick={() => { void handleCancel(); }} variant="secondary" disabled={isSubmitting}>
+              <Button
+                onClick={() => {
+                  void handleCancel();
+                }}
+                variant="secondary"
+                disabled={isSubmitting}
+              >
                 Cancel
               </Button>
             )}
@@ -103,14 +149,83 @@ export function PurchaseOrderDetailScreen() {
             </div>
             <div>
               <span className="text-text-muted">Total:</span>
-              <div className="font-medium">{order.totalMinor / 100} {order.currency}</div>
+              <div className="font-medium">
+                {order.totalMinor / 100} {order.currency}
+              </div>
             </div>
             <div>
               <span className="text-text-muted">Expected:</span>
-              {/* eslint-disable-next-line @typescript-eslint/no-base-to-string */}
-              <div className="font-medium">{order.expectedDate ? String(order.expectedDate) : '-'}</div>
+              {}
+              <div className="font-medium">
+                {/* eslint-disable-next-line @typescript-eslint/no-base-to-string */}
+                {order.expectedDate ? String(order.expectedDate) : '-'}
+              </div>
             </div>
           </div>
+        </div>
+
+        <div className="bg-surface p-6 rounded-panel border border-border shadow-sm space-y-4">
+          <h2 className="text-lg font-medium">Line Items</h2>
+          {items && items.items.length > 0 ? (
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="border-b border-border bg-background">
+                  <th className="p-4 font-medium text-text-muted text-sm">Product Name</th>
+                  <th className="p-4 font-medium text-text-muted text-sm">Ordered</th>
+                  <th className="p-4 font-medium text-text-muted text-sm">Received</th>
+                  <th className="p-4 font-medium text-text-muted text-sm">Total Price</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border">
+                {items.items.map((item) => (
+                  <tr key={item.itemId} className="hover:bg-background transition-colors">
+                    <td className="p-4 text-sm font-medium">
+                      {item.buyerProductNameSnapshot || item.itemId}
+                    </td>
+                    <td className="p-4 text-sm text-text-muted">
+                      {item.orderedBuyerBaseMilli / 1000}
+                    </td>
+                    <td className="p-4 text-sm text-text-muted">
+                      {item.receivedBuyerBaseMilli / 1000}
+                    </td>
+                    <td className="p-4 text-sm text-text-muted">
+                      {item.lineTotalMinor / 100} {order.currency}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          ) : (
+            <div className="text-sm text-text-muted">No items found.</div>
+          )}
+        </div>
+
+        <div className="bg-surface p-6 rounded-panel border border-border shadow-sm space-y-4">
+          <h2 className="text-lg font-medium">History</h2>
+          {history && history.items.length > 0 ? (
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="border-b border-border bg-background">
+                  <th className="p-4 font-medium text-text-muted text-sm">Date</th>
+                  <th className="p-4 font-medium text-text-muted text-sm">Status</th>
+                  <th className="p-4 font-medium text-text-muted text-sm">Previous Status</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border">
+                {history.items.map((event) => (
+                  <tr key={event.historyId} className="hover:bg-background transition-colors">
+                    <td className="p-4 text-sm font-medium">
+                      {new Date(event.createdAt.toMillis()).toLocaleString()}
+                    </td>
+                    <td className="p-4 text-sm text-text-muted">{event.toStatus}</td>
+                    <td className="p-4 text-sm text-text-muted">{event.fromStatus}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          ) : (
+            <div className="text-sm text-text-muted">No history found.</div>
+          )}
         </div>
       </div>
     </div>

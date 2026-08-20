@@ -44,7 +44,9 @@ export function PartnerCreateScreen() {
       };
       const newPartnerId = crypto.randomUUID();
       await executePartnerCreate(activeOrg.organizationId, newPartnerId, payload, user.uid);
-      void navigate(`/app/${handle ?? ''}/procurement/${partnerType === 'SUPPLIER' ? 'suppliers' : 'buyers'}/${newPartnerId}`);
+      void navigate(
+        `/app/${handle ?? ''}/procurement/${partnerType === 'SUPPLIER' ? 'suppliers' : 'buyers'}/${newPartnerId}`,
+      );
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to create partner');
     } finally {
@@ -72,10 +74,12 @@ export function PartnerCreateScreen() {
                 id="name"
                 required
                 value={formData.name}
-                onChange={(e) => { setFormData({ ...formData, name: e.target.value }); }}
+                onChange={(e) => {
+                  setFormData({ ...formData, name: e.target.value });
+                }}
               />
             </div>
-            
+
             <div>
               <label className="block text-sm font-medium text-text mb-1" htmlFor="contact">
                 Contact Person
@@ -83,7 +87,9 @@ export function PartnerCreateScreen() {
               <Input
                 id="contact"
                 value={formData.contactPerson}
-                onChange={(e) => { setFormData({ ...formData, contactPerson: e.target.value }); }}
+                onChange={(e) => {
+                  setFormData({ ...formData, contactPerson: e.target.value });
+                }}
               />
             </div>
 
@@ -95,7 +101,9 @@ export function PartnerCreateScreen() {
                 id="email"
                 type="email"
                 value={formData.email}
-                onChange={(e) => { setFormData({ ...formData, email: e.target.value }); }}
+                onChange={(e) => {
+                  setFormData({ ...formData, email: e.target.value });
+                }}
               />
             </div>
 
@@ -106,7 +114,9 @@ export function PartnerCreateScreen() {
               <Input
                 id="phone"
                 value={formData.phone}
-                onChange={(e) => { setFormData({ ...formData, phone: e.target.value }); }}
+                onChange={(e) => {
+                  setFormData({ ...formData, phone: e.target.value });
+                }}
               />
             </div>
 
@@ -117,7 +127,9 @@ export function PartnerCreateScreen() {
               <Input
                 id="address"
                 value={formData.address}
-                onChange={(e) => { setFormData({ ...formData, address: e.target.value }); }}
+                onChange={(e) => {
+                  setFormData({ ...formData, address: e.target.value });
+                }}
               />
             </div>
 
@@ -128,13 +140,22 @@ export function PartnerCreateScreen() {
               <Input
                 id="notes"
                 value={formData.notes}
-                onChange={(e) => { setFormData({ ...formData, notes: e.target.value }); }}
+                onChange={(e) => {
+                  setFormData({ ...formData, notes: e.target.value });
+                }}
               />
             </div>
           </div>
 
           <div className="flex justify-end gap-3 pt-6 border-t border-border">
-            <Button type="button" variant="secondary" onClick={() => { void navigate(-1); }} disabled={isSubmitting}>
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={() => {
+                void navigate(-1);
+              }}
+              disabled={isSubmitting}
+            >
               Cancel
             </Button>
             <Button type="submit" variant="primary" disabled={isSubmitting}>

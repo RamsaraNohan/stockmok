@@ -1,20 +1,30 @@
-// @vitest-environment jsdom
-/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-non-null-assertion */
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+/* eslint-disable */
+/**
+ * @vitest-environment jsdom
+ */
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { PartnerCreateScreen } from '@/features/procurement/partners/PartnerCreateScreen';
-import { PartnerDetailScreen } from '@/features/procurement/partners/PartnerDetailScreen';
+
 import { SupplierListScreen } from '@/features/procurement/partners/SupplierListScreen';
 import { BuyerListScreen } from '@/features/procurement/partners/BuyerListScreen';
+import { PartnerCreateScreen } from '@/features/procurement/partners/PartnerCreateScreen';
+import { PartnerDetailScreen } from '@/features/procurement/partners/PartnerDetailScreen';
+import { PurchaseOrderListScreen } from '@/features/procurement/purchase-orders/PurchaseOrderListScreen';
 import { PurchaseOrderCreateScreen } from '@/features/procurement/purchase-orders/PurchaseOrderCreateScreen';
 import { PurchaseOrderDetailScreen } from '@/features/procurement/purchase-orders/PurchaseOrderDetailScreen';
 import { ReceiveOrderScreen } from '@/features/procurement/receiving/ReceiveOrderScreen';
 
 import * as partnerAdapter from '@/data/adapters/partnerAdapter';
 import * as poAdapter from '@/data/adapters/poAdapter';
+import { httpsCallable } from 'firebase/functions';
+
+vi.mock('firebase/functions', () => ({
+  httpsCallable: vi.fn(() => vi.fn()),
+  getFunctions: vi.fn(),
+}));
 
 vi.mock('@/data/adapters/partnerAdapter', () => ({
   executePartnerCreate: vi.fn(),
@@ -42,16 +52,36 @@ vi.mock('@/services/auth/useAuth', () => ({
 }));
 
 vi.mock('@/services/workspace/useWorkspace', () => ({
-  useWorkspace: () => ({ activeOrg: mockOrg, activeSettings: mockSettings, user: mockUser }),
+  useWorkspace: () => ({
+    activeOrg: mockOrg,
+    activeSettings: mockSettings,
+    user: mockUser,
+    activeMembership: { organizationId: 'org-123' },
+  }),
 }));
 
 const mockRepositories = {
+  inventory: {
+    listWarehouses: vi.fn().mockResolvedValue({
+      items: [{ warehouseId: 'wh-1', name: 'Main Store' }],
+      nextCursor: null,
+    }),
+    listProductBalances: vi.fn().mockResolvedValue({
+      items: [{ warehouseId: 'wh-1', onHandMilli: 20000 }],
+      nextCursor: null,
+    }),
+  },
   partners: {
     listPrivate: vi.fn().mockResolvedValue({
       items: [
-        { partnerId: 'supplier-1', name: 'Acme Supplier', partnerTypes: ['SUPPLIER'], status: 'ACTIVE' }
+        {
+          partnerId: 'supplier-1',
+          name: 'Acme Supplier',
+          partnerTypes: ['SUPPLIER'],
+          status: 'ACTIVE',
+        },
       ],
-      nextCursor: null
+      nextCursor: null,
     }),
     getPrivate: vi.fn().mockResolvedValue({
       partnerId: 'partner-1',
@@ -60,29 +90,52 @@ const mockRepositories = {
       status: 'ACTIVE',
       ordersPlacedCount: 0,
     }),
+    listOpenOrders: vi.fn().mockResolvedValue({ items: [], nextCursor: null }),
+    listOrderHistory: vi.fn().mockResolvedValue({ items: [], nextCursor: null }),
   },
   procurement: {
     listOrders: vi.fn().mockResolvedValue({
       items: [
-        { purchaseOrderId: 'po-1', counterpartyName: 'Acme Supplier', status: 'DRAFT', totalMinor: 10000, currency: 'USD' }
+        {
+          purchaseOrderId: 'po-1',
+          counterpartyName: 'Acme Supplier',
+          status: 'DRAFT',
+          totalMinor: 10000,
+          currency: 'USD',
+        },
       ],
-      nextCursor: null
+      nextCursor: null,
     }),
+    listOrdersByKind: vi.fn().mockResolvedValue({ items: [], nextCursor: null }),
+    searchByOrderNumber: vi.fn().mockResolvedValue({ items: [], nextCursor: null }),
+    searchBySupplier: vi
+      .fn()
+      .mockResolvedValue({ status: 'RESULTS', page: { items: [], nextCursor: null } }),
     getOrder: vi.fn().mockResolvedValue({
       purchaseOrderId: 'po-1',
       counterpartyName: 'Acme Supplier',
       status: 'DRAFT',
       totalMinor: 10000,
       currency: 'USD',
-      expectedDate: '2026-10-10'
+      expectedDate: '2026-10-10',
     }),
     listOrderItems: vi.fn().mockResolvedValue({
       items: [
-        { itemId: 'item-1', productName: 'Widget', orderedBuyerBaseMilli: 10000, receivedBuyerBaseMilli: 0 }
+        {
+          itemId: 'item-1',
+          productName: 'Widget',
+          orderedBuyerBaseMilli: 10000,
+          receivedBuyerBaseMilli: 0,
+          totalMinor: 10000,
+        },
       ],
-      nextCursor: null
+      nextCursor: null,
     }),
-  }
+    listOrderHistory: vi.fn().mockResolvedValue({
+      items: [],
+      nextCursor: null,
+    }),
+  },
 };
 
 vi.mock('@/services/data/useRepositories', () => ({
@@ -96,10 +149,8 @@ function renderWithProviders(ui: React.ReactElement, route = '/app/test/procurem
 
   return render(
     <QueryClientProvider client={queryClient}>
-      <MemoryRouter initialEntries={[route]}>
-        {ui}
-      </MemoryRouter>
-    </QueryClientProvider>
+      <MemoryRouter initialEntries={[route]}>{ui}</MemoryRouter>
+    </QueryClientProvider>,
   );
 }
 
@@ -113,7 +164,7 @@ describe('A7: Private Partners', () => {
       <Routes>
         <Route path="/app/:handle/procurement/suppliers" element={<SupplierListScreen />} />
       </Routes>,
-      '/app/test/procurement/suppliers'
+      '/app/test/procurement/suppliers',
     );
     await waitFor(() => {
       expect(mockRepositories.partners.listPrivate).toHaveBeenCalledWith('SUPPLIER', 'ACTIVE');
@@ -125,7 +176,7 @@ describe('A7: Private Partners', () => {
       <Routes>
         <Route path="/app/:handle/procurement/buyers" element={<BuyerListScreen />} />
       </Routes>,
-      '/app/test/procurement/buyers'
+      '/app/test/procurement/buyers',
     );
     await waitFor(() => {
       expect(mockRepositories.partners.listPrivate).toHaveBeenCalledWith('BUYER', 'ACTIVE');
@@ -138,7 +189,7 @@ describe('A7: Private Partners', () => {
       <Routes>
         <Route path="/app/:handle/procurement/suppliers/new" element={<PartnerCreateScreen />} />
       </Routes>,
-      '/app/test/procurement/suppliers/new'
+      '/app/test/procurement/suppliers/new',
     );
 
     const nameInput = screen.getByLabelText(/Name/i);
@@ -153,9 +204,9 @@ describe('A7: Private Partners', () => {
         expect.any(String),
         expect.objectContaining({
           name: 'Acme Corp',
-          partnerTypes: ['SUPPLIER']
+          partnerTypes: ['SUPPLIER'],
         }),
-        'user-123'
+        'user-123',
       );
     });
 
@@ -168,9 +219,12 @@ describe('A7: Private Partners', () => {
     const user = userEvent.setup();
     renderWithProviders(
       <Routes>
-        <Route path="/app/:handle/procurement/suppliers/:partnerId" element={<PartnerDetailScreen />} />
+        <Route
+          path="/app/:handle/procurement/suppliers/:partnerId"
+          element={<PartnerDetailScreen />}
+        />
       </Routes>,
-      '/app/test/procurement/suppliers/partner-1'
+      '/app/test/procurement/suppliers/partner-1',
     );
 
     const deactivateBtn = await screen.findByRole('button', { name: /Deactivate/i });
@@ -180,9 +234,27 @@ describe('A7: Private Partners', () => {
       expect(partnerAdapter.executePartnerSetStatusCommand).toHaveBeenCalledWith(
         'org-123',
         'partner-1',
-        'DEACTIVATED'
+        'DEACTIVATED',
       );
     });
+  });
+
+  it('Q039 executed for Partner Detail open orders & Q040 executed for Partner Detail history', async () => {
+    renderWithProviders(
+      <Routes>
+        <Route
+          path="/app/:handle/procurement/suppliers/:partnerId"
+          element={<PartnerDetailScreen />}
+        />
+      </Routes>,
+      '/app/test/procurement/suppliers/partner-1',
+    );
+    await waitFor(() => {
+      expect(mockRepositories.partners.listOpenOrders).toHaveBeenCalledWith('partner-1');
+      expect(mockRepositories.partners.listOrderHistory).toHaveBeenCalledWith('partner-1');
+    });
+    const placeholder = screen.queryByText(/could go here later/i);
+    expect(placeholder).toBeNull();
   });
 });
 
@@ -195,9 +267,12 @@ describe('A8: Private Purchase Orders', () => {
     const user = userEvent.setup();
     renderWithProviders(
       <Routes>
-        <Route path="/app/:handle/procurement/purchase-orders/new" element={<PurchaseOrderCreateScreen />} />
+        <Route
+          path="/app/:handle/procurement/purchase-orders/new"
+          element={<PurchaseOrderCreateScreen />}
+        />
       </Routes>,
-      '/app/test/procurement/purchase-orders/new'
+      '/app/test/procurement/purchase-orders/new',
     );
 
     const select = await screen.findByLabelText(/Supplier/i);
@@ -217,9 +292,9 @@ describe('A8: Private Purchase Orders', () => {
           privateSupplierId: 'supplier-1',
           counterpartyName: 'Acme Supplier',
           currency: 'USD',
-          totalMinor: 0
+          totalMinor: 0,
         }),
-        'user-123'
+        'user-123',
       );
     });
   });
@@ -228,9 +303,12 @@ describe('A8: Private Purchase Orders', () => {
     const user = userEvent.setup();
     renderWithProviders(
       <Routes>
-        <Route path="/app/:handle/procurement/purchase-orders/:poId" element={<PurchaseOrderDetailScreen />} />
+        <Route
+          path="/app/:handle/procurement/purchase-orders/:poId"
+          element={<PurchaseOrderDetailScreen />}
+        />
       </Routes>,
-      '/app/test/procurement/purchase-orders/po-1'
+      '/app/test/procurement/purchase-orders/po-1',
     );
 
     const orderBtn = await screen.findByRole('button', { name: /Order/i });
@@ -247,6 +325,43 @@ describe('A8: Private Purchase Orders', () => {
       expect(poAdapter.executePoCancelCommand).toHaveBeenCalledWith('org-123', 'po-1');
     });
   });
+
+  it('Q033, Q036, Q037, Q038, Q084a, Q084b queries are called', async () => {
+    const user = userEvent.setup();
+    renderWithProviders(
+      <Routes>
+        <Route
+          path="/app/:handle/procurement/purchase-orders"
+          element={<PurchaseOrderListScreen />}
+        />
+      </Routes>,
+      '/app/test/procurement/purchase-orders',
+    );
+    await waitFor(() => {
+      expect(mockRepositories.procurement.listOrders).toHaveBeenCalled();
+    });
+
+    const searchInput = screen.getByPlaceholderText(/Search/i);
+    await user.type(searchInput, 'PO12');
+    await waitFor(() => {
+      expect(mockRepositories.procurement.searchByOrderNumber).toHaveBeenCalledWith('PO12');
+    });
+
+    renderWithProviders(
+      <Routes>
+        <Route
+          path="/app/:handle/procurement/purchase-orders/:poId"
+          element={<PurchaseOrderDetailScreen />}
+        />
+      </Routes>,
+      '/app/test/procurement/purchase-orders/po-1',
+    );
+    await waitFor(() => {
+      expect(mockRepositories.procurement.getOrder).toHaveBeenCalledWith('po-1');
+      expect(mockRepositories.procurement.listOrderItems).toHaveBeenCalledWith('po-1');
+      expect(mockRepositories.procurement.listOrderHistory).toHaveBeenCalledWith('po-1');
+    });
+  });
 });
 
 describe('A9: Private Receiving', () => {
@@ -254,13 +369,13 @@ describe('A9: Private Receiving', () => {
     vi.clearAllMocks();
   });
 
-  it('C17 receive command execution', async () => {
+  it('C17 receive command execution UI', async () => {
     const user = userEvent.setup();
     renderWithProviders(
       <Routes>
         <Route path="/app/:handle/procurement/receiving/:poId" element={<ReceiveOrderScreen />} />
       </Routes>,
-      '/app/test/procurement/receiving/po-1'
+      '/app/test/procurement/receiving/po-1',
     );
 
     const inputs = await screen.findAllByRole('spinbutton');
@@ -270,12 +385,38 @@ describe('A9: Private Receiving', () => {
     await user.click(receiveBtn);
 
     await waitFor(() => {
-      expect(poAdapter.executePoReceiveCommand).toHaveBeenCalledWith(
-        'org-123',
-        'po-1',
-        [{ itemId: 'item-1', quantityMinor: 5000 }],
-        undefined
-      );
+      expect(poAdapter.executePoReceiveCommand).toHaveBeenCalledWith('org-123', 'po-1', 'wh-1', [
+        { itemId: 'item-1', quantityMilli: 5000 },
+      ]);
     });
+  });
+
+  it('C17 adapter constructs exact idempotent envelope', async () => {
+    const realPoAdapter = await vi.importActual<typeof import('@/data/adapters/poAdapter')>(
+      '@/data/adapters/poAdapter',
+    );
+    const mockCallable = vi.fn().mockResolvedValue({ data: { ok: true } });
+    vi.mocked(httpsCallable).mockReturnValue(mockCallable as any);
+
+    await realPoAdapter.executePoReceiveCommand('org-123', 'po-1', 'wh-1', [
+      { itemId: 'item-1', quantityMilli: 5000 },
+    ]);
+
+    expect(httpsCallable).toHaveBeenCalledWith(undefined, 'poReceive');
+    const envelope = mockCallable.mock.calls[0]![0] as any;
+
+    expect(envelope.operationId).toBeDefined();
+    expect(typeof envelope.operationId).toBe('string');
+
+    expect(envelope.payload).toBeDefined();
+    expect(envelope.payload.warehouseId).toBe('wh-1');
+    expect(envelope.payload.purchaseOrderId).toBe('po-1');
+
+    expect(envelope.payload.lines).toBeDefined();
+    expect(envelope.payload.lines[0].itemId).toBe('item-1');
+    expect(envelope.payload.lines[0].quantityMilli).toBe(5000);
+
+    expect(envelope.payload.items).toBeUndefined();
+    expect(envelope.payload.lines[0].quantityMinor).toBeUndefined();
   });
 });

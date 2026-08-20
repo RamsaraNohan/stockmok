@@ -138,7 +138,10 @@ export async function executePoOrderCommand(orgId: string, purchaseOrderId: stri
 }
 
 // C-16 po.cancel
-export async function executePoCancelCommand(orgId: string, purchaseOrderId: string): Promise<void> {
+export async function executePoCancelCommand(
+  orgId: string,
+  purchaseOrderId: string,
+): Promise<void> {
   const callable = httpsCallable<unknown, Extract<CommandResult, { ok: true }>>(
     functions,
     'poCancel',
@@ -151,8 +154,21 @@ export async function executePoCancelCommand(orgId: string, purchaseOrderId: str
   await callable(payloadEnvelope);
 }
 
-export async function executePrivatePoLineRemove(orgId: string, purchaseOrderId: string, itemId: string, uid: string): Promise<void> {
-  const lineRef = doc(db, 'organizations', orgId, 'purchaseOrders', purchaseOrderId, 'items', itemId);
+export async function executePrivatePoLineRemove(
+  orgId: string,
+  purchaseOrderId: string,
+  itemId: string,
+  uid: string,
+): Promise<void> {
+  const lineRef = doc(
+    db,
+    'organizations',
+    orgId,
+    'purchaseOrders',
+    purchaseOrderId,
+    'items',
+    itemId,
+  );
   await updateDoc(lineRef, {
     orderedBuyerBaseMilli: 0,
     updatedAt: serverTimestamp(),
@@ -164,22 +180,22 @@ export async function executePrivatePoLineRemove(orgId: string, purchaseOrderId:
 export async function executePoReceiveCommand(
   orgId: string,
   purchaseOrderId: string,
-  items: Array<{ itemId: string; quantityMinor: number }>,
-  receiptDate?: string,
+  warehouseId: string,
+  lines: Array<{ itemId: string; quantityMilli: number }>,
 ): Promise<void> {
   const callable = httpsCallable<unknown, Extract<CommandResult, { ok: true }>>(
     functions,
     'poReceive',
   );
-  // NON-IDEMPOTENT envelope
+  // IDEMPOTENT envelope
   const payloadEnvelope = {
     orgId,
+    operationId: crypto.randomUUID(),
     payload: {
       purchaseOrderId,
-      items,
-      receiptDate,
+      warehouseId,
+      lines,
     },
   };
   await callable(payloadEnvelope);
 }
-

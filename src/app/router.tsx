@@ -211,78 +211,96 @@ export const router = createBrowserRouter([
           </RoleGuard>
         ),
       },
-        {
-          path: 'procurement/purchase-orders',
-          element: (
-            <RoleGuard allowedRoles={['OWNER', 'ADMIN', 'PROCUREMENT_MANAGER', 'INVENTORY_MANAGER', 'STOREKEEPER', 'ANALYST']}>
-              <PurchaseOrderListScreen />
-            </RoleGuard>
-          ),
-        },
-        {
-          path: 'procurement/purchase-orders/new',
-          element: (
-            <RoleGuard allowedRoles={['OWNER', 'ADMIN', 'PROCUREMENT_MANAGER']}>
-              <PurchaseOrderCreateScreen />
-            </RoleGuard>
-          ),
-        },
-        {
-          path: 'procurement/purchase-orders/:poId',
-          element: (
-            <RoleGuard allowedRoles={['OWNER', 'ADMIN', 'PROCUREMENT_MANAGER', 'INVENTORY_MANAGER', 'STOREKEEPER', 'ANALYST']}>
-              <PurchaseOrderDetailScreen />
-            </RoleGuard>
-          ),
-        },
-        {
-          path: 'procurement/suppliers',
-          element: (
-            <RoleGuard allowedRoles={['OWNER', 'ADMIN', 'PROCUREMENT_MANAGER']}>
-              <SupplierListScreen />
-            </RoleGuard>
-          ),
-        },
-        {
-          path: 'procurement/suppliers/new',
-          element: (
-            <RoleGuard allowedRoles={['OWNER', 'ADMIN', 'PROCUREMENT_MANAGER']}>
-              <PartnerCreateScreen />
-            </RoleGuard>
-          ),
-        },
-        {
-          path: 'procurement/suppliers/:partnerId',
-          element: (
-            <RoleGuard allowedRoles={['OWNER', 'ADMIN', 'PROCUREMENT_MANAGER']}>
-              <PartnerDetailScreen />
-            </RoleGuard>
-          ),
-        },
-        {
-          path: 'procurement/buyers',
-          element: (
-            <RoleGuard allowedRoles={['OWNER', 'ADMIN', 'PROCUREMENT_MANAGER']}>
-              <BuyerListScreen />
-            </RoleGuard>
-          ),
-        },
-        {
-          path: 'procurement/buyers/new',
-          element: (
-            <RoleGuard allowedRoles={['OWNER', 'ADMIN', 'PROCUREMENT_MANAGER']}>
-              <PartnerCreateScreen />
-            </RoleGuard>
-          ),
-        },
-        {
-          path: 'procurement/buyers/:partnerId',
-          element: (
-            <RoleGuard allowedRoles={['OWNER', 'ADMIN', 'PROCUREMENT_MANAGER']}>
-              <PartnerDetailScreen />
-            </RoleGuard>
-          ),
-        },
+      {
+        path: 'procurement/purchase-orders',
+        element: (
+          <RoleGuard
+            allowedRoles={[
+              'OWNER',
+              'ADMIN',
+              'PROCUREMENT_MANAGER',
+              'INVENTORY_MANAGER',
+              'STOREKEEPER',
+              'ANALYST',
+            ]}
+          >
+            <PurchaseOrderListScreen />
+          </RoleGuard>
+        ),
+      },
+      {
+        path: 'procurement/purchase-orders/new',
+        element: (
+          <RoleGuard allowedRoles={['OWNER', 'ADMIN', 'PROCUREMENT_MANAGER']}>
+            <PurchaseOrderCreateScreen />
+          </RoleGuard>
+        ),
+      },
+      {
+        path: 'procurement/purchase-orders/:poId',
+        element: (
+          <RoleGuard
+            allowedRoles={[
+              'OWNER',
+              'ADMIN',
+              'PROCUREMENT_MANAGER',
+              'INVENTORY_MANAGER',
+              'STOREKEEPER',
+              'ANALYST',
+            ]}
+          >
+            <PurchaseOrderDetailScreen />
+          </RoleGuard>
+        ),
+      },
+      {
+        path: 'procurement/suppliers',
+        element: (
+          <RoleGuard allowedRoles={['OWNER', 'ADMIN', 'PROCUREMENT_MANAGER']}>
+            <SupplierListScreen />
+          </RoleGuard>
+        ),
+      },
+      {
+        path: 'procurement/suppliers/new',
+        element: (
+          <RoleGuard allowedRoles={['OWNER', 'ADMIN', 'PROCUREMENT_MANAGER']}>
+            <PartnerCreateScreen />
+          </RoleGuard>
+        ),
+      },
+      {
+        path: 'procurement/suppliers/:partnerId',
+        element: (
+          <RoleGuard allowedRoles={['OWNER', 'ADMIN', 'PROCUREMENT_MANAGER']}>
+            <PartnerDetailScreen />
+          </RoleGuard>
+        ),
+      },
+      {
+        path: 'procurement/buyers',
+        element: (
+          <RoleGuard allowedRoles={['OWNER', 'ADMIN', 'PROCUREMENT_MANAGER']}>
+            <BuyerListScreen />
+          </RoleGuard>
+        ),
+      },
+      {
+        path: 'procurement/buyers/new',
+        element: (
+          <RoleGuard allowedRoles={['OWNER', 'ADMIN', 'PROCUREMENT_MANAGER']}>
+            <PartnerCreateScreen />
+          </RoleGuard>
+        ),
+      },
+      {
+        path: 'procurement/buyers/:partnerId',
+        element: (
+          <RoleGuard allowedRoles={['OWNER', 'ADMIN', 'PROCUREMENT_MANAGER']}>
+            <PartnerDetailScreen />
+          </RoleGuard>
+        ),
+      },
       {
         path: 'network/connections',
         element: (
@@ -299,22 +317,38 @@ export const router = createBrowserRouter([
           </RoleGuard>
         ),
       },
-        {
-          path: 'procurement/receiving',
-          element: (
-            <RoleGuard allowedRoles={['OWNER', 'ADMIN', 'INVENTORY_MANAGER', 'STOREKEEPER']}>
-              <ReceivingListScreen />
-            </RoleGuard>
-          ),
-        },
-        {
-          path: 'procurement/receiving/:poId',
-          element: (
-            <RoleGuard allowedRoles={['OWNER', 'ADMIN', 'INVENTORY_MANAGER', 'STOREKEEPER']}>
-              <ReceiveOrderScreen />
-            </RoleGuard>
-          ),
-        },
+      {
+        path: 'procurement/receiving',
+        element: (
+          <RoleGuard
+            allowedRoles={[
+              'OWNER',
+              'ADMIN',
+              'INVENTORY_MANAGER',
+              'PROCUREMENT_MANAGER',
+              'STOREKEEPER',
+            ]}
+          >
+            <ReceivingListScreen />
+          </RoleGuard>
+        ),
+      },
+      {
+        path: 'procurement/receiving/:poId',
+        element: (
+          <RoleGuard
+            allowedRoles={[
+              'OWNER',
+              'ADMIN',
+              'INVENTORY_MANAGER',
+              'PROCUREMENT_MANAGER',
+              'STOREKEEPER',
+            ]}
+          >
+            <ReceiveOrderScreen />
+          </RoleGuard>
+        ),
+      },
       {
         path: 'network/mappings',
         element: (
@@ -390,4 +424,3 @@ export function AppRouter() {
     </QueryClientProvider>
   );
 }
-
