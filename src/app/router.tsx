@@ -35,6 +35,10 @@ import { ProductCreateScreen } from '@/features/inventory/products/ProductCreate
 import { ProductDetailScreen } from '@/features/inventory/products/ProductDetailScreen';
 import { ProductEditScreen } from '@/features/inventory/products/ProductEditScreen';
 import { CategoryListScreen } from '@/features/inventory/categories/CategoryListScreen';
+import { SupplierListScreen } from '@/features/procurement/partners/SupplierListScreen';
+import { BuyerListScreen } from '@/features/procurement/partners/BuyerListScreen';
+import { PartnerCreateScreen } from '@/features/procurement/partners/PartnerCreateScreen';
+import { PartnerDetailScreen } from '@/features/procurement/partners/PartnerDetailScreen';
 import { WarehouseListScreen } from '@/features/inventory/warehouses/WarehouseListScreen';
 import { MovementHistoryScreen } from '@/features/movements/MovementHistoryScreen';
 
@@ -226,14 +230,54 @@ export const router = createBrowserRouter([
           </RoleGuard>
         ),
       },
-      {
-        path: 'procurement/suppliers',
-        element: (
-          <RoleGuard allowedRoles={['OWNER', 'ADMIN', 'PROCUREMENT_MANAGER']}>
-            <SectionPlaceholder title="Suppliers & Buyers" />
-          </RoleGuard>
-        ),
-      },
+        {
+          path: 'procurement/suppliers',
+          element: (
+            <RoleGuard allowedRoles={['OWNER', 'ADMIN', 'PROCUREMENT_MANAGER']}>
+              <SupplierListScreen />
+            </RoleGuard>
+          ),
+        },
+        {
+          path: 'procurement/suppliers/new',
+          element: (
+            <RoleGuard allowedRoles={['OWNER', 'ADMIN', 'PROCUREMENT_MANAGER']}>
+              <PartnerCreateScreen />
+            </RoleGuard>
+          ),
+        },
+        {
+          path: 'procurement/suppliers/:partnerId',
+          element: (
+            <RoleGuard allowedRoles={['OWNER', 'ADMIN', 'PROCUREMENT_MANAGER']}>
+              <PartnerDetailScreen />
+            </RoleGuard>
+          ),
+        },
+        {
+          path: 'procurement/buyers',
+          element: (
+            <RoleGuard allowedRoles={['OWNER', 'ADMIN', 'PROCUREMENT_MANAGER']}>
+              <BuyerListScreen />
+            </RoleGuard>
+          ),
+        },
+        {
+          path: 'procurement/buyers/new',
+          element: (
+            <RoleGuard allowedRoles={['OWNER', 'ADMIN', 'PROCUREMENT_MANAGER']}>
+              <PartnerCreateScreen />
+            </RoleGuard>
+          ),
+        },
+        {
+          path: 'procurement/buyers/:partnerId',
+          element: (
+            <RoleGuard allowedRoles={['OWNER', 'ADMIN', 'PROCUREMENT_MANAGER']}>
+              <PartnerDetailScreen />
+            </RoleGuard>
+          ),
+        },
       {
         path: 'network/connections',
         element: (
@@ -325,3 +369,4 @@ export function AppRouter() {
     </QueryClientProvider>
   );
 }
+
