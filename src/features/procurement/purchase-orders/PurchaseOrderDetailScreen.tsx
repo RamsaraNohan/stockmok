@@ -107,6 +107,7 @@ export function PurchaseOrderDetailScreen() {
             </div>
             <div>
               <span className="text-text-muted">Expected:</span>
+              {/* eslint-disable-next-line @typescript-eslint/no-base-to-string */}
               <div className="font-medium">{order.expectedDate ? String(order.expectedDate) : '-'}</div>
             </div>
           </div>

@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-non-null-assertion */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -11,6 +11,7 @@ import { SupplierListScreen } from '@/features/procurement/partners/SupplierList
 import { BuyerListScreen } from '@/features/procurement/partners/BuyerListScreen';
 import { PurchaseOrderCreateScreen } from '@/features/procurement/purchase-orders/PurchaseOrderCreateScreen';
 import { PurchaseOrderDetailScreen } from '@/features/procurement/purchase-orders/PurchaseOrderDetailScreen';
+import { ReceiveOrderScreen } from '@/features/procurement/receiving/ReceiveOrderScreen';
 
 import * as partnerAdapter from '@/data/adapters/partnerAdapter';
 import * as poAdapter from '@/data/adapters/poAdapter';
@@ -29,6 +30,7 @@ vi.mock('@/data/adapters/poAdapter', () => ({
   executePrivatePoLineRemove: vi.fn(),
   executePoOrderCommand: vi.fn(),
   executePoCancelCommand: vi.fn(),
+  executePoReceiveCommand: vi.fn(),
 }));
 
 const mockUser = { uid: 'user-123', email: 'test@example.com' } as any;
@@ -73,6 +75,12 @@ const mockRepositories = {
       totalMinor: 10000,
       currency: 'USD',
       expectedDate: '2026-10-10'
+    }),
+    listOrderItems: vi.fn().mockResolvedValue({
+      items: [
+        { itemId: 'item-1', productName: 'Widget', orderedBuyerBaseMilli: 10000, receivedBuyerBaseMilli: 0 }
+      ],
+      nextCursor: null
     }),
   }
 };
@@ -237,6 +245,37 @@ describe('A8: Private Purchase Orders', () => {
 
     await waitFor(() => {
       expect(poAdapter.executePoCancelCommand).toHaveBeenCalledWith('org-123', 'po-1');
+    });
+  });
+});
+
+describe('A9: Private Receiving', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('C17 receive command execution', async () => {
+    const user = userEvent.setup();
+    renderWithProviders(
+      <Routes>
+        <Route path="/app/:handle/procurement/receiving/:poId" element={<ReceiveOrderScreen />} />
+      </Routes>,
+      '/app/test/procurement/receiving/po-1'
+    );
+
+    const inputs = await screen.findAllByRole('spinbutton');
+    await user.type(inputs[0]!, '5');
+
+    const receiveBtn = screen.getByRole('button', { name: /Receive/i });
+    await user.click(receiveBtn);
+
+    await waitFor(() => {
+      expect(poAdapter.executePoReceiveCommand).toHaveBeenCalledWith(
+        'org-123',
+        'po-1',
+        [{ itemId: 'item-1', quantityMinor: 5000 }],
+        undefined
+      );
     });
   });
 });

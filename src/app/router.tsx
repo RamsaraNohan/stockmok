@@ -42,6 +42,8 @@ import { PartnerDetailScreen } from '@/features/procurement/partners/PartnerDeta
 import { PurchaseOrderListScreen } from '@/features/procurement/purchase-orders/PurchaseOrderListScreen';
 import { PurchaseOrderCreateScreen } from '@/features/procurement/purchase-orders/PurchaseOrderCreateScreen';
 import { PurchaseOrderDetailScreen } from '@/features/procurement/purchase-orders/PurchaseOrderDetailScreen';
+import { ReceivingListScreen } from '@/features/procurement/receiving/ReceivingListScreen';
+import { ReceiveOrderScreen } from '@/features/procurement/receiving/ReceiveOrderScreen';
 import { WarehouseListScreen } from '@/features/inventory/warehouses/WarehouseListScreen';
 import { MovementHistoryScreen } from '@/features/movements/MovementHistoryScreen';
 
@@ -233,22 +235,6 @@ export const router = createBrowserRouter([
             </RoleGuard>
           ),
         },
-      {
-        path: 'procurement/receiving',
-        element: (
-          <RoleGuard
-            allowedRoles={[
-              'OWNER',
-              'ADMIN',
-              'INVENTORY_MANAGER',
-              'PROCUREMENT_MANAGER',
-              'STOREKEEPER',
-            ]}
-          >
-            <SectionPlaceholder title="Receiving" />
-          </RoleGuard>
-        ),
-      },
         {
           path: 'procurement/suppliers',
           element: (
@@ -313,6 +299,22 @@ export const router = createBrowserRouter([
           </RoleGuard>
         ),
       },
+        {
+          path: 'procurement/receiving',
+          element: (
+            <RoleGuard allowedRoles={['OWNER', 'ADMIN', 'INVENTORY_MANAGER', 'STOREKEEPER']}>
+              <ReceivingListScreen />
+            </RoleGuard>
+          ),
+        },
+        {
+          path: 'procurement/receiving/:poId',
+          element: (
+            <RoleGuard allowedRoles={['OWNER', 'ADMIN', 'INVENTORY_MANAGER', 'STOREKEEPER']}>
+              <ReceiveOrderScreen />
+            </RoleGuard>
+          ),
+        },
       {
         path: 'network/mappings',
         element: (

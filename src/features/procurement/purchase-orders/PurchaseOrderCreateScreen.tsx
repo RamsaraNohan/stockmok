@@ -44,12 +44,13 @@ export function PurchaseOrderCreateScreen() {
       const supplier = suppliers?.items.find((s) => s.partnerId === formData.privateSupplierId);
       if (!supplier) throw new Error('Please select a valid supplier');
 
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any
       const payload: PrivatePoHeaderCreatePayload = {
         counterpartyName: supplier.name,
         privateSupplierId: supplier.partnerId,
         currency: activeSettings?.currency ?? 'USD',
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any
         expectedDate: formData.expectedDate ? (formData.expectedDate as any) : undefined,
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any
         totalMinor: 0 as any,
       };
       

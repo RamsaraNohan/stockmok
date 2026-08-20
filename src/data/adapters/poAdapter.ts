@@ -160,3 +160,26 @@ export async function executePrivatePoLineRemove(orgId: string, purchaseOrderId:
   });
 }
 
+// C-17 po.receive
+export async function executePoReceiveCommand(
+  orgId: string,
+  purchaseOrderId: string,
+  items: Array<{ itemId: string; quantityMinor: number }>,
+  receiptDate?: string,
+): Promise<void> {
+  const callable = httpsCallable<unknown, Extract<CommandResult, { ok: true }>>(
+    functions,
+    'poReceive',
+  );
+  // NON-IDEMPOTENT envelope
+  const payloadEnvelope = {
+    orgId,
+    payload: {
+      purchaseOrderId,
+      items,
+      receiptDate,
+    },
+  };
+  await callable(payloadEnvelope);
+}
+
