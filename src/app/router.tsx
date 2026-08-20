@@ -39,6 +39,9 @@ import { SupplierListScreen } from '@/features/procurement/partners/SupplierList
 import { BuyerListScreen } from '@/features/procurement/partners/BuyerListScreen';
 import { PartnerCreateScreen } from '@/features/procurement/partners/PartnerCreateScreen';
 import { PartnerDetailScreen } from '@/features/procurement/partners/PartnerDetailScreen';
+import { PurchaseOrderListScreen } from '@/features/procurement/purchase-orders/PurchaseOrderListScreen';
+import { PurchaseOrderCreateScreen } from '@/features/procurement/purchase-orders/PurchaseOrderCreateScreen';
+import { PurchaseOrderDetailScreen } from '@/features/procurement/purchase-orders/PurchaseOrderDetailScreen';
 import { WarehouseListScreen } from '@/features/inventory/warehouses/WarehouseListScreen';
 import { MovementHistoryScreen } from '@/features/movements/MovementHistoryScreen';
 
@@ -206,14 +209,30 @@ export const router = createBrowserRouter([
           </RoleGuard>
         ),
       },
-      {
-        path: 'procurement/purchase-orders',
-        element: (
-          <RoleGuard allowedRoles={['OWNER', 'ADMIN', 'PROCUREMENT_MANAGER', 'ANALYST']}>
-            <SectionPlaceholder title="Purchase Orders" />
-          </RoleGuard>
-        ),
-      },
+        {
+          path: 'procurement/purchase-orders',
+          element: (
+            <RoleGuard allowedRoles={['OWNER', 'ADMIN', 'PROCUREMENT_MANAGER', 'INVENTORY_MANAGER', 'STOREKEEPER', 'ANALYST']}>
+              <PurchaseOrderListScreen />
+            </RoleGuard>
+          ),
+        },
+        {
+          path: 'procurement/purchase-orders/new',
+          element: (
+            <RoleGuard allowedRoles={['OWNER', 'ADMIN', 'PROCUREMENT_MANAGER']}>
+              <PurchaseOrderCreateScreen />
+            </RoleGuard>
+          ),
+        },
+        {
+          path: 'procurement/purchase-orders/:poId',
+          element: (
+            <RoleGuard allowedRoles={['OWNER', 'ADMIN', 'PROCUREMENT_MANAGER', 'INVENTORY_MANAGER', 'STOREKEEPER', 'ANALYST']}>
+              <PurchaseOrderDetailScreen />
+            </RoleGuard>
+          ),
+        },
       {
         path: 'procurement/receiving',
         element: (

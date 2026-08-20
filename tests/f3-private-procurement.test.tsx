@@ -9,7 +9,11 @@ import { PartnerCreateScreen } from '@/features/procurement/partners/PartnerCrea
 import { PartnerDetailScreen } from '@/features/procurement/partners/PartnerDetailScreen';
 import { SupplierListScreen } from '@/features/procurement/partners/SupplierListScreen';
 import { BuyerListScreen } from '@/features/procurement/partners/BuyerListScreen';
+import { PurchaseOrderCreateScreen } from '@/features/procurement/purchase-orders/PurchaseOrderCreateScreen';
+import { PurchaseOrderDetailScreen } from '@/features/procurement/purchase-orders/PurchaseOrderDetailScreen';
+
 import * as partnerAdapter from '@/data/adapters/partnerAdapter';
+import * as poAdapter from '@/data/adapters/poAdapter';
 
 vi.mock('@/data/adapters/partnerAdapter', () => ({
   executePartnerCreate: vi.fn(),
@@ -17,26 +21,58 @@ vi.mock('@/data/adapters/partnerAdapter', () => ({
   executePartnerSetStatusCommand: vi.fn(),
 }));
 
+vi.mock('@/data/adapters/poAdapter', () => ({
+  executePrivatePoHeaderCreate: vi.fn(),
+  executePrivatePoHeaderUpdate: vi.fn(),
+  executePrivatePoLineCreate: vi.fn(),
+  executePrivatePoLineUpdate: vi.fn(),
+  executePrivatePoLineRemove: vi.fn(),
+  executePoOrderCommand: vi.fn(),
+  executePoCancelCommand: vi.fn(),
+}));
+
 const mockUser = { uid: 'user-123', email: 'test@example.com' } as any;
 const mockOrg = { organizationId: 'org-123', name: 'Test Org' } as any;
+const mockSettings = { currency: 'USD' } as any;
 
 vi.mock('@/services/auth/useAuth', () => ({
   useAuth: () => ({ user: mockUser }),
 }));
 
 vi.mock('@/services/workspace/useWorkspace', () => ({
-  useWorkspace: () => ({ activeOrg: mockOrg, user: mockUser }),
+  useWorkspace: () => ({ activeOrg: mockOrg, activeSettings: mockSettings, user: mockUser }),
 }));
 
 const mockRepositories = {
   partners: {
-    listPrivate: vi.fn().mockResolvedValue({ items: [], nextCursor: null }),
+    listPrivate: vi.fn().mockResolvedValue({
+      items: [
+        { partnerId: 'supplier-1', name: 'Acme Supplier', partnerTypes: ['SUPPLIER'], status: 'ACTIVE' }
+      ],
+      nextCursor: null
+    }),
     getPrivate: vi.fn().mockResolvedValue({
       partnerId: 'partner-1',
       name: 'Test Partner',
       partnerTypes: ['SUPPLIER'],
       status: 'ACTIVE',
       ordersPlacedCount: 0,
+    }),
+  },
+  procurement: {
+    listOrders: vi.fn().mockResolvedValue({
+      items: [
+        { purchaseOrderId: 'po-1', counterpartyName: 'Acme Supplier', status: 'DRAFT', totalMinor: 10000, currency: 'USD' }
+      ],
+      nextCursor: null
+    }),
+    getOrder: vi.fn().mockResolvedValue({
+      purchaseOrderId: 'po-1',
+      counterpartyName: 'Acme Supplier',
+      status: 'DRAFT',
+      totalMinor: 10000,
+      currency: 'USD',
+      expectedDate: '2026-10-10'
     }),
   }
 };
@@ -65,28 +101,24 @@ describe('A7: Private Partners', () => {
   });
 
   it('Supplier and Buyer Q-031 request shapes & separate route/filter state', async () => {
-    // Render supplier list
     renderWithProviders(
       <Routes>
         <Route path="/app/:handle/procurement/suppliers" element={<SupplierListScreen />} />
       </Routes>,
       '/app/test/procurement/suppliers'
     );
-    
     await waitFor(() => {
       expect(mockRepositories.partners.listPrivate).toHaveBeenCalledWith('SUPPLIER', 'ACTIVE');
     });
 
     vi.clearAllMocks();
 
-    // Render buyer list
     renderWithProviders(
       <Routes>
         <Route path="/app/:handle/procurement/buyers" element={<BuyerListScreen />} />
       </Routes>,
       '/app/test/procurement/buyers'
     );
-    
     await waitFor(() => {
       expect(mockRepositories.partners.listPrivate).toHaveBeenCalledWith('BUYER', 'ACTIVE');
     });
@@ -119,8 +151,7 @@ describe('A7: Private Partners', () => {
       );
     });
 
-    // Check that status and ordersPlacedCount are not in payload (they are added in adapter)
-    const payload = vi.mocked(partnerAdapter.executePartnerCreate).mock.calls[0][2];
+    const payload = vi.mocked(partnerAdapter.executePartnerCreate).mock.calls[0]![2];
     expect(payload).not.toHaveProperty('status');
     expect(payload).not.toHaveProperty('ordersPlacedCount');
   });
@@ -143,6 +174,69 @@ describe('A7: Private Partners', () => {
         'partner-1',
         'DEACTIVATED'
       );
+    });
+  });
+});
+
+describe('A8: Private Purchase Orders', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('creates draft PO header safely', async () => {
+    const user = userEvent.setup();
+    renderWithProviders(
+      <Routes>
+        <Route path="/app/:handle/procurement/purchase-orders/new" element={<PurchaseOrderCreateScreen />} />
+      </Routes>,
+      '/app/test/procurement/purchase-orders/new'
+    );
+
+    const select = await screen.findByLabelText(/Supplier/i);
+    await waitFor(() => {
+      expect(screen.getByText('Acme Supplier')).toBeDefined();
+    });
+    await user.selectOptions(select, 'supplier-1');
+
+    const createBtn = screen.getByRole('button', { name: /Create PO/i });
+    await user.click(createBtn);
+
+    await waitFor(() => {
+      expect(poAdapter.executePrivatePoHeaderCreate).toHaveBeenCalledWith(
+        'org-123',
+        expect.any(String),
+        expect.objectContaining({
+          privateSupplierId: 'supplier-1',
+          counterpartyName: 'Acme Supplier',
+          currency: 'USD',
+          totalMinor: 0
+        }),
+        'user-123'
+      );
+    });
+  });
+
+  it('C15 and C16 command executions', async () => {
+    const user = userEvent.setup();
+    renderWithProviders(
+      <Routes>
+        <Route path="/app/:handle/procurement/purchase-orders/:poId" element={<PurchaseOrderDetailScreen />} />
+      </Routes>,
+      '/app/test/procurement/purchase-orders/po-1'
+    );
+
+    const orderBtn = await screen.findByRole('button', { name: /Order/i });
+    await user.click(orderBtn);
+
+    await waitFor(() => {
+      expect(poAdapter.executePoOrderCommand).toHaveBeenCalledWith('org-123', 'po-1');
+    });
+
+    const cancelBtn = screen.getByRole('button', { name: /Cancel/i });
+    await user.click(cancelBtn);
+
+    await waitFor(() => {
+      expect(poAdapter.executePoCancelCommand).toHaveBeenCalledWith('org-123', 'po-1');
     });
   });
 });
