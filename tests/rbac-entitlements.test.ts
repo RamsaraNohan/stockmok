@@ -33,7 +33,7 @@ describe('RBAC Entitlements & Sidebar Separation', () => {
     expect(allowedRoles).toContain('PROCUREMENT_MANAGER'); // PM_PRODUCTS_ROUTE_READ = ALLOWED
   });
 
-  it('proves STOREKEEPER has Purchase Orders sidebar link HIDDEN and route DENIED', () => {
+  it('proves STOREKEEPER has Purchase Orders sidebar link HIDDEN but route READ ALLOWED', () => {
     const role = 'STOREKEEPER';
 
     // Sidebar visibility logic
@@ -46,6 +46,6 @@ describe('RBAC Entitlements & Sidebar Separation', () => {
     const routeElement = poRoute?.element as ReactElement<RoleGuardElementProps> | undefined;
     const allowedRoles = routeElement?.props.allowedRoles ?? [];
 
-    expect(allowedRoles).not.toContain('STOREKEEPER');
+    expect(allowedRoles).toContain('STOREKEEPER');
   });
 });

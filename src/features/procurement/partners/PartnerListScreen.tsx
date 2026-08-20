@@ -35,7 +35,12 @@ export function PartnerListScreen({ partnerType }: { partnerType: 'SUPPLIER' | '
       <PageHeader
         title={title}
         actions={
-          <Button onClick={() => { void navigate('new'); }} variant="primary">
+          <Button
+            onClick={() => {
+              void navigate('new');
+            }}
+            variant="primary"
+          >
             Add {partnerType === 'SUPPLIER' ? 'Supplier' : 'Buyer'}
           </Button>
         }
@@ -45,7 +50,9 @@ export function PartnerListScreen({ partnerType }: { partnerType: 'SUPPLIER' | '
           <select
             className="h-10 px-3 rounded-control border border-border bg-surface text-text text-sm focus:ring-2 focus:ring-primary outline-none"
             value={status}
-            onChange={(e) => { setStatus(e.target.value as PartnerStatus); }}
+            onChange={(e) => {
+              setStatus(e.target.value as PartnerStatus);
+            }}
           >
             <option value="ACTIVE">Active</option>
             <option value="DEACTIVATED">Deactivated</option>
@@ -65,7 +72,12 @@ export function PartnerListScreen({ partnerType }: { partnerType: 'SUPPLIER' | '
             title={`No ${title.toLowerCase()} found`}
             description={`Get started by adding your first ${title.toLowerCase().slice(0, -1)}.`}
             action={
-              <Button onClick={() => { void navigate('new'); }} variant="primary">
+              <Button
+                onClick={() => {
+                  void navigate('new');
+                }}
+                variant="primary"
+              >
                 Add {partnerType === 'SUPPLIER' ? 'Supplier' : 'Buyer'}
               </Button>
             }
@@ -87,7 +99,9 @@ export function PartnerListScreen({ partnerType }: { partnerType: 'SUPPLIER' | '
                   <tr
                     key={partner.partnerId}
                     className="hover:bg-background cursor-pointer transition-colors"
-                    onClick={() => { void navigate(partner.partnerId); }}
+                    onClick={() => {
+                      void navigate(partner.partnerId);
+                    }}
                   >
                     <td className="p-4 text-sm font-medium">{partner.name}</td>
                     <td className="p-4 text-sm text-text-muted">{partner.contactPerson || '-'}</td>

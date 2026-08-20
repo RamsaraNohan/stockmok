@@ -7,12 +7,16 @@ import { Button } from '@/ui/primitives/Button';
 import { EmptyState } from '@/ui/primitives/EmptyState';
 import { ErrorState } from '@/ui/primitives/ErrorState';
 import { Skeleton } from '@/ui/primitives/Skeleton';
-import type { PoStatus } from '@stockmok/shared';
+import { Input } from '@/ui/primitives/Input';
+import type { PoStatus, PurchaseOrder } from '@stockmok/shared';
 
 export function PurchaseOrderListScreen() {
   const navigate = useNavigate();
   const repositories = useRepositories();
   const [status, setStatus] = useState<PoStatus>('DRAFT');
+  const [supplierKind, setSupplierKind] = useState<'ALL' | 'PRIVATE' | 'CONNECTED'>('ALL');
+  const [searchMode, setSearchMode] = useState<'NUMBER' | 'SUPPLIER'>('NUMBER');
+  const [searchQuery, setSearchQuery] = useState('');
 
   const {
     data: page,
@@ -20,10 +24,27 @@ export function PurchaseOrderListScreen() {
     isError,
     error,
   } = useQuery({
-    queryKey: ['purchaseOrders', status],
+    queryKey: ['purchaseOrders', status, supplierKind, searchMode, searchQuery],
     queryFn: async () => {
       if (!repositories) return null;
-      return repositories.procurement.listOrders([status]);
+
+      if (searchQuery.trim().length >= 2) {
+        if (searchMode === 'NUMBER') {
+          return repositories.procurement.searchByOrderNumber(searchQuery.trim().toUpperCase());
+        } else {
+          const res = await repositories.procurement.searchBySupplier(searchQuery.trim());
+          if (res.status === 'NARROW_SEARCH') {
+            return { items: [] as PurchaseOrder[] }; // Fallback for too short term
+          }
+          return res.page;
+        }
+      }
+
+      if (supplierKind === 'ALL') {
+        return repositories.procurement.listOrders([status]);
+      } else {
+        return repositories.procurement.listOrdersByKind(supplierKind, [status]);
+      }
     },
     enabled: !!repositories,
   });
@@ -33,23 +54,62 @@ export function PurchaseOrderListScreen() {
       <PageHeader
         title="Purchase Orders"
         actions={
-          <Button onClick={() => { void navigate('new'); }} variant="primary">
+          <Button
+            onClick={() => {
+              void navigate('new');
+            }}
+            variant="primary"
+          >
             Create Order
           </Button>
         }
       />
       <div className="p-4 md:p-8">
-        <div className="mb-6 flex gap-4">
+        <div className="mb-6 flex flex-wrap gap-4 items-center">
+          <Input
+            placeholder="Search..."
+            value={searchQuery}
+            onChange={(e) => {
+              setSearchQuery(e.target.value);
+            }}
+            className="w-48"
+          />
+          <select
+            className="h-10 px-3 rounded-control border border-border bg-surface text-text text-sm focus:ring-2 focus:ring-primary outline-none"
+            value={searchMode}
+            onChange={(e) => {
+              setSearchMode(e.target.value as 'NUMBER' | 'SUPPLIER');
+            }}
+          >
+            <option value="NUMBER">By PO Number</option>
+            <option value="SUPPLIER">By Supplier</option>
+          </select>
+          <div className="w-px h-6 bg-border mx-2" />
           <select
             className="h-10 px-3 rounded-control border border-border bg-surface text-text text-sm focus:ring-2 focus:ring-primary outline-none"
             value={status}
-            onChange={(e) => { setStatus(e.target.value as PoStatus); }}
+            onChange={(e) => {
+              setStatus(e.target.value as PoStatus);
+            }}
+            disabled={searchQuery.trim().length >= 2}
           >
             <option value="DRAFT">Draft</option>
             <option value="ORDERED">Ordered</option>
             <option value="PARTIALLY_RECEIVED">Partially Received</option>
             <option value="RECEIVED">Received</option>
             <option value="CANCELLED">Cancelled</option>
+          </select>
+          <select
+            className="h-10 px-3 rounded-control border border-border bg-surface text-text text-sm focus:ring-2 focus:ring-primary outline-none"
+            value={supplierKind}
+            onChange={(e) => {
+              setSupplierKind(e.target.value as 'ALL' | 'PRIVATE' | 'CONNECTED');
+            }}
+            disabled={searchQuery.trim().length >= 2}
+          >
+            <option value="ALL">All Kinds</option>
+            <option value="PRIVATE">Private</option>
+            <option value="CONNECTED">Connected</option>
           </select>
         </div>
 
@@ -64,11 +124,22 @@ export function PurchaseOrderListScreen() {
         ) : !page?.items.length ? (
           <EmptyState
             title="No orders found"
-            description="Get started by creating your first purchase order."
+            description={
+              searchQuery.trim().length >= 2
+                ? 'No matches found.'
+                : 'Get started by creating your first purchase order.'
+            }
             action={
-              <Button onClick={() => { void navigate('new'); }} variant="primary">
-                Create Order
-              </Button>
+              !searchQuery.trim().length ? (
+                <Button
+                  onClick={() => {
+                    void navigate('new');
+                  }}
+                  variant="primary"
+                >
+                  Create Order
+                </Button>
+              ) : undefined
             }
           />
         ) : (
@@ -83,16 +154,20 @@ export function PurchaseOrderListScreen() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
-                {page.items.map((order) => (
+                {page.items.map((order: PurchaseOrder) => (
                   <tr
                     key={order.purchaseOrderId}
                     className="hover:bg-background cursor-pointer transition-colors"
-                    onClick={() => { void navigate(order.purchaseOrderId); }}
+                    onClick={() => {
+                      void navigate(order.purchaseOrderId);
+                    }}
                   >
                     <td className="p-4 text-sm font-medium">{order.orderNumber || 'Draft'}</td>
                     <td className="p-4 text-sm text-text-muted">{order.counterpartyName}</td>
                     <td className="p-4 text-sm text-text-muted">{order.status}</td>
-                    <td className="p-4 text-sm text-text-muted">{order.totalMinor / 100} {order.currency}</td>
+                    <td className="p-4 text-sm text-text-muted">
+                      {order.totalMinor / 100} {order.currency}
+                    </td>
                   </tr>
                 ))}
               </tbody>

@@ -72,16 +72,19 @@ export async function executePoOrderCommand(orgId: string, purchaseOrderId: stri
   return adapterPoOrder(orgId, purchaseOrderId);
 }
 
-export async function executePoCancelCommand(orgId: string, purchaseOrderId: string): Promise<void> {
+export async function executePoCancelCommand(
+  orgId: string,
+  purchaseOrderId: string,
+): Promise<void> {
   return adapterPoCancel(orgId, purchaseOrderId);
 }
 
 export async function executePoReceiveCommand(
   orgId: string,
   purchaseOrderId: string,
-  items: Array<{ itemId: string; quantityMinor: number }>,
-  receiptDate?: string,
+  warehouseId: string,
+  lines: Array<{ itemId: string; quantityMilli: number }>,
 ): Promise<void> {
   const { executePoReceiveCommand: adapterPoReceive } = await import('@/data/adapters/poAdapter');
-  return adapterPoReceive(orgId, purchaseOrderId, items, receiptDate);
+  return adapterPoReceive(orgId, purchaseOrderId, warehouseId, lines);
 }

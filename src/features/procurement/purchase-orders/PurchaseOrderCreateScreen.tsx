@@ -53,7 +53,7 @@ export function PurchaseOrderCreateScreen() {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any
         totalMinor: 0 as any,
       };
-      
+
       const newPoId = crypto.randomUUID();
       await executePrivatePoHeaderCreate(activeOrg.organizationId, newPoId, payload, user.uid);
       void navigate(`/app/${handle ?? ''}/procurement/purchase-orders/${newPoId}`);
@@ -70,7 +70,9 @@ export function PurchaseOrderCreateScreen() {
 
       <div className="p-4 md:p-8">
         <form
-          onSubmit={(e) => { void handleSubmit(e); }}
+          onSubmit={(e) => {
+            void handleSubmit(e);
+          }}
           className="bg-surface p-6 rounded-panel border border-border shadow-sm space-y-6"
         >
           {error && <div className="text-error text-sm font-medium">{error}</div>}
@@ -85,9 +87,13 @@ export function PurchaseOrderCreateScreen() {
                 required
                 className="w-full h-10 px-3 rounded-control border border-border bg-surface text-text text-sm focus:ring-2 focus:ring-primary outline-none"
                 value={formData.privateSupplierId}
-                onChange={(e) => { setFormData({ ...formData, privateSupplierId: e.target.value }); }}
+                onChange={(e) => {
+                  setFormData({ ...formData, privateSupplierId: e.target.value });
+                }}
               >
-                <option value="" disabled>Select supplier...</option>
+                <option value="" disabled>
+                  Select supplier...
+                </option>
                 {suppliers?.items.map((s) => (
                   <option key={s.partnerId} value={s.partnerId}>
                     {s.name}
@@ -104,16 +110,29 @@ export function PurchaseOrderCreateScreen() {
                 id="expected-date"
                 type="date"
                 value={formData.expectedDate}
-                onChange={(e) => { setFormData({ ...formData, expectedDate: e.target.value }); }}
+                onChange={(e) => {
+                  setFormData({ ...formData, expectedDate: e.target.value });
+                }}
               />
             </div>
           </div>
 
           <div className="flex justify-end gap-3 pt-6 border-t border-border">
-            <Button type="button" variant="secondary" onClick={() => { void navigate(-1); }} disabled={isSubmitting}>
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={() => {
+                void navigate(-1);
+              }}
+              disabled={isSubmitting}
+            >
               Cancel
             </Button>
-            <Button type="submit" variant="primary" disabled={isSubmitting || !formData.privateSupplierId}>
+            <Button
+              type="submit"
+              variant="primary"
+              disabled={isSubmitting || !formData.privateSupplierId}
+            >
               {isSubmitting ? 'Creating...' : 'Create PO'}
             </Button>
           </div>

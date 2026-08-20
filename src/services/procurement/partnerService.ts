@@ -33,4 +33,3 @@ export async function executePartnerSetStatusCommand(
 ): Promise<void> {
   return adapterSetStatus(orgId, partnerId, status);
 }
-

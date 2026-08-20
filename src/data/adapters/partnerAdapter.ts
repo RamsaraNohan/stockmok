@@ -6,10 +6,25 @@ import type { CommandResult } from '@stockmok/shared';
 
 export type PartnerCreatePayload = Omit<
   PrivatePartner,
-  'partnerId' | 'createdAt' | 'createdBy' | 'updatedAt' | 'updatedBy' | 'status' | 'ordersPlacedCount'
+  | 'partnerId'
+  | 'createdAt'
+  | 'createdBy'
+  | 'updatedAt'
+  | 'updatedBy'
+  | 'status'
+  | 'ordersPlacedCount'
 >;
 export type PartnerUpdatePayload = Partial<
-  Omit<PrivatePartner, 'partnerId' | 'createdAt' | 'createdBy' | 'updatedAt' | 'updatedBy' | 'status' | 'ordersPlacedCount'>
+  Omit<
+    PrivatePartner,
+    | 'partnerId'
+    | 'createdAt'
+    | 'createdBy'
+    | 'updatedAt'
+    | 'updatedBy'
+    | 'status'
+    | 'ordersPlacedCount'
+  >
 >;
 
 export async function executePartnerCreate(
@@ -64,4 +79,3 @@ export async function executePartnerSetStatusCommand(
   };
   await callable(payloadEnvelope);
 }
-
