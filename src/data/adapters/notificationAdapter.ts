@@ -1,17 +1,33 @@
-import type { Notification } from '@stockmok/shared';
-import { createReadClient } from '@stockmok/data';
+import type { Notification, NotificationCategory } from '@stockmok/shared';
+import { createReadClient, type PageRequest, type PageResult } from '@stockmok/data';
 import { doc, updateDoc } from 'firebase/firestore';
 
 import { db } from '../firebase/client';
+
+export interface NotificationListFilters {
+  readonly read?: boolean;
+  readonly category?: NotificationCategory;
+}
 
 // Q-004: Notification list users/{uid}/notifications
 export async function fetchUserNotifications(
   uid: string,
   maxResults = 50,
 ): Promise<readonly Notification[]> {
-  const client = createReadClient(db, { uid });
-  const result = await client.list<Notification>('Q-004', undefined, { limit: maxResults });
+  const result = await fetchNotificationPage(uid, {}, { limit: maxResults });
   return result.items;
+}
+
+export async function fetchNotificationPage(
+  uid: string,
+  filters: NotificationListFilters = {},
+  page: PageRequest = {},
+): Promise<PageResult<Notification>> {
+  const client = createReadClient(db, { uid });
+  const parameters: Record<string, unknown> = {};
+  if (filters.read !== undefined) parameters.read = filters.read;
+  if (filters.category !== undefined) parameters.category = filters.category;
+  return client.list<Notification>('Q-004', parameters, page);
 }
 
 // Q-005 Transport A: Exact one-shot count from server via getCountFromServer

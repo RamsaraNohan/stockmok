@@ -18,7 +18,7 @@ export function ProductDetailScreen() {
   const queryClient = useQueryClient();
   const { handle, productId } = useParams<{ handle: string; productId: string }>();
   const repositories = useRepositories();
-  const { activeRole, activeOrg } = useWorkspace();
+  const { activeRole, activeOrg, activeSettings } = useWorkspace();
   const [activeTab, setActiveTab] = useState<'overview' | 'stock' | 'movements' | 'purchaseOrders'>(
     'overview',
   );
@@ -120,6 +120,10 @@ export function ProductDetailScreen() {
 
   const canWriteInventory =
     activeRole === 'OWNER' || activeRole === 'ADMIN' || activeRole === 'INVENTORY_MANAGER';
+  const canPublishToPartners =
+    activeSettings?.networkEnabled === true &&
+    product?.status === 'ACTIVE' &&
+    (activeRole === 'OWNER' || activeRole === 'ADMIN' || activeRole === 'PROCUREMENT_MANAGER');
   const canWriteTransfer = canWriteInventory;
 
   const handleToggleStatus = async () => {
@@ -189,6 +193,18 @@ export function ProductDetailScreen() {
         title={product.name}
         actions={
           <div className="flex gap-2">
+            {canPublishToPartners && (
+              <Button
+                onClick={() => {
+                  void navigate(
+                    `/app/${handle ?? ''}/network/partner-catalog?productId=${encodeURIComponent(productId)}`,
+                  );
+                }}
+                variant="secondary"
+              >
+                Publish to partners
+              </Button>
+            )}
             {canWriteInventory && (
               <Button
                 onClick={() => {

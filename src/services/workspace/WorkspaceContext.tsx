@@ -25,8 +25,10 @@ export interface WorkspaceContextValue {
   readonly activeMemberDoc: Member | null;
   readonly activeRole: Role | null;
   readonly isLoading: boolean;
+  readonly isWorkspaceDataLoading: boolean;
   readonly setActiveHandle: (handle: string) => Promise<boolean>;
   readonly refreshMemberships: () => Promise<readonly UserMembership[]>;
+  readonly refreshWorkspaceData: () => Promise<void>;
 }
 
 const WorkspaceContext = createContext<WorkspaceContextValue | undefined>(undefined);
@@ -41,6 +43,7 @@ export function WorkspaceProvider({ children }: { readonly children: ReactNode }
   const [activeSettings, setActiveSettings] = useState<OrganizationSettings | null>(null);
   const [activeMemberDoc, setActiveMemberDoc] = useState<Member | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isWorkspaceDataLoading, setIsWorkspaceDataLoading] = useState(false);
 
   const loadMemberships = useCallback(async (uid: string) => {
     try {
@@ -64,6 +67,7 @@ export function WorkspaceProvider({ children }: { readonly children: ReactNode }
           setActiveOrg(null);
           setActiveSettings(null);
           setActiveMemberDoc(null);
+          setIsWorkspaceDataLoading(false);
           setIsLoading(false);
         }
       });
@@ -95,6 +99,7 @@ export function WorkspaceProvider({ children }: { readonly children: ReactNode }
           setActiveOrg(null);
           setActiveSettings(null);
           setActiveMemberDoc(null);
+          setIsWorkspaceDataLoading(false);
         }
       });
       return () => {
@@ -116,6 +121,10 @@ export function WorkspaceProvider({ children }: { readonly children: ReactNode }
         if (isMounted) {
           setActiveOrg(null);
           setActiveSettings(null);
+        }
+      } finally {
+        if (isMounted) {
+          setIsWorkspaceDataLoading(false);
         }
       }
     };
@@ -144,6 +153,9 @@ export function WorkspaceProvider({ children }: { readonly children: ReactNode }
 
       // Purge private cached queries before exposing new organization surface.
       queryClient.clear();
+      setActiveOrg(null);
+      setActiveSettings(null);
+      setActiveMemberDoc(null);
 
       const freshMemberships = await loadMemberships(user.uid);
       const target = freshMemberships.find(
@@ -153,11 +165,13 @@ export function WorkspaceProvider({ children }: { readonly children: ReactNode }
       );
 
       if (target) {
+        setIsWorkspaceDataLoading(true);
         setActiveMembership(target);
         return true;
       }
 
       setActiveMembership(null);
+      setIsWorkspaceDataLoading(false);
       return false;
     },
     [loadMemberships, queryClient, user],
@@ -167,6 +181,21 @@ export function WorkspaceProvider({ children }: { readonly children: ReactNode }
     if (!user) return [];
     return loadMemberships(user.uid);
   }, [loadMemberships, user]);
+
+  const refreshWorkspaceData = useCallback(async (): Promise<void> => {
+    if (!activeMembership) return;
+    setIsWorkspaceDataLoading(true);
+    try {
+      const [org, settings] = await Promise.all([
+        fetchOrganization(activeMembership.organizationId),
+        fetchOrganizationSettings(activeMembership.organizationId),
+      ]);
+      setActiveOrg(org);
+      setActiveSettings(settings);
+    } finally {
+      setIsWorkspaceDataLoading(false);
+    }
+  }, [activeMembership]);
 
   const activeRole = activeMemberDoc?.role ?? activeMembership?.role ?? null;
 
@@ -180,8 +209,10 @@ export function WorkspaceProvider({ children }: { readonly children: ReactNode }
         activeMemberDoc,
         activeRole,
         isLoading,
+        isWorkspaceDataLoading,
         setActiveHandle,
         refreshMemberships,
+        refreshWorkspaceData,
       }}
     >
       {children}

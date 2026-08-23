@@ -1,63 +1,33 @@
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import type { Notification } from '@stockmok/shared';
-import { Bell, Check } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { Bell, Check, ExternalLink } from 'lucide-react';
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
 
 import { useAuth } from '@/services/auth/useAuth';
-import {
-  fetchUserNotifications,
-  markNotificationRead,
-  subscribeToUnreadNotifications,
-} from '@/services/notifications/notificationService';
+import { fetchUserNotifications } from '@/services/notifications/notificationService';
+import { useWorkspace } from '@/services/workspace/useWorkspace';
 import { Badge } from '@/ui/primitives/Badge';
+
+import { resolveNotificationReference } from './notificationReferences';
+import { useUnreadNotifications } from './useUnreadNotifications';
 
 export function NotificationFlyout() {
   const { user } = useAuth();
-  const [unreadState, setUnreadState] = useState<{ count: number; isCapped: boolean }>({
-    count: 0,
-    isCapped: false,
-  });
-  const [notifications, setNotifications] = useState<readonly Notification[]>([]);
+  const { memberships, activeMembership, activeSettings } = useWorkspace();
+  const unreadState = useUnreadNotifications(user?.uid ?? null);
   const [isOpen, setIsOpen] = useState(false);
+  const listQuery = useQuery({
+    queryKey: ['notifications', 'flyout', user?.uid],
+    queryFn: () => fetchUserNotifications(user?.uid ?? '', 5),
+    enabled: isOpen && !!user,
+  });
+  const notifications: readonly Notification[] = listQuery.data ?? [];
 
-  useEffect(() => {
-    if (!user) {
-      return;
-    }
-
-    let isMounted = true;
-    const unsub = subscribeToUnreadNotifications(user.uid, (data) => {
-      if (isMounted) {
-        setUnreadState(data);
-      }
-    });
-
-    return () => {
-      isMounted = false;
-      unsub();
-    };
-  }, [user]);
-
-  useEffect(() => {
-    if (!isOpen || !user) return;
-
-    let isMounted = true;
-    void fetchUserNotifications(user.uid).then((list) => {
-      if (isMounted) {
-        setNotifications(list);
-      }
-    });
-
-    return () => {
-      isMounted = false;
-    };
-  }, [isOpen, user]);
-
-  const handleMarkAsRead = async (id: string) => {
-    if (!user) return;
-    await markNotificationRead(user.uid, id);
-    setNotifications((prev) => prev.map((n) => (n.referenceId === id ? { ...n, read: true } : n)));
-  };
+  const viewAllHref = activeMembership
+    ? `/app/${encodeURIComponent(activeMembership.handle)}/notifications`
+    : null;
 
   return (
     <DropdownMenu.Root open={isOpen} onOpenChange={setIsOpen}>
@@ -93,38 +63,86 @@ export function NotificationFlyout() {
           </div>
 
           <div className="mt-3 max-h-80 overflow-y-auto flex flex-col gap-2">
-            {notifications.length === 0 ? (
-              <p className="text-text-muted py-6 text-center text-xs">
-                No notifications to display.
+            {listQuery.isLoading ? (
+              <p className="text-text-muted py-6 text-center text-xs" role="status">
+                Loading notifications…
               </p>
+            ) : listQuery.isError ? (
+              <p className="text-red-700 py-6 text-center text-xs" role="alert">
+                Notifications could not be loaded.
+              </p>
+            ) : notifications.length === 0 ? (
+              <p className="text-text-muted py-6 text-center text-xs">You&apos;re all caught up.</p>
             ) : (
-              notifications.map((n, idx) => (
-                <div
-                  key={n.referenceId || idx}
-                  className={`flex flex-col gap-1 rounded-lg border p-3 text-xs transition-colors ${
-                    n.read
-                      ? 'border-border/50 bg-surface text-text-muted'
-                      : 'border-primary/30 bg-primary-subtle text-text font-medium'
-                  }`}
-                >
-                  <div className="flex items-start justify-between gap-2">
-                    <span className="font-bold">{n.title}</span>
-                    {!n.read && (
-                      <button
-                        aria-label="Mark notification as read"
-                        className="text-primary hover:text-primary/80 cursor-pointer p-0.5"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          void handleMarkAsRead(n.referenceId);
+              notifications.map((notification) => {
+                const target = resolveNotificationReference(
+                  notification,
+                  memberships,
+                  activeMembership?.organizationId ?? null,
+                  activeSettings,
+                );
+                const key = `${String(notification.createdAt.toMillis())}-${notification.referenceType}-${notification.referenceId}`;
+                return (
+                  <div
+                    key={key}
+                    className={`flex flex-col gap-1 rounded-lg border p-3 text-xs transition-colors ${
+                      notification.read
+                        ? 'border-border/50 bg-surface text-text-muted'
+                        : 'border-primary/30 bg-primary-subtle text-text font-medium'
+                    }`}
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <span className="font-bold">{notification.title}</span>
+                      {!notification.read && (
+                        <button
+                          aria-label="Mark as read unavailable"
+                          className="text-text-muted cursor-not-allowed p-0.5 opacity-50"
+                          disabled
+                          title="Read status updates are temporarily unavailable"
+                        >
+                          <Check className="size-3.5" />
+                        </button>
+                      )}
+                    </div>
+                    <p className="leading-normal">{notification.message}</p>
+                    <p className="text-text-muted mt-1">{notification.organizationName}</p>
+                    {target ? (
+                      <Link
+                        className="text-primary mt-1 inline-flex items-center gap-1 font-bold hover:underline"
+                        onClick={() => {
+                          setIsOpen(false);
                         }}
+                        to={target.href}
                       >
-                        <Check className="size-3.5" />
-                      </button>
+                        {target.label}
+                        <ExternalLink aria-hidden="true" className="size-3" />
+                      </Link>
+                    ) : (
+                      <span className="text-text-muted mt-1">
+                        Access to this item may have changed.
+                      </span>
                     )}
                   </div>
-                  <p className="leading-normal">{n.message}</p>
-                </div>
-              ))
+                );
+              })
+            )}
+          </div>
+
+          <div className="border-border mt-3 border-t pt-3">
+            {viewAllHref ? (
+              <Link
+                className="text-primary flex min-h-10 items-center justify-center rounded-control text-sm font-bold hover:bg-primary-subtle max-md:min-h-11"
+                onClick={() => {
+                  setIsOpen(false);
+                }}
+                to={viewAllHref}
+              >
+                View all notifications
+              </Link>
+            ) : (
+              <span className="text-text-muted block py-2 text-center text-xs">
+                Select a workspace to view all notifications.
+              </span>
             )}
           </div>
         </DropdownMenu.Content>
