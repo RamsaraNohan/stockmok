@@ -64,9 +64,11 @@ export function KpiPanel() {
 
 function KpiCard({ label, value }: { readonly label: string; readonly value: string | number }) {
   return (
-    <div className="bg-surface border-border rounded-panel flex flex-col border p-4 shadow-sm">
+    <div className="bg-surface border-border rounded-panel flex min-w-0 flex-col border p-4 shadow-sm">
       <span className="text-text-muted text-sm font-medium">{label}</span>
-      <span className="text-text mt-2 text-2xl font-bold">{value}</span>
+      <span className="text-text mt-2 min-w-0 text-xl font-bold break-words sm:text-2xl">
+        {value}
+      </span>
     </div>
   );
 }
