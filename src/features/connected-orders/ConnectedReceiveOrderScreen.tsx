@@ -166,7 +166,7 @@ export function ConnectedReceiveOrderScreen({
           queryClient.invalidateQueries({ queryKey: ['balances', item.buyerProductId] }),
         ),
       ]);
-      void navigate(`../../purchase-orders/${poId}`);
+      void navigate(`/app/${activeMembership.handle}/procurement/purchase-orders/${poId}`);
     } catch {
       setError('The receipt was not applied. Refresh the order and try again.');
     } finally {
