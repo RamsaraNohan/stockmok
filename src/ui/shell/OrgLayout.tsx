@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { Suspense, useState } from 'react';
 import { Outlet } from 'react-router-dom';
 
 import { DesktopSidebar } from './DesktopSidebar';
@@ -27,7 +27,15 @@ export function OrgLayout() {
         <DesktopSidebar />
 
         <main id="main-content" className="min-w-0 flex-1 p-8 max-md:p-4" tabIndex={-1}>
-          <Outlet />
+          <Suspense
+            fallback={
+              <div className="flex h-full items-center justify-center p-8">
+                <div className="text-secondary">Loading...</div>
+              </div>
+            }
+          >
+            <Outlet />
+          </Suspense>
         </main>
       </div>
 
