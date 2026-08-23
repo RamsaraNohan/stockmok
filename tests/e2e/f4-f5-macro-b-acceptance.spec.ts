@@ -393,6 +393,14 @@ test('Owner invites a new user and the invite link is shown exactly once', async
 
 // ─── Settings ───────────────────────────────────────────────────────────────
 
+test('A non-Owner/Admin role is denied Team before any team query fires', async ({
+  page,
+}, testInfo) => {
+  cover(testInfo, 'A10-F5-TEAM-003');
+  await login(page, USERS.storekeeper, 'grand-ocean');
+  await expectDenied(page, '/app/grand-ocean/team');
+});
+
 test('Owner has full Settings access including the Network toggle', async ({ page }, testInfo) => {
   cover(testInfo, 'A10-F5-SET-001');
   await login(page, USERS.owner, 'grand-ocean');

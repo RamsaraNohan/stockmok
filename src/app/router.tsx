@@ -1,3 +1,4 @@
+import { lazy, Suspense } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { createBrowserRouter, Navigate, RouterProvider } from 'react-router-dom';
 
@@ -6,19 +7,39 @@ import { GuestGuard } from '@/app/guards/GuestGuard';
 import { NetworkFeatureGuard } from '@/app/guards/NetworkFeatureGuard';
 import { RoleGuard } from '@/app/guards/RoleGuard';
 import { WorkspaceGuard } from '@/app/guards/WorkspaceGuard';
-import { AcceptInviteScreen } from '@/features/auth/AcceptInviteScreen';
-import { BrandedLoginScreen } from '@/features/auth/BrandedLoginScreen';
-import { LandingScreen } from '@/features/auth/LandingScreen';
-import { SignInScreen } from '@/features/auth/SignInScreen';
-import { SignUpScreen } from '@/features/auth/SignUpScreen';
-import { NotFoundScreen } from '@/features/exceptions/NotFoundScreen';
-import { OnboardingScreen } from '@/features/onboarding/OnboardingScreen';
-import { WorkspaceSelectorScreen } from '@/features/onboarding/WorkspaceSelectorScreen';
+const AcceptInviteScreen = lazy(() =>
+  import('@/features/auth/AcceptInviteScreen').then((m) => ({ default: m.AcceptInviteScreen })),
+);
+const BrandedLoginScreen = lazy(() =>
+  import('@/features/auth/BrandedLoginScreen').then((m) => ({ default: m.BrandedLoginScreen })),
+);
+const LandingScreen = lazy(() =>
+  import('@/features/auth/LandingScreen').then((m) => ({ default: m.LandingScreen })),
+);
+const SignInScreen = lazy(() =>
+  import('@/features/auth/SignInScreen').then((m) => ({ default: m.SignInScreen })),
+);
+const SignUpScreen = lazy(() =>
+  import('@/features/auth/SignUpScreen').then((m) => ({ default: m.SignUpScreen })),
+);
+const NotFoundScreen = lazy(() =>
+  import('@/features/exceptions/NotFoundScreen').then((m) => ({ default: m.NotFoundScreen })),
+);
+const OnboardingScreen = lazy(() =>
+  import('@/features/onboarding/OnboardingScreen').then((m) => ({ default: m.OnboardingScreen })),
+);
+const WorkspaceSelectorScreen = lazy(() =>
+  import('@/features/onboarding/WorkspaceSelectorScreen').then((m) => ({
+    default: m.WorkspaceSelectorScreen,
+  })),
+);
 import { AuthProvider } from '@/services/auth/AuthContext';
 import { isEmulatorMode } from '@/services/runtime/environment';
 import { WorkspaceProvider } from '@/services/workspace/WorkspaceContext';
 import { EmulatorRibbon } from '@/ui/EmulatorRibbon';
-import { OrgLayout } from '@/ui/shell/OrgLayout';
+const OrgLayout = lazy(() =>
+  import('@/ui/shell/OrgLayout').then((m) => ({ default: m.OrgLayout })),
+);
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -29,33 +50,133 @@ const queryClient = new QueryClient({
   },
 });
 
-import { DashboardScreen } from '@/features/dashboard/DashboardScreen';
-import { ProductListScreen } from '@/features/inventory/products/ProductListScreen';
-import { ProductCreateScreen } from '@/features/inventory/products/ProductCreateScreen';
-import { ProductDetailScreen } from '@/features/inventory/products/ProductDetailScreen';
-import { ProductEditScreen } from '@/features/inventory/products/ProductEditScreen';
-import { CategoryListScreen } from '@/features/inventory/categories/CategoryListScreen';
-import { SupplierListScreen } from '@/features/procurement/partners/SupplierListScreen';
-import { BuyerListScreen } from '@/features/procurement/partners/BuyerListScreen';
-import { PartnerCreateScreen } from '@/features/procurement/partners/PartnerCreateScreen';
-import { PartnerDetailScreen } from '@/features/procurement/partners/PartnerDetailScreen';
-import { PurchaseOrderListScreen } from '@/features/procurement/purchase-orders/PurchaseOrderListScreen';
-import { PurchaseOrderCreateScreen } from '@/features/procurement/purchase-orders/PurchaseOrderCreateScreen';
-import { PurchaseOrderRouteScreen } from '@/features/connected-orders/PurchaseOrderRouteScreen';
-import { ReceivingListScreen } from '@/features/procurement/receiving/ReceivingListScreen';
-import { ReceiveOrderRouteScreen } from '@/features/connected-orders/ReceiveOrderRouteScreen';
-import { WarehouseListScreen } from '@/features/inventory/warehouses/WarehouseListScreen';
-import { MovementHistoryScreen } from '@/features/movements/MovementHistoryScreen';
-import { ConnectedBusinessesScreen } from '@/features/network/ConnectedBusinessesScreen';
-import { ConnectionDetailScreen } from '@/features/network/ConnectionDetailScreen';
-import { SupplierPartnerCatalogScreen } from '@/features/catalog/SupplierPartnerCatalogScreen';
-import { BuyerPartnerCatalogScreen } from '@/features/catalog/BuyerPartnerCatalogScreen';
-import { ProductMappingsScreen } from '@/features/mappings/ProductMappingsScreen';
-import { ProductMappingWizardScreen } from '@/features/mappings/ProductMappingWizardScreen';
-import { NotificationsScreen } from '@/features/notifications/NotificationsScreen';
-import { ReportsScreen } from '@/features/reports/ReportsScreen';
-import { SettingsScreen } from '@/features/settings/SettingsScreen';
-import { TeamScreen } from '@/features/team/TeamScreen';
+const DashboardScreen = lazy(() =>
+  import('@/features/dashboard/DashboardScreen').then((m) => ({ default: m.DashboardScreen })),
+);
+const ProductListScreen = lazy(() =>
+  import('@/features/inventory/products/ProductListScreen').then((m) => ({
+    default: m.ProductListScreen,
+  })),
+);
+const ProductCreateScreen = lazy(() =>
+  import('@/features/inventory/products/ProductCreateScreen').then((m) => ({
+    default: m.ProductCreateScreen,
+  })),
+);
+const ProductDetailScreen = lazy(() =>
+  import('@/features/inventory/products/ProductDetailScreen').then((m) => ({
+    default: m.ProductDetailScreen,
+  })),
+);
+const ProductEditScreen = lazy(() =>
+  import('@/features/inventory/products/ProductEditScreen').then((m) => ({
+    default: m.ProductEditScreen,
+  })),
+);
+const CategoryListScreen = lazy(() =>
+  import('@/features/inventory/categories/CategoryListScreen').then((m) => ({
+    default: m.CategoryListScreen,
+  })),
+);
+const SupplierListScreen = lazy(() =>
+  import('@/features/procurement/partners/SupplierListScreen').then((m) => ({
+    default: m.SupplierListScreen,
+  })),
+);
+const BuyerListScreen = lazy(() =>
+  import('@/features/procurement/partners/BuyerListScreen').then((m) => ({
+    default: m.BuyerListScreen,
+  })),
+);
+const PartnerCreateScreen = lazy(() =>
+  import('@/features/procurement/partners/PartnerCreateScreen').then((m) => ({
+    default: m.PartnerCreateScreen,
+  })),
+);
+const PartnerDetailScreen = lazy(() =>
+  import('@/features/procurement/partners/PartnerDetailScreen').then((m) => ({
+    default: m.PartnerDetailScreen,
+  })),
+);
+const PurchaseOrderListScreen = lazy(() =>
+  import('@/features/procurement/purchase-orders/PurchaseOrderListScreen').then((m) => ({
+    default: m.PurchaseOrderListScreen,
+  })),
+);
+const PurchaseOrderCreateScreen = lazy(() =>
+  import('@/features/procurement/purchase-orders/PurchaseOrderCreateScreen').then((m) => ({
+    default: m.PurchaseOrderCreateScreen,
+  })),
+);
+const PurchaseOrderRouteScreen = lazy(() =>
+  import('@/features/connected-orders/PurchaseOrderRouteScreen').then((m) => ({
+    default: m.PurchaseOrderRouteScreen,
+  })),
+);
+const ReceivingListScreen = lazy(() =>
+  import('@/features/procurement/receiving/ReceivingListScreen').then((m) => ({
+    default: m.ReceivingListScreen,
+  })),
+);
+const ReceiveOrderRouteScreen = lazy(() =>
+  import('@/features/connected-orders/ReceiveOrderRouteScreen').then((m) => ({
+    default: m.ReceiveOrderRouteScreen,
+  })),
+);
+const WarehouseListScreen = lazy(() =>
+  import('@/features/inventory/warehouses/WarehouseListScreen').then((m) => ({
+    default: m.WarehouseListScreen,
+  })),
+);
+const MovementHistoryScreen = lazy(() =>
+  import('@/features/movements/MovementHistoryScreen').then((m) => ({
+    default: m.MovementHistoryScreen,
+  })),
+);
+const ConnectedBusinessesScreen = lazy(() =>
+  import('@/features/network/ConnectedBusinessesScreen').then((m) => ({
+    default: m.ConnectedBusinessesScreen,
+  })),
+);
+const ConnectionDetailScreen = lazy(() =>
+  import('@/features/network/ConnectionDetailScreen').then((m) => ({
+    default: m.ConnectionDetailScreen,
+  })),
+);
+const SupplierPartnerCatalogScreen = lazy(() =>
+  import('@/features/catalog/SupplierPartnerCatalogScreen').then((m) => ({
+    default: m.SupplierPartnerCatalogScreen,
+  })),
+);
+const BuyerPartnerCatalogScreen = lazy(() =>
+  import('@/features/catalog/BuyerPartnerCatalogScreen').then((m) => ({
+    default: m.BuyerPartnerCatalogScreen,
+  })),
+);
+const ProductMappingsScreen = lazy(() =>
+  import('@/features/mappings/ProductMappingsScreen').then((m) => ({
+    default: m.ProductMappingsScreen,
+  })),
+);
+const ProductMappingWizardScreen = lazy(() =>
+  import('@/features/mappings/ProductMappingWizardScreen').then((m) => ({
+    default: m.ProductMappingWizardScreen,
+  })),
+);
+const NotificationsScreen = lazy(() =>
+  import('@/features/notifications/NotificationsScreen').then((m) => ({
+    default: m.NotificationsScreen,
+  })),
+);
+const ReportsScreen = lazy(() =>
+  import('@/features/reports/ReportsScreen').then((m) => ({ default: m.ReportsScreen })),
+);
+const SettingsScreen = lazy(() =>
+  import('@/features/settings/SettingsScreen').then((m) => ({ default: m.SettingsScreen })),
+);
+const TeamScreen = lazy(() =>
+  import('@/features/team/TeamScreen').then((m) => ({ default: m.TeamScreen })),
+);
 import { useWorkspace } from '@/services/workspace/useWorkspace';
 
 function SettingsRouteScreen() {
@@ -74,7 +195,7 @@ export const router = createBrowserRouter([
     path: '/',
     element: (
       <GuestGuard>
-        <LandingScreen />
+        <Suspense fallback={<div className="flex h-screen items-center justify-center">Loading...</div>}><LandingScreen /></Suspense>
       </GuestGuard>
     ),
   },
@@ -82,7 +203,7 @@ export const router = createBrowserRouter([
     path: '/signup',
     element: (
       <GuestGuard>
-        <SignUpScreen />
+        <Suspense fallback={<div className="flex h-screen items-center justify-center">Loading...</div>}><SignUpScreen /></Suspense>
       </GuestGuard>
     ),
   },
@@ -90,23 +211,23 @@ export const router = createBrowserRouter([
     path: '/login',
     element: (
       <GuestGuard>
-        <SignInScreen />
+        <Suspense fallback={<div className="flex h-screen items-center justify-center">Loading...</div>}><SignInScreen /></Suspense>
       </GuestGuard>
     ),
   },
   {
     path: '/b/:handle',
-    element: <BrandedLoginScreen />,
+    element: <Suspense fallback={<div className="flex h-screen items-center justify-center">Loading...</div>}><BrandedLoginScreen /></Suspense>,
   },
   {
     path: '/invite/:token',
-    element: <AcceptInviteScreen />,
+    element: <Suspense fallback={<div className="flex h-screen items-center justify-center">Loading...</div>}><AcceptInviteScreen /></Suspense>,
   },
   {
     path: '/select-workspace',
     element: (
       <AuthGuard>
-        <WorkspaceSelectorScreen />
+        <Suspense fallback={<div className="flex h-screen items-center justify-center">Loading...</div>}><WorkspaceSelectorScreen /></Suspense>
       </AuthGuard>
     ),
   },
@@ -114,7 +235,7 @@ export const router = createBrowserRouter([
     path: '/onboarding',
     element: (
       <AuthGuard>
-        <OnboardingScreen />
+        <Suspense fallback={<div className="flex h-screen items-center justify-center">Loading...</div>}><OnboardingScreen /></Suspense>
       </AuthGuard>
     ),
   },
@@ -123,7 +244,7 @@ export const router = createBrowserRouter([
     element: (
       <AuthGuard>
         <WorkspaceGuard>
-          <OrgLayout />
+          <Suspense fallback={<div className="flex h-screen items-center justify-center">Loading...</div>}><OrgLayout /></Suspense>
         </WorkspaceGuard>
       </AuthGuard>
     ),

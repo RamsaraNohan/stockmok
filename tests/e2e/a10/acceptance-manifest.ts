@@ -8,7 +8,8 @@ export interface AcceptanceRow {
   readonly queryIds: readonly string[];
   readonly commandIds: readonly string[];
   readonly viewportRequirement: string;
-  readonly evidenceType: 'REAL_BROWSER' | 'REAL_BROWSER_REAL_EMULATOR';
+  readonly evidenceType:
+    'REAL_BROWSER' | 'REAL_BROWSER_REAL_EMULATOR' | 'BLOCKED_AUTHORITY_DEPENDENCY';
 }
 
 const source = {
@@ -695,6 +696,41 @@ export const acceptanceManifest: readonly AcceptanceRow[] = [
     viewportRequirement: '1280x900',
     evidenceType: 'REAL_BROWSER_REAL_EMULATOR',
   },
+  {
+    acceptanceId: 'A10-F4-CPO-BLOCKED-001',
+    sourceAuthority: source.command,
+    screenId: 'SCREEN-038',
+    routeId: 'ROUTE-019',
+    roleOrRoleClass: 'PO_WRITERS',
+    behavior: 'F4-T03e C34 connected draft-line persistence',
+    queryIds: [],
+    commandIds: ['C-34'],
+    viewportRequirement: '1280x900',
+    evidenceType: 'BLOCKED_AUTHORITY_DEPENDENCY',
+  },
+  {
+    acceptanceId: 'A10-F5-NOTIF-BLOCKED-001',
+    sourceAuthority: source.command,
+    screenId: 'SCREEN-026',
+    routeId: 'ROUTE-029',
+    roleOrRoleClass: 'OWNER',
+    behavior: 'F5-T02 Notification mark-read',
+    queryIds: [],
+    commandIds: [],
+    viewportRequirement: '1280x900',
+    evidenceType: 'BLOCKED_AUTHORITY_DEPENDENCY',
+  },
+  {
+    acceptanceId: 'A10-F5-TEAM-003',
+    sourceAuthority: source.rbac,
+    screenId: 'SCREEN-027',
+    routeId: 'ROUTE-027',
+    roleOrRoleClass: 'STOREKEEPER',
+    behavior: 'A non-Owner/Admin role is denied Team before any team query fires',
+    queryIds: [],
+    commandIds: [],
+    viewportRequirement: '1280x900',
+    evidenceType: 'REAL_BROWSER_REAL_EMULATOR',
+  },
 ];
-
 export const acceptanceIds = new Set(acceptanceManifest.map((row) => row.acceptanceId));
