@@ -195,7 +195,11 @@ export const router = createBrowserRouter([
     path: '/',
     element: (
       <GuestGuard>
-        <Suspense fallback={<div className="flex h-screen items-center justify-center">Loading...</div>}><LandingScreen /></Suspense>
+        <Suspense
+          fallback={<div className="flex h-screen items-center justify-center">Loading...</div>}
+        >
+          <LandingScreen />
+        </Suspense>
       </GuestGuard>
     ),
   },
@@ -203,7 +207,11 @@ export const router = createBrowserRouter([
     path: '/signup',
     element: (
       <GuestGuard>
-        <Suspense fallback={<div className="flex h-screen items-center justify-center">Loading...</div>}><SignUpScreen /></Suspense>
+        <Suspense
+          fallback={<div className="flex h-screen items-center justify-center">Loading...</div>}
+        >
+          <SignUpScreen />
+        </Suspense>
       </GuestGuard>
     ),
   },
@@ -211,23 +219,43 @@ export const router = createBrowserRouter([
     path: '/login',
     element: (
       <GuestGuard>
-        <Suspense fallback={<div className="flex h-screen items-center justify-center">Loading...</div>}><SignInScreen /></Suspense>
+        <Suspense
+          fallback={<div className="flex h-screen items-center justify-center">Loading...</div>}
+        >
+          <SignInScreen />
+        </Suspense>
       </GuestGuard>
     ),
   },
   {
     path: '/b/:handle',
-    element: <Suspense fallback={<div className="flex h-screen items-center justify-center">Loading...</div>}><BrandedLoginScreen /></Suspense>,
+    element: (
+      <Suspense
+        fallback={<div className="flex h-screen items-center justify-center">Loading...</div>}
+      >
+        <BrandedLoginScreen />
+      </Suspense>
+    ),
   },
   {
     path: '/invite/:token',
-    element: <Suspense fallback={<div className="flex h-screen items-center justify-center">Loading...</div>}><AcceptInviteScreen /></Suspense>,
+    element: (
+      <Suspense
+        fallback={<div className="flex h-screen items-center justify-center">Loading...</div>}
+      >
+        <AcceptInviteScreen />
+      </Suspense>
+    ),
   },
   {
     path: '/select-workspace',
     element: (
       <AuthGuard>
-        <Suspense fallback={<div className="flex h-screen items-center justify-center">Loading...</div>}><WorkspaceSelectorScreen /></Suspense>
+        <Suspense
+          fallback={<div className="flex h-screen items-center justify-center">Loading...</div>}
+        >
+          <WorkspaceSelectorScreen />
+        </Suspense>
       </AuthGuard>
     ),
   },
@@ -235,7 +263,11 @@ export const router = createBrowserRouter([
     path: '/onboarding',
     element: (
       <AuthGuard>
-        <Suspense fallback={<div className="flex h-screen items-center justify-center">Loading...</div>}><OnboardingScreen /></Suspense>
+        <Suspense
+          fallback={<div className="flex h-screen items-center justify-center">Loading...</div>}
+        >
+          <OnboardingScreen />
+        </Suspense>
       </AuthGuard>
     ),
   },
@@ -244,7 +276,11 @@ export const router = createBrowserRouter([
     element: (
       <AuthGuard>
         <WorkspaceGuard>
-          <Suspense fallback={<div className="flex h-screen items-center justify-center">Loading...</div>}><OrgLayout /></Suspense>
+          <Suspense
+            fallback={<div className="flex h-screen items-center justify-center">Loading...</div>}
+          >
+            <OrgLayout />
+          </Suspense>
         </WorkspaceGuard>
       </AuthGuard>
     ),
@@ -558,7 +594,13 @@ export const router = createBrowserRouter([
   },
   {
     path: '*',
-    element: <NotFoundScreen />,
+    element: (
+      <Suspense
+        fallback={<div className="flex h-screen items-center justify-center">Loading...</div>}
+      >
+        <NotFoundScreen />
+      </Suspense>
+    ),
   },
 ]);
 

@@ -1,7 +1,7 @@
 import { expect, type Page } from '@playwright/test';
 
-import { cover } from './a10/acceptance';
-import { test } from './a10/test';
+import { cover } from './macro-b/acceptance';
+import { test } from './macro-b/test';
 
 const USERS = {
   owner: 'owner@grand-ocean.stockmok.test',
@@ -34,7 +34,7 @@ async function expectDenied(page: Page, path: string) {
 test('Network enabled: Connected Businesses lists the ACTIVE Fresh Foods connection', async ({
   page,
 }, testInfo) => {
-  cover(testInfo, 'A10-F4-NET-001');
+  cover(testInfo, 'MB-F4-NET-001');
   await login(page, USERS.owner, 'grand-ocean');
   await page.goto('/app/grand-ocean/network/connections');
   await expect(page.getByText('Fresh Foods Ltd').first()).toBeVisible();
@@ -45,7 +45,7 @@ test('Network enabled: Connected Businesses lists the ACTIVE Fresh Foods connect
 test('Network RBAC: STOREKEEPER is denied Network routes before any query fires', async ({
   page,
 }, testInfo) => {
-  cover(testInfo, 'A10-F4-NET-002');
+  cover(testInfo, 'MB-F4-NET-002');
   await login(page, USERS.storekeeper, 'grand-ocean');
   await expectDenied(page, '/app/grand-ocean/network/connections');
   await expectDenied(page, '/app/grand-ocean/network/mappings');
@@ -54,7 +54,7 @@ test('Network RBAC: STOREKEEPER is denied Network routes before any query fires'
 test('Network disabled renders 404, not 403, and re-enabling restores access', async ({
   page,
 }, testInfo) => {
-  cover(testInfo, 'A10-F4-NET-003');
+  cover(testInfo, 'MB-F4-NET-003');
   await login(page, USERS.owner, 'grand-ocean');
   await page.goto('/app/grand-ocean/settings');
   const networkSwitch = page.getByRole('switch', { name: /Network/ });
@@ -80,7 +80,7 @@ test('Network disabled renders 404, not 403, and re-enabling restores access', a
 // ─── Business discovery ─────────────────────────────────────────────────────
 
 test('Discovery blocks searching the caller’s own handle', async ({ page }, testInfo) => {
-  cover(testInfo, 'A10-F4-DISC-001');
+  cover(testInfo, 'MB-F4-DISC-001');
   await login(page, USERS.owner, 'grand-ocean');
   await page.goto('/app/grand-ocean/network/connections');
   await page.getByRole('button', { name: 'Find business' }).click();
@@ -90,7 +90,7 @@ test('Discovery blocks searching the caller’s own handle', async ({ page }, te
 });
 
 test('Discovery reports no match for an exact unknown handle', async ({ page }, testInfo) => {
-  cover(testInfo, 'A10-F4-DISC-002');
+  cover(testInfo, 'MB-F4-DISC-002');
   await login(page, USERS.owner, 'grand-ocean');
   await page.goto('/app/grand-ocean/network/connections');
   await page.getByRole('button', { name: 'Find business' }).click();
@@ -104,7 +104,7 @@ test('Discovery reports no match for an exact unknown handle', async ({ page }, 
 test('Discovery finds an exact-handle match and surfaces its directory card', async ({
   page,
 }, testInfo) => {
-  cover(testInfo, 'A10-F4-DISC-003');
+  cover(testInfo, 'MB-F4-DISC-003');
   await login(page, USERS.owner, 'grand-ocean');
   await page.goto('/app/grand-ocean/network/connections');
   await page.getByRole('button', { name: 'Find business' }).click();
@@ -119,7 +119,7 @@ test('Discovery finds an exact-handle match and surfaces its directory card', as
 test('Connection detail renders status, direction, and action affordances', async ({
   page,
 }, testInfo) => {
-  cover(testInfo, 'A10-F4-CONN-001');
+  cover(testInfo, 'MB-F4-CONN-001');
   await login(page, USERS.owner, 'grand-ocean');
   await page.goto('/app/grand-ocean/network/connections/grand-ocean-org__fresh-foods-org');
   await expect(page.getByText('ACTIVE')).toBeVisible();
@@ -134,7 +134,7 @@ test('Connection detail renders status, direction, and action affordances', asyn
 test('Publishing an own product projects only the allowlisted fields', async ({
   page,
 }, testInfo) => {
-  cover(testInfo, 'A10-F4-CAT-SUP-001');
+  cover(testInfo, 'MB-F4-CAT-SUP-001');
   await login(page, USERS.owner, 'grand-ocean');
   await page.goto('/app/grand-ocean/network/partner-catalog?productId=dair-002');
   const dialog = page.getByRole('dialog');
@@ -147,7 +147,7 @@ test('Publishing an own product projects only the allowlisted fields', async ({
   await expect(dialog).toBeHidden();
   // The own-catalog table renders internalProductNameSnapshot ("Butter Block"), not
   // the partner-facing displayName I just entered — that projection is what buyers
-  // see via the buyer catalog (already covered by A10-F4-CAT-BUY-001).
+  // see via the buyer catalog (already covered by MB-F4-CAT-BUY-001).
   const row = page.getByRole('row', { name: /DAIR-002-PARTNER/ });
   await expect(row).toBeVisible();
   await expect(row.getByRole('cell', { name: 'Butter Block' })).toBeVisible();
@@ -157,9 +157,9 @@ test('Publishing an own product projects only the allowlisted fields', async ({
 test('Unpublishing a supplier catalog item removes it from the published list', async ({
   page,
 }, testInfo) => {
-  cover(testInfo, 'A10-F4-CAT-SUP-002');
+  cover(testInfo, 'MB-F4-CAT-SUP-002');
   await login(page, USERS.owner, 'grand-ocean');
-  // A distinct product from A10-F4-CAT-SUP-001's dair-002, so the two tests don't
+  // A distinct product from MB-F4-CAT-SUP-001's dair-002, so the two tests don't
   // race to publish (and unpublish-check) the same catalog item.
   await page.goto('/app/grand-ocean/network/partner-catalog?productId=dry-001');
   const dialog = page.getByRole('dialog');
@@ -181,7 +181,7 @@ test('Unpublishing a supplier catalog item removes it from the published list', 
 test('Buyer catalog lists a connected supplier’s items and finds one by exact SKU', async ({
   page,
 }, testInfo) => {
-  cover(testInfo, 'A10-F4-CAT-BUY-001');
+  cover(testInfo, 'MB-F4-CAT-BUY-001');
   await login(page, USERS.owner, 'grand-ocean');
   await page.goto('/app/grand-ocean/network/partner-catalog/fresh-foods-org');
   await expect(page.getByText('Chicken Breast 5 KG Pack').first()).toBeVisible();
@@ -191,7 +191,7 @@ test('Buyer catalog lists a connected supplier’s items and finds one by exact 
 });
 
 // ─── Connected purchase orders ──────────────────────────────────────────────
-// (runs before "Product mappings" below: A10-F4-MAP-004 disables the exact
+// (runs before "Product mappings" below: MB-F4-MAP-004 disables the exact
 // mapping every seeded connected-PO fixture line references, and a disabled
 // mapping correctly fails cpoSubmit's re-verification — so mapping disablement
 // must happen only after these fixtures have been exercised.)
@@ -199,7 +199,7 @@ test('Buyer catalog lists a connected supplier’s items and finds one by exact 
 test('Buyer submits an existing connected draft (C34 lines stay read-only)', async ({
   page,
 }, testInfo) => {
-  cover(testInfo, 'A10-F4-CPO-001');
+  cover(testInfo, 'MB-F4-CPO-001');
   await login(page, USERS.owner, 'grand-ocean');
   await page.goto('/app/grand-ocean/procurement/purchase-orders/cpo-draft-submit');
   await expect(
@@ -213,7 +213,7 @@ test('Buyer submits an existing connected draft (C34 lines stay read-only)', asy
 });
 
 test('Buyer cancels an existing connected draft', async ({ page }, testInfo) => {
-  cover(testInfo, 'A10-F4-CPO-002');
+  cover(testInfo, 'MB-F4-CPO-002');
   await login(page, USERS.owner, 'grand-ocean');
   await page.goto('/app/grand-ocean/procurement/purchase-orders/cpo-draft-cancel');
   await page.getByRole('button', { name: 'Cancel order' }).click();
@@ -224,7 +224,7 @@ test('Buyer cancels an existing connected draft', async ({ page }, testInfo) => 
 });
 
 test('Supplier accepts a SUBMITTED connected order', async ({ page }, testInfo) => {
-  cover(testInfo, 'A10-F4-CPO-003');
+  cover(testInfo, 'MB-F4-CPO-003');
   page.on('dialog', (dialog) => {
     void dialog.accept();
   });
@@ -238,7 +238,7 @@ test('Supplier accepts a SUBMITTED connected order', async ({ page }, testInfo) 
 });
 
 test('Supplier rejects a SUBMITTED connected order', async ({ page }, testInfo) => {
-  cover(testInfo, 'A10-F4-CPO-004');
+  cover(testInfo, 'MB-F4-CPO-004');
   page.on('dialog', (dialog) => {
     void dialog.accept();
   });
@@ -252,7 +252,7 @@ test('Supplier rejects a SUBMITTED connected order', async ({ page }, testInfo) 
 });
 
 test('Supplier ships an ACCEPTED order as a single full shipment', async ({ page }, testInfo) => {
-  cover(testInfo, 'A10-F4-CPO-005');
+  cover(testInfo, 'MB-F4-CPO-005');
   page.on('dialog', (dialog) => {
     void dialog.accept();
   });
@@ -268,7 +268,7 @@ test('Supplier ships an ACCEPTED order as a single full shipment', async ({ page
 test('Buyer receives a SHIPPED connected order partially, then completes it', async ({
   page,
 }, testInfo) => {
-  cover(testInfo, 'A10-F4-CPO-006');
+  cover(testInfo, 'MB-F4-CPO-006');
   await login(page, USERS.owner, 'grand-ocean');
   await page.goto('/app/grand-ocean/procurement/receiving/cpo-shipped-receive');
   await expect(page.getByText('quantities are entered in supplier order units')).toBeVisible();
@@ -289,7 +289,7 @@ test('Buyer receives a SHIPPED connected order partially, then completes it', as
 test('An over-receipt beyond the outstanding supplier quantity is blocked client-side', async ({
   page,
 }, testInfo) => {
-  cover(testInfo, 'A10-F4-CPO-007');
+  cover(testInfo, 'MB-F4-CPO-007');
   await login(page, USERS.owner, 'grand-ocean');
   await page.goto('/app/grand-ocean/procurement/receiving/cpo-shipped-over');
   await page.locator('#receive-line-1').first().fill('6');
@@ -301,7 +301,7 @@ test('An over-receipt beyond the outstanding supplier quantity is blocked client
 test('Mappings list shows the VERIFIED mapping and the no-restore notice', async ({
   page,
 }, testInfo) => {
-  cover(testInfo, 'A10-F4-MAP-001');
+  cover(testInfo, 'MB-F4-MAP-001');
   await login(page, USERS.owner, 'grand-ocean');
   await page.goto('/app/grand-ocean/network/mappings');
   await expect(page.getByText('Chicken Breast', { exact: true }).first()).toBeVisible();
@@ -312,7 +312,7 @@ test('Mappings list shows the VERIFIED mapping and the no-restore notice', async
 test('Mapping wizard refuses an unknown supplier SKU and an invalid factor', async ({
   page,
 }, testInfo) => {
-  cover(testInfo, 'A10-F4-MAP-002');
+  cover(testInfo, 'MB-F4-MAP-002');
   await login(page, USERS.owner, 'grand-ocean');
   await page.goto('/app/grand-ocean/network/mappings/new');
   await page
@@ -330,7 +330,7 @@ test('Mapping wizard refuses an unknown supplier SKU and an invalid factor', asy
 test('Mapping wizard creates a new VERIFIED mapping after semantic confirmation', async ({
   page,
 }, testInfo) => {
-  cover(testInfo, 'A10-F4-MAP-003');
+  cover(testInfo, 'MB-F4-MAP-003');
   await login(page, USERS.owner, 'grand-ocean');
   await page.goto('/app/grand-ocean/network/mappings/new');
   await page
@@ -350,7 +350,7 @@ test('Mapping wizard creates a new VERIFIED mapping after semantic confirmation'
 test('Disabling a mapping removes it from the active list with no restore offered', async ({
   page,
 }, testInfo) => {
-  cover(testInfo, 'A10-F4-MAP-004');
+  cover(testInfo, 'MB-F4-MAP-004');
   await login(page, USERS.owner, 'grand-ocean');
   await page.goto('/app/grand-ocean/network/mappings');
   const chickenRow = page.getByRole('row', { name: /Chicken Breast/ });
@@ -368,7 +368,7 @@ test('Disabling a mapping removes it from the active list with no restore offere
 test('Team screen protects the Owner row from role/suspend/remove actions', async ({
   page,
 }, testInfo) => {
-  cover(testInfo, 'A10-F5-TEAM-001');
+  cover(testInfo, 'MB-F5-TEAM-001');
   await login(page, USERS.owner, 'grand-ocean');
   await page.goto('/app/grand-ocean/team');
   await expect(page.getByText('Protected Owner').first()).toBeVisible();
@@ -379,7 +379,7 @@ test('Team screen protects the Owner row from role/suspend/remove actions', asyn
 test('Owner invites a new user and the invite link is shown exactly once', async ({
   page,
 }, testInfo) => {
-  cover(testInfo, 'A10-F5-TEAM-002');
+  cover(testInfo, 'MB-F5-TEAM-002');
   await login(page, USERS.owner, 'grand-ocean');
   await page.goto('/app/grand-ocean/team');
   await page.getByRole('button', { name: 'Invite user' }).click();
@@ -396,13 +396,13 @@ test('Owner invites a new user and the invite link is shown exactly once', async
 test('A non-Owner/Admin role is denied Team before any team query fires', async ({
   page,
 }, testInfo) => {
-  cover(testInfo, 'A10-F5-TEAM-003');
+  cover(testInfo, 'MB-F5-TEAM-003');
   await login(page, USERS.storekeeper, 'grand-ocean');
   await expectDenied(page, '/app/grand-ocean/team');
 });
 
 test('Owner has full Settings access including the Network toggle', async ({ page }, testInfo) => {
-  cover(testInfo, 'A10-F5-SET-001');
+  cover(testInfo, 'MB-F5-SET-001');
   await login(page, USERS.owner, 'grand-ocean');
   await page.goto('/app/grand-ocean/settings');
   await expect(page.getByLabel('Handle')).toHaveValue('@grand-ocean');
@@ -413,7 +413,7 @@ test('Owner has full Settings access including the Network toggle', async ({ pag
 test('A non-Owner/Admin role is denied Settings before any settings query fires', async ({
   page,
 }, testInfo) => {
-  cover(testInfo, 'A10-F5-SET-002');
+  cover(testInfo, 'MB-F5-SET-002');
   await login(page, USERS.storekeeper, 'grand-ocean');
   await expectDenied(page, '/app/grand-ocean/settings');
 });
@@ -423,7 +423,7 @@ test('A non-Owner/Admin role is denied Settings before any settings query fires'
 test('Notifications list renders and mark-read is stated as authority-blocked', async ({
   page,
 }, testInfo) => {
-  cover(testInfo, 'A10-F5-NOTIF-001');
+  cover(testInfo, 'MB-F5-NOTIF-001');
   await login(page, USERS.owner, 'grand-ocean');
   await page.goto('/app/grand-ocean/notifications');
   await expect(page.getByRole('tab', { name: /Unread/ })).toBeVisible();
@@ -437,7 +437,7 @@ test('Notifications list renders and mark-read is stated as authority-blocked', 
 test('Stock-on-hand report renders filters, subtotals, and desktop CSV export', async ({
   page,
 }, testInfo) => {
-  cover(testInfo, 'A10-F5-REPORT-001');
+  cover(testInfo, 'MB-F5-REPORT-001');
   await login(page, USERS.owner, 'grand-ocean');
   await page.goto('/app/grand-ocean/reports');
   await expect(page.getByRole('columnheader', { name: 'Product' })).toBeVisible();
@@ -450,7 +450,7 @@ test('Stock-on-hand report renders filters, subtotals, and desktop CSV export', 
 test('PO report renders for an authorized role; Storekeeper is denied before query', async ({
   page,
 }, testInfo) => {
-  cover(testInfo, 'A10-F5-REPORT-002');
+  cover(testInfo, 'MB-F5-REPORT-002');
   await login(page, USERS.owner, 'grand-ocean');
   await page.goto('/app/grand-ocean/reports?tab=purchase-orders');
   await expect(page.getByRole('columnheader', { name: 'PO Number' })).toBeVisible();
