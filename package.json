@@ -39,6 +39,7 @@
     "test:seed": "firebase emulators:exec --project stockmok --only firestore \"npm run test:seed:inner\"",
     "seed:bootstrap": "tsx scripts/bootstrap/seed.ts --target=emulator",
     "seed:a10": "tsx scripts/bootstrap/a10-fixtures.ts --target=emulator",
+    "seed:macro-b": "tsx scripts/bootstrap/macro-b-fixtures.ts --target=emulator",
     "replay:bootstrap": "tsx scripts/bootstrap/replay.ts --target=emulator",
     "reset:emulator": "tsx scripts/bootstrap/reset.ts --target=emulator",
     "reseed:bootstrap": "npm run reset:emulator && npm run seed:bootstrap",

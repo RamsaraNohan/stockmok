@@ -216,7 +216,7 @@ export function ConnectedOrderScreen({ poId, initialOrder }: ConnectedOrderScree
               Mark as shipped
             </Button>
           ) : actions.receive ? (
-            <Link to={`../../receiving/${poId}`}>
+            <Link to={`/app/${activeMembership?.handle ?? ''}/procurement/receiving/${poId}`}>
               <Button>Receive shipment</Button>
             </Link>
           ) : undefined
