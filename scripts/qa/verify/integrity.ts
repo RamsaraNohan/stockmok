@@ -39,7 +39,7 @@ import {
   PurchaseOrderItemSchema,
   PurchaseOrderSchema,
 } from '../../../packages/shared/src/schemas/procurement.js';
-import { classifyDocumentPath } from '../manifest.js';
+import { classifyDocumentPath, PATH_FAMILIES } from '../manifest.js';
 
 /**
  * Structural integrity: every document sits at a known path, parses against the
@@ -61,20 +61,30 @@ export interface QaSnapshot {
 
 export async function readAllDocuments(db: Firestore): Promise<QaSnapshot> {
   const documents = new Map<string, DocumentData>();
+  const collectionIds = [
+    ...new Set(
+      PATH_FAMILIES.flatMap((family) =>
+        family.template.split('/').filter((_, index) => index % 2 === 0),
+      ),
+    ),
+  ].sort();
 
-  async function walkCollection(collection: FirebaseFirestore.CollectionReference): Promise<void> {
-    const snapshot = await collection.get();
-    for (const document of snapshot.docs) {
-      documents.set(document.ref.path, document.data());
-      const children = await document.ref.listCollections();
-      for (const child of children) {
-        await walkCollection(child);
-      }
-    }
-  }
-
-  for (const collection of await db.listCollections()) {
-    await walkCollection(collection);
+  // The old recursive walk called listCollections() once for every document.
+  // That is harmless at Smoke scale but becomes ~139k sequential metadata
+  // round trips in Wide. The manifest is already the governed enumeration of
+  // every physical path family, so one collection-group read per collection id
+  // is both complete and bounded. Six concurrent reads keep emulator pressure
+  // controlled while reducing traversal from O(documents) RPCs to O(families).
+  const concurrency = 6;
+  for (let offset = 0; offset < collectionIds.length; offset += concurrency) {
+    await Promise.all(
+      collectionIds.slice(offset, offset + concurrency).map(async (collectionId) => {
+        const snapshot = await db.collectionGroup(collectionId).get();
+        for (const document of snapshot.docs) {
+          documents.set(document.ref.path, document.data());
+        }
+      }),
+    );
   }
 
   return { documents };

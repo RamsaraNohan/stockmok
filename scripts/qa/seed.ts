@@ -11,7 +11,7 @@ import { generateInventory } from './generators/inventory.js';
 import { generateMovements } from './generators/movements.js';
 import {
   generateNetwork,
-  connectedNetworkPlan,
+  connectedNetworkPlans,
   connectedSubmittedCount,
 } from './generators/network.js';
 import { generateNotifications } from './generators/notifications.js';
@@ -34,6 +34,8 @@ import { generateProcurement, orderedPoCount } from './generators/procurement.js
 
 /** Firestore caps a write batch at 500 operations. */
 const BATCH_LIMIT = 400;
+/** Keep Auth emulator load bounded while avoiding one thousand serial round trips in Wide. */
+const AUTH_CONCURRENCY = 25;
 
 export function buildDataset(plan: QaPlan): DatasetBuilder {
   const builder = new DatasetBuilder();
@@ -41,13 +43,12 @@ export function buildDataset(plan: QaPlan): DatasetBuilder {
   // The buyer's `counters/purchaseOrder` allocates numbers for private *and*
   // connected orders, so identity needs both plans before it can write a
   // counter value that agrees with the order numbers on disk.
-  const network = connectedNetworkPlan(plan);
+  const networks = connectedNetworkPlans(plan);
   const counters = new Map<string, number>();
   for (const org of plan.organizations) {
-    const connected =
-      network !== undefined && network.buyer.orgId === org.orgId
-        ? connectedSubmittedCount(network)
-        : 0;
+    const connected = networks
+      .filter((network) => network.buyer.orgId === org.orgId)
+      .reduce((sum, network) => sum + connectedSubmittedCount(network), 0);
     counters.set(org.orgId, orderedPoCount(org) + connected);
   }
 
@@ -64,6 +65,7 @@ export async function seedQaDataset(
   argv: readonly string[] = process.argv.slice(2),
 ): Promise<QaPlan> {
   assertBootstrapSafety([...argv]);
+  const generationStartedAt = Date.now();
 
   const definition = resolveProfile(argv);
   assertProfileExecutable(definition);
@@ -85,8 +87,13 @@ export async function seedQaDataset(
 
   const { db, auth } = getBootstrapContext();
 
-  for (const user of collectAuthUsers(plan)) {
-    await upsertAuthUser(auth, user);
+  const authUsers = collectAuthUsers(plan);
+  for (let offset = 0; offset < authUsers.length; offset += AUTH_CONCURRENCY) {
+    await Promise.all(
+      authUsers.slice(offset, offset + AUTH_CONCURRENCY).map(async (user) => {
+        await upsertAuthUser(auth, user);
+      }),
+    );
   }
 
   const documents = builder.documents;
@@ -112,8 +119,9 @@ export async function seedQaDataset(
   console.log(`QA_SEED=${String(plan.seed)}`);
   console.log(`QA_FIXTURE_EPOCH=${plan.fixtureEpoch}`);
   console.log(`QA_ORGANIZATIONS=${String(plan.organizations.length)}`);
-  console.log(`QA_AUTH_USERS=${String(collectAuthUsers(plan).length)}`);
+  console.log(`QA_AUTH_USERS=${String(authUsers.length)}`);
   console.log(`QA_DOCUMENTS_WRITTEN=${String(documents.length)}`);
+  console.log(`QA_GENERATION_DURATION_MS=${String(Date.now() - generationStartedAt)}`);
   console.log('QA_SEED_RESULT=PASS');
   return plan;
 }

@@ -23,11 +23,11 @@ describe('QA dataset integrity', () => {
     expect(PROFILES.wide.specialOrganizationCount).toBe(6);
   });
 
-  it('keeps the wide profile defined but not executable', () => {
-    expect(PROFILES.wide.executable).toBe(false);
+  it('opens the wide profile only at the post-Smoke checkpoint', () => {
+    expect(PROFILES.wide.executable).toBe(true);
     expect(() => {
       assertProfileExecutable(PROFILES.wide);
-    }).toThrow(/not executable/);
+    }).not.toThrow();
     expect(() => {
       assertProfileExecutable(PROFILES.smoke);
     }).not.toThrow();

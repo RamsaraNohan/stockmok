@@ -66,6 +66,25 @@ const PARTNERS: readonly PartnerBlueprint[] = [
 /** Every private order in the smoke profile is placed against this partner. */
 const ORDERING_PARTNER = 'qa-partner-01';
 
+function partnersForOrg(org: QaOrg): readonly PartnerBlueprint[] {
+  if (org.profile === 'smoke') return PARTNERS;
+  if (org.specialKind === 'EMPTY' || org.specialKind === 'TINY') return [];
+  return Array.from({ length: 48 }, (_, index) => {
+    const supplier = index < 24;
+    const partnerId = `qa-partner-${ordinal(index + 1)}`;
+    return {
+      partnerId,
+      // The first four names deliberately repeat across every tenant.
+      name:
+        index < PARTNERS.length
+          ? (PARTNERS[index]?.name ?? `QA Partner ${ordinal(index + 1)}`)
+          : `QA ${supplier ? 'Supplier' : 'Buyer'} ${ordinal(index + 1, 2)}`,
+      partnerTypes: supplier ? (['SUPPLIER'] as const) : (['BUYER'] as const),
+      status: index % 11 === 0 ? 'DEACTIVATED' : 'ACTIVE',
+    };
+  });
+}
+
 export interface QaPoLine {
   readonly itemId: string;
   readonly productId: string;
@@ -109,14 +128,18 @@ function orderCandidates(org: QaOrg, warehouseId: string): readonly QaProduct[] 
   return org.products.filter(
     (product) =>
       product.status === 'ACTIVE' &&
-      product.warehouseIds[0] === warehouseId &&
+      (org.profile === 'wide'
+        ? product.warehouseIds.includes(warehouseId)
+        : product.warehouseIds[0] === warehouseId) &&
       totalOnHandMilli(product) >= 15_000,
   );
 }
 
 export function privateProcurementPlan(org: QaOrg): readonly QaPrivateOrder[] {
+  if (org.specialKind !== undefined && org.specialKind !== 'HIGH_VOLUME') return [];
   const mainCandidates = orderCandidates(org, 'main-store');
   const coldCandidates = orderCandidates(org, 'cold-room');
+  if (org.profile === 'wide' && (mainCandidates.length < 4 || coldCandidates.length < 4)) return [];
   if (mainCandidates.length < 4 || coldCandidates.length < 4) {
     throw new Error(
       `${org.orgId} cannot host the private procurement fixtures: ` +
@@ -141,6 +164,42 @@ export function privateProcurementPlan(org: QaOrg): readonly QaPrivateOrder[] {
   }
 
   const prefix = org.purchaseOrderPrefix;
+  if (org.profile === 'wide') {
+    const statuses: readonly PoStatus[] = [
+      'DRAFT',
+      'ORDERED',
+      'PARTIALLY_RECEIVED',
+      'RECEIVED',
+      'CANCELLED',
+    ];
+    let numbered = 0;
+    return Array.from({ length: 50 }, (_, orderIndex) => {
+      const status = statuses[orderIndex % statuses.length];
+      if (status === undefined) throw new Error('wide private status lookup failed');
+      const pool = orderIndex % 2 === 0 ? mainCandidates : coldCandidates;
+      const receivingWarehouseId = orderIndex % 2 === 0 ? 'main-store' : 'cold-room';
+      const lines = Array.from({ length: 5 }, (_, lineIndex) => {
+        const product = candidate(pool, (orderIndex + lineIndex) % pool.length);
+        const orderedMilli = 1_000 + lineIndex * 500;
+        const receivedMilli =
+          status === 'RECEIVED'
+            ? orderedMilli
+            : status === 'PARTIALLY_RECEIVED' && lineIndex === 0
+              ? Math.floor(orderedMilli / 2)
+              : 0;
+        return line(product, lineIndex, receivedMilli);
+      });
+      const orderNumber =
+        status === 'DRAFT' ? undefined : `${prefix}-2026-${ordinal(++numbered, 3)}`;
+      return {
+        purchaseOrderId: `qa-po-${org.handle}-${ordinal(orderIndex + 1)}`,
+        orderNumber,
+        status,
+        receivingWarehouseId,
+        lines,
+      };
+    });
+  }
   return [
     {
       purchaseOrderId: `qa-po-${org.handle}-01`,
@@ -225,7 +284,7 @@ const HISTORY_TARGETS: Readonly<Record<string, readonly PoStatus[]>> = {
 
 function writePartners(builder: DatasetBuilder, org: QaOrg): void {
   const placed = ordersPlacedCount(org);
-  for (const partner of PARTNERS) {
+  for (const partner of partnersForOrg(org)) {
     builder.add(paths.privatePartner(org.orgId, partner.partnerId), PrivatePartnerSchema, {
       partnerId: partner.partnerId,
       partnerTypes: partner.partnerTypes,
@@ -246,12 +305,14 @@ function writePartners(builder: DatasetBuilder, org: QaOrg): void {
 }
 
 function writeOrders(builder: DatasetBuilder, org: QaOrg): void {
-  const partner = PARTNERS.find((entry) => entry.partnerId === ORDERING_PARTNER);
-  if (partner === undefined) throw new Error('ordering partner blueprint is missing');
+  const orders = privateProcurementPlan(org);
+  if (orders.length === 0) return;
+  const partner = partnersForOrg(org).find((entry) => entry.partnerId === ORDERING_PARTNER);
+  if (partner === undefined) throw new Error(`${org.orgId} ordering partner blueprint is missing`);
   const createdBy = actorUid(org, 'PROCUREMENT_MANAGER');
   const createdByName = actorName(org, 'PROCUREMENT_MANAGER');
 
-  for (const order of privateProcurementPlan(org)) {
+  for (const order of orders) {
     let totalMinor = 0;
     for (const orderLine of order.lines) {
       totalMinor += deriveStockValueMinor(orderLine.orderedMilli, orderLine.unitPriceMinor);
@@ -337,7 +398,7 @@ export function publishedCatalogProducts(org: QaOrg): readonly QaProduct[] {
 }
 
 function writePartnerCatalog(builder: DatasetBuilder, org: QaOrg): void {
-  if (org.networkRole !== 'SUPPLIER') return;
+  if (org.profile === 'smoke' && org.networkRole !== 'SUPPLIER') return;
   for (const product of publishedCatalogProducts(org)) {
     const catalogItemId = partnerCatalogItemId(product);
     const partnerSku = `PACK-${product.internalSku}`;

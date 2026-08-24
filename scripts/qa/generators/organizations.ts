@@ -3,9 +3,18 @@ import type {
   Role,
   StockStatus,
   Unit,
+  WarehouseType,
 } from '../../../packages/shared/src/primitives.js';
 import { DATASET_VERSION, FIXTURE_EPOCH, type ProfileDefinition } from '../config.js';
-import type { QaCategory, QaOrg, QaPlan, QaProduct, QaUser, QaWarehouse } from '../dataset.js';
+import type {
+  QaCategory,
+  QaOrg,
+  QaPlan,
+  QaProduct,
+  QaSpecialKind,
+  QaUser,
+  QaWarehouse,
+} from '../dataset.js';
 import { ordinal } from '../deterministic.js';
 
 /**
@@ -161,7 +170,7 @@ interface OrgSeedIdentity {
   readonly industry: string;
   readonly networkRole: QaOrg['networkRole'];
   /** Organizations sharing a blueprint key receive identical product identities. */
-  readonly productBlueprint: 'shared' | 'supplier';
+  readonly productBlueprint: 'shared' | 'supplier' | 'wide';
 }
 
 const SMOKE_ORGS: readonly OrgSeedIdentity[] = [
@@ -310,6 +319,7 @@ function buildOrg(identity: OrgSeedIdentity): QaOrg {
   const defaultWarehouse = WAREHOUSES[0];
   if (defaultWarehouse === undefined) throw new Error('warehouse blueprint is empty');
   return {
+    profile: 'smoke',
     orgId: identity.orgId,
     handle: identity.handle,
     name: identity.name,
@@ -330,12 +340,235 @@ function buildOrg(identity: OrgSeedIdentity): QaOrg {
   };
 }
 
+const WIDE_Q005_BOUNDARIES = [0, 1, 5, 20, 49, 50, 51, 75] as const;
+
+function buildWideUsers(
+  identity: OrgSeedIdentity,
+  count: number,
+  boundaryOrg: boolean,
+): readonly QaUser[] {
+  return Array.from({ length: count }, (_, index) => {
+    const role = ROLES[index % ROLES.length];
+    if (role === undefined) throw new Error('wide role lookup failed');
+    const slug = role.toLowerCase().replaceAll('_', '-');
+    const suffix = ordinal(index + 1, 2);
+    return {
+      uid: `${identity.handle}-${slug}-${suffix}`,
+      email: `${identity.handle}-${slug}-${suffix}@example.com`,
+      displayName: `${ROLE_PEOPLE[role]} ${suffix}`,
+      role,
+      unreadNotifications: boundaryOrg
+        ? (WIDE_Q005_BOUNDARIES[index % WIDE_Q005_BOUNDARIES.length] ?? 0)
+        : 3 + (index % 5),
+      readNotifications: 2 + (index % 3),
+    };
+  });
+}
+
+function buildWideCategories(count: number): readonly QaCategory[] {
+  return Array.from({ length: count }, (_, index) => {
+    const smoke = CATEGORIES[index];
+    return (
+      smoke ?? {
+        categoryId: `category-${ordinal(index + 1, 2)}`,
+        name: `QA Category ${ordinal(index + 1, 2)}`,
+      }
+    );
+  });
+}
+
+const WIDE_WAREHOUSE_TYPES: readonly WarehouseType[] = [
+  'STORE_ROOM',
+  'REFRIGERATED',
+  'FREEZER',
+  'KITCHEN',
+];
+
+function buildWideWarehouses(count: number): readonly QaWarehouse[] {
+  return Array.from({ length: count }, (_, index) => {
+    const smoke = WAREHOUSES[index];
+    const type = WIDE_WAREHOUSE_TYPES[index % WIDE_WAREHOUSE_TYPES.length];
+    if (type === undefined) throw new Error('wide warehouse type lookup failed');
+    return (
+      smoke ?? {
+        warehouseId: `warehouse-${ordinal(index + 1, 2)}`,
+        name: `QA Store Room ${ordinal(index + 1, 2)}`,
+        type,
+      }
+    );
+  });
+}
+
+function wideProduct(
+  index: number,
+  orgIndex: number,
+  categories: readonly QaCategory[],
+  warehouses: readonly QaWarehouse[],
+  specialKind: QaSpecialKind | undefined,
+): QaProduct {
+  // Adjacent products share the full category/warehouse/status filter group
+  // while keeping distinct sort values. That makes all four sorts observable
+  // for the most selective product-matrix shape.
+  const groupIndex = Math.floor(index / 2);
+  const category = categories[groupIndex % categories.length];
+  const word = PRODUCT_WORDS[index % PRODUCT_WORDS.length];
+  if (category === undefined || word === undefined) throw new Error('wide product lookup failed');
+  const unit: Unit =
+    index % 4 === 0 ? 'KG' : index % 4 === 1 ? 'L' : index % 4 === 2 ? 'PACK' : 'EACH';
+  const archived = specialKind === 'ARCHIVED' || index >= 108;
+  const status: LifecycleStatus = archived ? 'ARCHIVED' : 'ACTIVE';
+  const minimumStockMilli = 8_000 + (index % 20) * 500;
+  const stockTarget: StockStatus =
+    specialKind === 'LOW_STOCK'
+      ? index % 3 === 0
+        ? 'OUT_OF_STOCK'
+        : 'LOW_STOCK'
+      : (STOCK_TARGETS[index % STOCK_TARGETS.length] ?? 'IN_STOCK');
+  const total =
+    (specialKind === undefined && index < 108) || (specialKind === 'HIGH_VOLUME' && index < 80)
+      ? 300_000
+      : stockTarget === 'OUT_OF_STOCK'
+        ? 0
+        : stockTarget === 'LOW_STOCK'
+          ? Math.max(1_000, minimumStockMilli - 2_000)
+          : minimumStockMilli + 8_000 + (index % 7) * 500;
+  const balanceCount = Math.min(specialKind === 'HIGH_VOLUME' ? 4 : 3, warehouses.length);
+  const warehouseIds = Array.from({ length: balanceCount }, (_, offset) => {
+    const warehouse = warehouses[(groupIndex + offset) % warehouses.length];
+    if (warehouse === undefined) throw new Error('wide product warehouse lookup failed');
+    return warehouse.warehouseId;
+  });
+  const targetOnHandMilli: Record<string, number> = {};
+  let remainder = total;
+  warehouseIds.forEach((warehouseId, offset) => {
+    const value =
+      offset === warehouseIds.length - 1 ? remainder : Math.floor(total / warehouseIds.length);
+    targetOnHandMilli[warehouseId] = value;
+    remainder -= value;
+  });
+  const trap = index < 30;
+  const suffix = ordinal(index + 1, 3);
+  return {
+    productId: trap
+      ? `wide-shared-product-${suffix}`
+      : `wide-product-${ordinal(orgIndex + 1, 2)}-${suffix}`,
+    internalSku: trap ? `WIDE-SHARED-${suffix}` : `WIDE-${ordinal(orgIndex + 1, 2)}-${suffix}`,
+    name: trap ? `Wide Standard Item ${suffix}` : `${word} ${ordinal(orgIndex + 1, 2)}-${suffix}`,
+    categoryId: category.categoryId,
+    baseUnit: unit,
+    purchaseCostMinor: 25_000 + index * 775 + orgIndex * 10,
+    minimumStockMilli,
+    reorderTargetMilli: minimumStockMilli + 6_000,
+    status,
+    partnerPublished: status === 'ACTIVE' && index < 60,
+    updatedAtDayOffset: 2 + (index % 25),
+    warehouseIds,
+    targetOnHandMilli,
+  };
+}
+
+function wideIdentity(index: number): OrgSeedIdentity {
+  const suffix = ordinal(index + 1, 2);
+  return {
+    orgId: `qa-wide-org-${suffix}`,
+    handle: `qa-wide-${suffix}`,
+    name: `QA Wide Organization ${suffix}`,
+    monogram: `W${String(index % 10)}`,
+    monogramColor: index % 2 === 0 ? '#0F766E' : '#1D4ED8',
+    industry: index % 2 === 0 ? 'Hospitality' : 'Wholesale',
+    networkRole: index % 2 === 0 ? 'BUYER' : 'SUPPLIER',
+    productBlueprint: 'wide',
+  };
+}
+
+const SPECIAL_KINDS: readonly QaSpecialKind[] = [
+  'EMPTY',
+  'TINY',
+  'LOW_STOCK',
+  'ARCHIVED',
+  'NETWORK_OFF',
+  'HIGH_VOLUME',
+];
+
+function specialIdentity(kind: QaSpecialKind, index: number): OrgSeedIdentity {
+  const slug = kind.toLowerCase().replaceAll('_', '-');
+  return {
+    orgId: `qa-special-${slug}`,
+    handle: `qa-${slug}`,
+    name: `QA Special ${kind.replaceAll('_', ' ')}`,
+    monogram: `S${String(index + 1)}`,
+    monogramColor: '#7C3AED',
+    industry: 'QA Special',
+    networkRole:
+      kind === 'NETWORK_OFF' || kind === 'EMPTY' || kind === 'TINY' ? 'ISOLATED' : 'BUYER',
+    productBlueprint: 'wide',
+  };
+}
+
+function buildWideOrg(
+  identity: OrgSeedIdentity,
+  orgIndex: number,
+  specialKind?: QaSpecialKind,
+): QaOrg {
+  const userCount = specialKind === 'EMPTY' ? 1 : specialKind === 'TINY' ? 2 : 20;
+  const categoryCount = specialKind === 'EMPTY' ? 0 : specialKind === 'TINY' ? 1 : 24;
+  const warehouseCount = specialKind === 'TINY' || specialKind === 'EMPTY' ? 1 : 20;
+  const productCount =
+    specialKind === 'EMPTY'
+      ? 0
+      : specialKind === 'TINY'
+        ? 2
+        : specialKind === 'HIGH_VOLUME'
+          ? 180
+          : 120;
+  const users = buildWideUsers(identity, userCount, orgIndex === 0);
+  const categories = buildWideCategories(categoryCount);
+  const warehouses = buildWideWarehouses(warehouseCount);
+  const owner = users.find((user) => user.role === 'OWNER') ?? users[0];
+  const defaultWarehouse = warehouses[0];
+  if (owner === undefined || defaultWarehouse === undefined)
+    throw new Error(`${identity.orgId} lacks required core fixtures`);
+  return {
+    profile: 'wide',
+    ...(specialKind === undefined ? {} : { specialKind }),
+    orgId: identity.orgId,
+    handle: identity.handle,
+    name: identity.name,
+    industry: identity.industry,
+    country: 'LK',
+    currency: 'LKR',
+    timezone: 'Asia/Colombo',
+    monogram: identity.monogram,
+    monogramColor: identity.monogramColor,
+    ownerUid: owner.uid,
+    defaultWarehouseId: defaultWarehouse.warehouseId,
+    purchaseOrderPrefix: `W${ordinal(orgIndex + 1, 2)}`,
+    networkRole: identity.networkRole,
+    users,
+    categories,
+    warehouses,
+    products: Array.from({ length: productCount }, (_, index) =>
+      wideProduct(index, orgIndex, categories, warehouses, specialKind),
+    ),
+  };
+}
+
 export function buildPlan(definition: ProfileDefinition, seed: number): QaPlan {
-  const identities = SMOKE_ORGS.slice(0, definition.organizationCount);
-  if (identities.length !== definition.organizationCount) {
+  const organizations =
+    definition.profile === 'smoke'
+      ? SMOKE_ORGS.slice(0, definition.organizationCount).map(buildOrg)
+      : [
+          ...Array.from({ length: definition.organizationCount }, (_, index) =>
+            buildWideOrg(wideIdentity(index), index),
+          ),
+          ...SPECIAL_KINDS.slice(0, definition.specialOrganizationCount).map((kind, index) =>
+            buildWideOrg(specialIdentity(kind, index), definition.organizationCount + index, kind),
+          ),
+        ];
+  const expected = definition.organizationCount + definition.specialOrganizationCount;
+  if (organizations.length !== expected) {
     throw new Error(
-      `Profile "${definition.profile}" wants ${String(definition.organizationCount)} organizations ` +
-        `but only ${String(identities.length)} blueprints exist. The wide blueprints are not authored yet.`,
+      `Profile "${definition.profile}" built ${String(organizations.length)} organizations, expected ${String(expected)}`,
     );
   }
   return {
@@ -343,7 +576,7 @@ export function buildPlan(definition: ProfileDefinition, seed: number): QaPlan {
     profile: definition.profile,
     seed,
     fixtureEpoch: FIXTURE_EPOCH,
-    organizations: identities.map(buildOrg),
+    organizations,
   };
 }
 

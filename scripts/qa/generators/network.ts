@@ -219,7 +219,7 @@ function findOrg(plan: QaPlan, role: QaOrg['networkRole']): QaOrg | undefined {
   return plan.organizations.find((org) => org.networkRole === role);
 }
 
-function buildMappings(buyer: QaOrg, supplier: QaOrg): readonly QaMapping[] {
+function buildMappings(buyer: QaOrg, supplier: QaOrg, connectionId: string): readonly QaMapping[] {
   const catalog = publishedCatalogProducts(supplier).slice(0, 4);
   // A mapped buyer product receives connected stock, so it has to be one whose
   // balance can absorb a receipt without implying a negative opening balance.
@@ -240,7 +240,10 @@ function buildMappings(buyer: QaOrg, supplier: QaOrg): readonly QaMapping[] {
     }
     taken.add(buyerProduct.productId);
     return {
-      mappingId: `qa-mapping-${ordinal(index + 1)}`,
+      mappingId:
+        buyer.profile === 'smoke'
+          ? `qa-mapping-${ordinal(index + 1)}`
+          : `qa-mapping-${connectionId}-${ordinal(index + 1)}`,
       buyerProduct,
       supplierProduct,
       supplierCatalogItemId: partnerCatalogItemId(supplierProduct),
@@ -248,11 +251,26 @@ function buildMappings(buyer: QaOrg, supplier: QaOrg): readonly QaMapping[] {
   });
 }
 
-function buildOrders(buyer: QaOrg, mappings: readonly QaMapping[]): readonly QaConnectedOrder[] {
-  let allocated = orderedPoCount(buyer);
+function buildOrders(
+  buyer: QaOrg,
+  supplier: QaOrg,
+  mappings: readonly QaMapping[],
+  connectionIndex: number,
+  startingAllocation: number,
+): readonly QaConnectedOrder[] {
+  let allocated = startingAllocation;
   const orders: QaConnectedOrder[] = [];
 
-  CONNECTED_STATUSES.forEach((status, index) => {
+  const statuses =
+    buyer.profile === 'smoke'
+      ? CONNECTED_STATUSES
+      : Array.from(
+          { length: 3 },
+          (_, offset) =>
+            CONNECTED_STATUSES[(connectionIndex * 3 + offset) % CONNECTED_STATUSES.length],
+        ).filter((status): status is PoStatus => status !== undefined);
+
+  statuses.forEach((status, index) => {
     const mapping = mappings[index % mappings.length];
     if (mapping === undefined) throw new Error('connected order needs a mapping');
     const orderedSupplierMilli = 1_000 + index * 200;
@@ -275,7 +293,10 @@ function buildOrders(buyer: QaOrg, mappings: readonly QaMapping[]): readonly QaC
     if (receivingWarehouseId === undefined) throw new Error('mapped product has no warehouse');
 
     orders.push({
-      purchaseOrderId: `qa-cpo-${ordinal(index + 1)}`,
+      purchaseOrderId:
+        buyer.profile === 'smoke'
+          ? `qa-cpo-${ordinal(index + 1)}`
+          : `qa-cpo-${buyer.handle}-${supplier.handle}-${ordinal(index + 1)}`,
       orderNumber,
       status,
       receivingWarehouseId,
@@ -298,18 +319,57 @@ function buildOrders(buyer: QaOrg, mappings: readonly QaMapping[]): readonly QaC
 
 /** The connected lane exists only when both a buyer and a supplier organization do. */
 export function connectedNetworkPlan(plan: QaPlan): QaNetwork | undefined {
+  return connectedNetworkPlans(plan)[0];
+}
+
+/**
+ * Smoke owns one connection. Wide uses a directed ring with offsets 1..10:
+ * every normal organization is buyer on ten connections and supplier on ten,
+ * giving 20 relationship projections and 30 buyer-side connected orders.
+ */
+export function connectedNetworkPlans(plan: QaPlan): readonly QaNetwork[] {
+  if (plan.profile === 'wide') {
+    const organizations = plan.organizations.filter(
+      (org) => org.profile === 'wide' && org.specialKind === undefined,
+    );
+    const networks: QaNetwork[] = [];
+    organizations.forEach((buyer, buyerIndex) => {
+      let allocated = orderedPoCount(buyer);
+      for (let offset = 1; offset <= 10; offset += 1) {
+        const supplier = organizations[(buyerIndex + offset) % organizations.length];
+        if (supplier === undefined || supplier.orgId === buyer.orgId) continue;
+        const connectionId = `${buyer.orgId}__${supplier.orgId}`;
+        const mappings = buildMappings(buyer, supplier, connectionId);
+        if (mappings.length === 0) continue;
+        const orders = buildOrders(buyer, supplier, mappings, offset - 1, allocated);
+        allocated += orders.filter((order) => order.orderNumber !== undefined).length;
+        networks.push({
+          connectionId,
+          buyer,
+          supplier,
+          mappings,
+          orders,
+        });
+      }
+    });
+    return networks;
+  }
+
   const buyer = findOrg(plan, 'BUYER');
   const supplier = findOrg(plan, 'SUPPLIER');
-  if (buyer === undefined || supplier === undefined) return undefined;
-  const mappings = buildMappings(buyer, supplier);
-  if (mappings.length === 0) return undefined;
-  return {
-    connectionId: `${buyer.orgId}__${supplier.orgId}`,
-    buyer,
-    supplier,
-    mappings,
-    orders: buildOrders(buyer, mappings),
-  };
+  if (buyer === undefined || supplier === undefined) return [];
+  const connectionId = `${buyer.orgId}__${supplier.orgId}`;
+  const mappings = buildMappings(buyer, supplier, connectionId);
+  if (mappings.length === 0) return [];
+  return [
+    {
+      connectionId,
+      buyer,
+      supplier,
+      mappings,
+      orders: buildOrders(buyer, supplier, mappings, 0, orderedPoCount(buyer)),
+    },
+  ];
 }
 
 /**
@@ -559,9 +619,9 @@ function writeOrders(builder: DatasetBuilder, network: QaNetwork): void {
 }
 
 export function generateNetwork(builder: DatasetBuilder, plan: QaPlan): void {
-  const network = connectedNetworkPlan(plan);
-  if (network === undefined) return;
-  writeConnection(builder, network);
-  writeMappings(builder, network);
-  writeOrders(builder, network);
+  for (const network of connectedNetworkPlans(plan)) {
+    writeConnection(builder, network);
+    writeMappings(builder, network);
+    writeOrders(builder, network);
+  }
 }
