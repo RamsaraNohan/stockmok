@@ -54,31 +54,27 @@ const CONNECTED_STATUSES: readonly PoStatus[] = [
 
 const STATUS_TIMESTAMPS: Readonly<Record<string, Record<string, ReturnType<typeof epochPlus>>>> = {
   DRAFT: {},
-  SUBMITTED: { submittedAt: CPO_SUBMITTED, orderedAt: CPO_SUBMITTED },
-  ACCEPTED: { submittedAt: CPO_SUBMITTED, orderedAt: CPO_SUBMITTED, acceptedAt: epochPlus(14, 9) },
-  REJECTED: { submittedAt: CPO_SUBMITTED, orderedAt: CPO_SUBMITTED },
+  SUBMITTED: { submittedAt: CPO_SUBMITTED },
+  ACCEPTED: { submittedAt: CPO_SUBMITTED, acceptedAt: epochPlus(14, 9) },
+  REJECTED: { submittedAt: CPO_SUBMITTED },
   SHIPPED: {
     submittedAt: CPO_SUBMITTED,
-    orderedAt: CPO_SUBMITTED,
     acceptedAt: epochPlus(14, 9),
     shippedAt: epochPlus(15, 9),
   },
   PARTIALLY_RECEIVED: {
     submittedAt: CPO_SUBMITTED,
-    orderedAt: CPO_SUBMITTED,
     acceptedAt: epochPlus(14, 9),
     shippedAt: epochPlus(15, 9),
   },
   RECEIVED: {
     submittedAt: CPO_SUBMITTED,
-    orderedAt: CPO_SUBMITTED,
     acceptedAt: epochPlus(14, 9),
     shippedAt: epochPlus(15, 9),
     receivedAt: epochPlus(16, 9),
   },
   CANCELLED: {
     submittedAt: CPO_SUBMITTED,
-    orderedAt: CPO_SUBMITTED,
     cancelledAt: epochPlus(14, 9),
   },
 };
@@ -316,10 +312,19 @@ export function connectedNetworkPlan(plan: QaPlan): QaNetwork | undefined {
   };
 }
 
-/** Connected orders that consumed a number from the buyer's shared counter. */
-export function connectedNumberedCount(network: QaNetwork | undefined): number {
+/**
+ * Connected orders that successfully passed `cpo.submit`.
+ *
+ * DB-CR-040 defines DV-12 by the retained `submittedAt` marker, not current
+ * status and not the coincidental presence of an order number. Use the same
+ * timestamp plan that is written to the documents so the generator cannot
+ * silently drift from its verifier.
+ */
+export function connectedSubmittedCount(network: QaNetwork | undefined): number {
   if (network === undefined) return 0;
-  return network.orders.filter((order) => order.orderNumber !== undefined).length;
+  return network.orders.filter(
+    (order) => STATUS_TIMESTAMPS[order.status]?.['submittedAt'] !== undefined,
+  ).length;
 }
 
 function connectionFields(network: QaNetwork): Record<string, unknown> {
@@ -347,7 +352,7 @@ function writeConnection(builder: DatasetBuilder, network: QaNetwork): void {
     CanonicalConnectionSchema,
     fields,
   );
-  const ordersPlacedCount = connectedNumberedCount(network);
+  const ordersPlacedCount = connectedSubmittedCount(network);
   for (const org of [network.buyer, network.supplier]) {
     builder.add(
       paths.connectionProjection(org.orgId, network.connectionId),

@@ -2,7 +2,7 @@ import type { DocumentData } from 'firebase-admin/firestore';
 import { describe, expect, it } from 'vitest';
 
 import { verifyAuthority } from '../../scripts/qa/verify/authority.js';
-import { verifyNetwork } from '../../scripts/qa/verify/network.js';
+import { networkMetrics, verifyNetwork } from '../../scripts/qa/verify/network.js';
 import {
   documentField,
   field,
@@ -96,6 +96,34 @@ describe('QA connected network', () => {
     );
     expect(roles).toEqual(new Set(['BUYER', 'SUPPLIER']));
   });
+
+  it('rebuilds DV-12 from submittedAt and keeps cancelled orders in the lifetime count', () => {
+    const fixture = smokeFixture();
+    const metrics = networkMetrics(fixture.snapshot);
+    expect(metrics.dv12ExpectedCount).toBe(7);
+    expect(metrics.dv12ActualCount).toBe(7);
+    expect(
+      connectedOrders()
+        .find((order) => order.read('status') === 'CANCELLED')
+        ?.read('submittedAt'),
+    ).toBeDefined();
+    expect(
+      connectedOrders()
+        .find((order) => order.read('status') === 'DRAFT')
+        ?.read('submittedAt'),
+    ).toBeUndefined();
+  });
+
+  it('never writes private-only orderedAt onto a connected order', () => {
+    const fixture = smokeFixture();
+    expect(networkMetrics(fixture.snapshot).unreachableOrderedAt).toBe(0);
+    for (const order of connectedOrders()) expect(order.read('orderedAt')).toBeUndefined();
+    for (const [path, data] of fixture.snapshot.documents) {
+      if (path.split('/')[0] !== 'connectedPurchaseOrders') continue;
+      if (path.split('/').length !== 2) continue;
+      expect(field(data, 'orderedAt'), path).toBeUndefined();
+    }
+  });
 });
 
 /** The buyer-side connected order document carrying the given status. */
@@ -126,6 +154,30 @@ function orderIds(data: DocumentData): {
 }
 
 describe('QA connected network — negative coverage (regressions for DV review findings)', () => {
+  it('DB-CR-040: catches a canonical connected order with no submittedAt marker', () => {
+    const fixture = smokeFixture();
+    const { data } = connectedOrder('CANCELLED');
+    const { purchaseOrderId } = orderIds(data);
+    const canonicalPath = `connectedPurchaseOrders/${purchaseOrderId}`;
+    const failures = verifyNetwork(
+      mutatedSnapshot(fixture, canonicalPath, { submittedAt: undefined }),
+    );
+    expect(failures.some((failure) => failure.includes('DV12_SUBMISSION_MARKER'))).toBe(true);
+  });
+
+  it('orderedAt parity: catches a production-unreachable connected timestamp', () => {
+    const fixture = smokeFixture();
+    const { path } = connectedOrder('SUBMITTED');
+    const failures = verifyNetwork(
+      mutatedSnapshot(fixture, path, {
+        orderedAt: field(connectedOrder('SUBMITTED').data, 'submittedAt'),
+      }),
+    );
+    expect(
+      failures.some((failure) => failure.includes('CONNECTED_ORDER_UNREACHABLE_ORDERED_AT')),
+    ).toBe(true);
+  });
+
   it('QA-2: catches a supplier dispatch quantity written in the wrong domain', () => {
     const fixture = smokeFixture();
     const { data } = connectedOrder('SHIPPED');

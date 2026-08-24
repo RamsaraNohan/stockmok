@@ -9,7 +9,7 @@ import { fingerprintSnapshot } from './verify/determinism.js';
 import { readAllDocuments, verifyReferences, verifySchemas } from './verify/integrity.js';
 import { verifyInventory } from './verify/inventory.js';
 import { verifyMovements } from './verify/movements.js';
-import { verifyNetwork } from './verify/network.js';
+import { networkMetrics, verifyNetwork } from './verify/network.js';
 import { verifyProcurement } from './verify/procurement.js';
 import { verifyTenancy, verifyTrapsArmed } from './verify/tenancy.js';
 
@@ -87,6 +87,27 @@ export async function verifyQaDataset(
 
   const networkFailures = verifyNetwork(snapshot);
   total += report('NETWORK_RECONCILIATION_FAILURES', networkFailures);
+  const network = networkMetrics(snapshot);
+  console.log(`DV12_EXPECTED_COUNT=${String(network.dv12ExpectedCount)}`);
+  console.log(`DV12_ACTUAL_COUNT=${String(network.dv12ActualCount)}`);
+  console.log(`CONNECTED_ORDER_UNREACHABLE_ORDERED_AT=${String(network.unreachableOrderedAt)}`);
+  console.log(
+    `CONNECTED_PROJECTION_PARITY_FAILURES=${String(
+      networkFailures.filter(
+        (failure) =>
+          failure.includes('CONNECTED_HEADER_PARITY') || failure.includes('CONNECTED_ITEM_PARITY'),
+      ).length,
+    )}`,
+  );
+  console.log(
+    `CONNECTED_HISTORY_FAILURES=${String(
+      networkFailures.filter(
+        (failure) =>
+          failure.includes('CONNECTED_HISTORY_PARITY') ||
+          failure.includes('ILLEGAL_HISTORY_TRANSITION'),
+      ).length,
+    )}`,
+  );
 
   const authority = verifyAuthority(snapshot);
   total += report('INVALID_ENUM_FAILURES', authority.invalidEnumFailures);
