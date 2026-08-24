@@ -12,6 +12,7 @@ import { verifyMovements } from './verify/movements.js';
 import { networkMetrics, verifyNetwork } from './verify/network.js';
 import { verifyProcurement } from './verify/procurement.js';
 import { verifyTenancy, verifyTrapsArmed } from './verify/tenancy.js';
+import { verifyWideCoverage } from './verify/wide.js';
 
 /**
  * QA dataset verifier. Reads the emulator back and re-derives everything the
@@ -43,13 +44,20 @@ export async function verifyQaDataset(
   argv: readonly string[] = process.argv.slice(2),
 ): Promise<VerifyResult> {
   assertBootstrapSafety([...argv]);
+  const verificationStartedAt = Date.now();
   const definition = resolveProfile(argv);
   const seed = resolveSeed(argv);
 
   const { db, auth } = getBootstrapContext();
   const snapshot = await readAllDocuments(db);
-  const authUsers = await auth.listUsers();
-  const authUids = authUsers.users.map((user) => user.uid);
+  const authUids: string[] = [];
+  let pageToken: string | undefined;
+  do {
+    const page = await auth.listUsers(1_000, pageToken);
+    authUids.push(...page.users.map((user) => user.uid));
+    pageToken = page.pageToken;
+  } while (pageToken !== undefined);
+  authUids.sort();
 
   console.log(`DATASET_VERSION=${DATASET_VERSION}`);
   console.log(`QA_PROFILE=${definition.profile}`);
@@ -62,9 +70,35 @@ export async function verifyQaDataset(
     const parts = path.split('/');
     return parts[0] === 'organizations' && parts.length === 2;
   });
-  console.log(`SMOKE_ORGANIZATIONS=${String(organizations.length)}`);
+  console.log(`QA_ORGANIZATIONS=${String(organizations.length)}`);
+  if (definition.profile === 'smoke') {
+    console.log(`SMOKE_ORGANIZATIONS=${String(organizations.length)}`);
+  } else {
+    const normal = organizations.filter((path) => path.startsWith('organizations/qa-wide-org-'));
+    const special = organizations.filter((path) => path.startsWith('organizations/qa-special-'));
+    console.log(`WIDE_ORGANIZATIONS=${String(normal.length)}`);
+    console.log(`SPECIAL_ORGANIZATIONS=${String(special.length)}`);
+    console.log(`TOTAL_ORGANIZATIONS=${String(organizations.length)}`);
+  }
 
   let total = 0;
+
+  const firestoreUids = [...snapshot.documents.keys()]
+    .filter((path) => path.startsWith('users/') && path.split('/').length === 2)
+    .map((path) => path.split('/')[1])
+    .filter((uid): uid is string => uid !== undefined)
+    .sort();
+  const authSet = new Set(authUids);
+  const firestoreSet = new Set(firestoreUids);
+  const authParityFailures = [
+    ...firestoreUids
+      .filter((uid) => !authSet.has(uid))
+      .map((uid) => `AUTH_USER_PARITY users/${uid} has no Auth account`),
+    ...authUids
+      .filter((uid) => !firestoreSet.has(uid))
+      .map((uid) => `AUTH_USER_PARITY Auth account ${uid} has no users document`),
+  ];
+  total += report('AUTH_USER_PARITY_FAILURES', authParityFailures);
 
   const schemaFailures = verifySchemas(snapshot);
   total += report('INVALID_DOCUMENT_FAILURES', schemaFailures);
@@ -77,6 +111,11 @@ export async function verifyQaDataset(
 
   const inventoryFailures = verifyInventory(snapshot);
   total += report('INVENTORY_RECONCILIATION_FAILURES', inventoryFailures);
+  console.log(
+    `PRODUCT_SUMMARY_FAILURES=${String(
+      inventoryFailures.filter((failure) => failure.includes('/productStockSummaries/')).length,
+    )}`,
+  );
 
   const movements = verifyMovements(snapshot);
   total += report('MOVEMENT_LEDGER_FAILURES', movements.ledgerFailures);
@@ -121,6 +160,10 @@ export async function verifyQaDataset(
     `TENANT_TRAP_DUPLICATED_PARTNER_NAMES=${String(traps.duplicatedPartnerNames.length)}`,
   );
 
+  if (definition.profile === 'wide') {
+    total += report('WIDE_COVERAGE_FAILURES', verifyWideCoverage(snapshot));
+  }
+
   // The seeder writes only through the emulator-guarded admin client, so a
   // production write is impossible by guard rather than merely unobserved.
   console.log('PRODUCTION_WRITE_ATTEMPTS=0');
@@ -153,9 +196,8 @@ export async function verifyQaDataset(
     console.log(`  UNCOVERED_SHAPES=${matrix.uncovered.join(',')}`);
     total += matrix.uncovered.length;
   }
-  console.log(
-    'QUERY_DATA_COVERAGE=32 shapes have data; EXECUTED_QUERY_ACCEPTANCE is not claimed here',
-  );
+  console.log(`QUERY_DATA_COVERAGE=${String(matrix.covered)}/${String(matrix.total)}`);
+  console.log('EXECUTED_QUERY_ACCEPTANCE=0');
 
   console.log(`MOVEMENT_TYPES_PRESENT=${movements.movementTypesSeen.join(',')}`);
 
@@ -195,6 +237,7 @@ export async function verifyQaDataset(
 
   console.log(`QA_VERIFY_TOTAL_FAILURES=${String(total)}`);
   console.log(`QA_VERIFY_RESULT=${total === 0 ? 'PASS' : 'FAIL'}`);
+  console.log(`QA_VERIFICATION_DURATION_MS=${String(Date.now() - verificationStartedAt)}`);
   return {
     failures: total,
     fingerprint: fingerprint.fingerprint,

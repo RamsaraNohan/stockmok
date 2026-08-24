@@ -4,7 +4,7 @@ import type { ReferenceTypeSchema } from '../../../packages/shared/src/primitive
 import { NotificationSchema } from '../../../packages/shared/src/schemas/core.js';
 import type { DatasetBuilder, QaOrg, QaPlan, QaUser } from '../dataset.js';
 import { epochPlus, ordinal } from '../deterministic.js';
-import { connectedNetworkPlan } from './network.js';
+import { connectedNetworkPlans } from './network.js';
 import { privateProcurementPlan } from './procurement.js';
 
 /**
@@ -90,8 +90,10 @@ function shapesFor(org: QaOrg, plan: QaPlan): readonly NotificationShape[] {
     });
   }
 
-  const network = connectedNetworkPlan(plan);
-  if (network !== undefined && org.networkRole !== 'ISOLATED') {
+  const network = connectedNetworkPlans(plan).find(
+    (candidate) => candidate.buyer.orgId === org.orgId || candidate.supplier.orgId === org.orgId,
+  );
+  if (network !== undefined) {
     shapes.push({
       type: 'CONNECTION_RESPONDED',
       category: 'NETWORK',

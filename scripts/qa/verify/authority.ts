@@ -253,8 +253,9 @@ export interface Q005Coverage {
   readonly boundariesMissing: readonly number[];
 }
 
-/** Q-005 separates empty, under-cap, at-cap and over-cap unread windows. */
-const Q005_BOUNDARIES = [0, 1, 49, 50, 51] as const;
+/** Q-005 separates empty, low, pagination-edge, cap, and high-volume windows. */
+const SMOKE_Q005_BOUNDARIES = [0, 1, 49, 50, 51] as const;
+const WIDE_Q005_BOUNDARIES = [0, 1, 5, 20, 49, 50, 51, 75] as const;
 
 export function q005Coverage(snapshot: QaSnapshot): Q005Coverage {
   const unread = new Map<string, number>();
@@ -278,9 +279,13 @@ export function q005Coverage(snapshot: QaSnapshot): Q005Coverage {
   for (const uid of [...users].sort()) counts[uid] = unread.get(uid) ?? 0;
 
   const observed = new Set(Object.values(counts));
+  const wide = [...snapshot.documents.keys()].some((path) =>
+    path.startsWith('organizations/qa-wide-'),
+  );
+  const boundaries = wide ? WIDE_Q005_BOUNDARIES : SMOKE_Q005_BOUNDARIES;
   return {
     unreadCountsByUid: counts,
-    boundariesCovered: Q005_BOUNDARIES.filter((value) => observed.has(value)),
-    boundariesMissing: Q005_BOUNDARIES.filter((value) => !observed.has(value)),
+    boundariesCovered: boundaries.filter((value) => observed.has(value)),
+    boundariesMissing: boundaries.filter((value) => !observed.has(value)),
   };
 }

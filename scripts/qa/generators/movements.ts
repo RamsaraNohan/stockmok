@@ -7,7 +7,7 @@ import type {
 import { StockMovementSchema } from '../../../packages/shared/src/schemas/inventory.js';
 import type { DatasetBuilder, QaOrg, QaPlan, QaProduct } from '../dataset.js';
 import { epochPlus, hashLabel, ordinal } from '../deterministic.js';
-import { connectedNetworkPlan } from './network.js';
+import { connectedNetworkPlans } from './network.js';
 import { privateProcurementPlan } from './procurement.js';
 
 /**
@@ -71,8 +71,7 @@ function externalSteps(plan: QaPlan): ReadonlyMap<BalanceKey, readonly LedgerSte
     }
   }
 
-  const network = connectedNetworkPlan(plan);
-  if (network !== undefined) {
+  for (const network of connectedNetworkPlans(plan)) {
     for (const order of network.orders) {
       for (const line of order.lines) {
         // Buyer side: connected stock arrives in the buyer's base unit.
@@ -121,8 +120,13 @@ function localSteps(
 ): readonly LedgerStep[] {
   const entropy = hashLabel(`${org.orgId}:${product.productId}:${warehouseId}`);
   const steps: LedgerStep[] = [];
+  const primaryWarehouse = product.warehouseIds[0];
+  const addAdjustments =
+    org.profile === 'smoke' ||
+    org.specialKind === 'HIGH_VOLUME' ||
+    (warehouseId === primaryWarehouse && hashLabel(product.productId) % 3 === 0);
 
-  if (target > 0) {
+  if (target > 0 && addAdjustments) {
     steps.push({
       movementType: 'ADJUSTMENT_IN',
       delta: 500 + (entropy % 4) * 100,
@@ -135,7 +139,7 @@ function localSteps(
       sourceType: 'MANUAL',
       adjustmentReason: 'WASTAGE',
     });
-  } else {
+  } else if (target === 0 && addAdjustments) {
     // An out-of-stock balance that was never stocked is not interesting. This
     // one held stock and lost it, which is the shape reconciliation must cope with.
     steps.push({
@@ -147,7 +151,12 @@ function localSteps(
   }
 
   const [primary, secondary] = product.warehouseIds;
-  if (primary !== undefined && secondary !== undefined) {
+  const addTransfer =
+    org.profile === 'smoke' ||
+    ((product.targetOnHandMilli[primary ?? ''] ?? 0) >= 1_000 &&
+      (product.targetOnHandMilli[secondary ?? ''] ?? 0) >= 1_000 &&
+      (org.specialKind === 'HIGH_VOLUME' || hashLabel(product.productId) % 2 === 0));
+  if (primary !== undefined && secondary !== undefined && addTransfer) {
     // Derived from the *pair*, not from this leg. `entropy` is keyed by the leg's
     // own warehouse, so using it here would give the two legs different
     // quantities and a transfer that does not balance.
@@ -186,8 +195,10 @@ export function generateMovements(builder: DatasetBuilder, plan: QaPlan): void {
   const externals = externalSteps(plan);
 
   for (const org of plan.organizations) {
-    const keeper = org.users.find((user) => user.role === 'STOREKEEPER');
-    if (keeper === undefined) throw new Error(`${org.orgId} has no STOREKEEPER`);
+    const keeper =
+      org.users.find((user) => user.role === 'STOREKEEPER') ??
+      org.users.find((user) => user.role === 'OWNER');
+    if (keeper === undefined) throw new Error(`${org.orgId} has no stock-writing fixture user`);
 
     for (const product of org.products) {
       for (const warehouseId of product.warehouseIds) {

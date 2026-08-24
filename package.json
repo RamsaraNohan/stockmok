@@ -49,6 +49,8 @@
     "qa:smoke": "firebase emulators:exec --project stockmok --only auth,firestore \"npm run qa:smoke:inner\"",
     "qa:determinism:inner": "tsx scripts/qa/determinism-run.ts --target=emulator",
     "qa:determinism": "firebase emulators:exec --project stockmok --only auth,firestore \"npm run qa:determinism:inner\"",
+    "qa:wide:inner": "tsx scripts/qa/determinism-run.ts --target=emulator --profile=wide",
+    "qa:wide": "firebase emulators:exec --project stockmok --only auth,firestore \"npm run qa:wide:inner\"",
     "qa:test": "vitest run tests/qa",
     "test:bootstrap:t0:inner": "tsx scripts/bootstrap/test-bootstrap.ts t0 --target=emulator",
     "test:bootstrap:replay:inner": "tsx scripts/bootstrap/test-bootstrap.ts replay --target=emulator",

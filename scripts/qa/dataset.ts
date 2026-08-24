@@ -121,8 +121,12 @@ export interface QaProduct {
 }
 
 export type QaNetworkRole = 'BUYER' | 'SUPPLIER' | 'ISOLATED';
+export type QaSpecialKind =
+  'EMPTY' | 'TINY' | 'LOW_STOCK' | 'ARCHIVED' | 'NETWORK_OFF' | 'HIGH_VOLUME';
 
 export interface QaOrg {
+  readonly profile: 'smoke' | 'wide';
+  readonly specialKind?: QaSpecialKind;
   readonly orgId: string;
   readonly handle: string;
   readonly name: string;
