@@ -180,15 +180,25 @@ export function verifyNetwork(snapshot: QaSnapshot): readonly string[] {
     }
   }
 
-  // Count numbered connected orders per connection, from the canonical records.
-  const numberedByConnection = new Map<string, number>();
+  // DB-CR-040: reconstruct DV-12 from the immutable evidence that cpo.submit
+  // succeeded. Current status and orderNumber are not the authority.
+  const submittedByConnection = new Map<string, number>();
   for (const [path, data] of snapshot.documents) {
     const parts = path.split('/');
     if (parts[0] !== 'connectedPurchaseOrders' || parts.length !== 2) continue;
     const connectionId = stringField(data, 'connectionId');
     if (connectionId === undefined) continue;
-    if (stringField(data, 'orderNumber') !== undefined) {
-      numberedByConnection.set(connectionId, (numberedByConnection.get(connectionId) ?? 0) + 1);
+    if (isTimestampLike(data['submittedAt'])) {
+      submittedByConnection.set(connectionId, (submittedByConnection.get(connectionId) ?? 0) + 1);
+    } else {
+      failures.push(
+        `DV12_SUBMISSION_MARKER ${path} is canonical but has no valid submittedAt timestamp`,
+      );
+    }
+    if (Object.prototype.hasOwnProperty.call(data, 'orderedAt')) {
+      failures.push(
+        `CONNECTED_ORDER_UNREACHABLE_ORDERED_AT ${path} carries orderedAt, which no cpo.* command writes`,
+      );
     }
     if (boolField(data, 'isProjection') !== false) {
       failures.push(
@@ -257,6 +267,9 @@ export function verifyNetwork(snapshot: QaSnapshot): readonly string[] {
           `NETWORK_RECONCILIATION ${path} is a DRAFT and projects nothing, so isProjection must be false`,
         );
       }
+      if (Object.prototype.hasOwnProperty.call(data, 'submittedAt')) {
+        failures.push(`DV12_SUBMISSION_MARKER ${path} is a DRAFT but carries submittedAt`);
+      }
       // `cpo.draftSave` never writes `receivingWarehouseId` — only
       // `cpo.receive` does, onto an order that has already been submitted.
       if (stringField(data, 'receivingWarehouseId') !== undefined) {
@@ -264,6 +277,11 @@ export function verifyNetwork(snapshot: QaSnapshot): readonly string[] {
       }
     } else if (!canonicalExists) {
       failures.push(`NETWORK_RECONCILIATION ${path} is ${String(status)} with no canonical record`);
+    }
+    if (Object.prototype.hasOwnProperty.call(data, 'orderedAt')) {
+      failures.push(
+        `CONNECTED_ORDER_UNREACHABLE_ORDERED_AT ${path} carries orderedAt, which no cpo.* command writes`,
+      );
     }
 
     // `receivingWarehouseId` is pinned only by `cpo.receive`, so it cannot
@@ -300,10 +318,10 @@ export function verifyNetwork(snapshot: QaSnapshot): readonly string[] {
     const connectionId = parts[3];
     if (connectionId === undefined) continue;
     const actual = numberField(data, 'ordersPlacedCount');
-    const expected = numberedByConnection.get(connectionId) ?? 0;
+    const expected = submittedByConnection.get(connectionId) ?? 0;
     if (actual !== expected) {
       failures.push(
-        `NETWORK_RECONCILIATION ${path} ordersPlacedCount=${String(actual)} but ${String(expected)} connected orders carry a number`,
+        `NETWORK_RECONCILIATION ${path} ordersPlacedCount=${String(actual)} but ${String(expected)} canonical connected orders carry submittedAt`,
       );
     }
   }
@@ -512,4 +530,47 @@ export function verifyNetwork(snapshot: QaSnapshot): readonly string[] {
   }
 
   return failures;
+}
+
+export interface NetworkMetrics {
+  readonly dv12ExpectedCount: number;
+  readonly dv12ActualCount: number;
+  readonly unreachableOrderedAt: number;
+}
+
+/** Aggregate observability for the smoke/Wide gate output. */
+export function networkMetrics(snapshot: QaSnapshot): NetworkMetrics {
+  let dv12ExpectedCount = 0;
+  let unreachableOrderedAt = 0;
+  const actualByConnection = new Map<string, number>();
+
+  for (const [path, data] of snapshot.documents) {
+    const parts = path.split('/');
+    const isCanonical = parts[0] === 'connectedPurchaseOrders' && parts.length === 2;
+    const isProjection =
+      parts[0] === 'organizations' &&
+      parts[2] === 'purchaseOrders' &&
+      parts.length === 4 &&
+      stringField(data, 'supplierKind') === 'CONNECTED';
+
+    if (isCanonical && isTimestampLike(data['submittedAt'])) dv12ExpectedCount += 1;
+    if ((isCanonical || isProjection) && Object.prototype.hasOwnProperty.call(data, 'orderedAt')) {
+      unreachableOrderedAt += 1;
+    }
+
+    const isConnectionProjection =
+      parts[0] === 'organizations' && parts[2] === 'connections' && parts.length === 4;
+    if (!isConnectionProjection) continue;
+    const connectionId = parts[3];
+    const count = numberField(data, 'ordersPlacedCount');
+    if (connectionId === undefined || count === undefined) continue;
+    const prior = actualByConnection.get(connectionId);
+    if (prior === undefined) actualByConnection.set(connectionId, count);
+  }
+
+  return {
+    dv12ExpectedCount,
+    dv12ActualCount: [...actualByConnection.values()].reduce((sum, count) => sum + count, 0),
+    unreachableOrderedAt,
+  };
 }

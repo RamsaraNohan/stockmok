@@ -12,7 +12,7 @@ import { generateMovements } from './generators/movements.js';
 import {
   generateNetwork,
   connectedNetworkPlan,
-  connectedNumberedCount,
+  connectedSubmittedCount,
 } from './generators/network.js';
 import { generateNotifications } from './generators/notifications.js';
 import { generateProcurement, orderedPoCount } from './generators/procurement.js';
@@ -46,7 +46,7 @@ export function buildDataset(plan: QaPlan): DatasetBuilder {
   for (const org of plan.organizations) {
     const connected =
       network !== undefined && network.buyer.orgId === org.orgId
-        ? connectedNumberedCount(network)
+        ? connectedSubmittedCount(network)
         : 0;
     counters.set(org.orgId, orderedPoCount(org) + connected);
   }
