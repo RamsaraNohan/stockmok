@@ -654,9 +654,11 @@ Index: `IDX-15` `status, buyerProductId`.
 
 ### 6.3 `organizations/{orgId}/connections/{connectionId}` — projection, **CMD**
 
-> **A3 · DB-CR-035 — `ordersPlacedCount: integer ≥ 0`.** The canonical Gate 8 board draws the sub-line
+> **A3 · DB-CR-035; DB-CR-040 — `ordersPlacedCount: integer ≥ 0`.** The canonical Gate 8 board draws the sub-line
 > *"Connected since 9 Aug 2026 · **1 order placed**"* on each connection row. Written by `cpo.submit` in
-> the same transaction that writes both projections (`INV-19`). Governed by **DV-12**. `19` `TABLE-018`'s
+> the same transaction that writes both projections (`INV-19`). It is a historical count of successfully
+> submitted connected orders: later cancellation does not decrement it. `submittedAt` is the retained
+> submission evidence used by **DV-12** rebuild. `19` `TABLE-018`'s
 > *Mapped Items* and *Open Connected POs* columns are **deleted** — the canonical board draws
 > `Business · Handle · Relationship · State · Action` and neither column appears (A3 §8.5).
 

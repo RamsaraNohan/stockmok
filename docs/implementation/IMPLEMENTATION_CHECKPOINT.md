@@ -157,3 +157,11 @@ UNRESOLVED_OWNER_DECISIONS    = 0 (database) · 4 (design-side, non-blocking)
 A3R_P2_PRODUCTION_CODE_CHANGED = NO
 NEXT_ACTION                   = PREPARE_PARALLEL_IMPLEMENTATION_LANES
 ```
+
+## 6. Post-checkpoint owner amendment — DB-CR-040
+
+On 2026-08-24 the owner resolved DV-12 as `LIFETIME_PLACED_ORDERS`. A successfully submitted connected
+order contributes once; cancellation and every other later lifecycle transition contribute zero. The
+verified rebuild marker is retained `submittedAt`, absent from an unsubmitted connected DRAFT and written
+atomically by `cpo.submit`. This forward amendment changes documentation only and preserves the frozen
+backend behavior and all governed totals: `92 · 67 · 38 · 26 · 14`.
