@@ -1486,3 +1486,63 @@ LANE_A = CODEX_C2_READ_QUERY_LAYER
 LANE_B = CLAUDE_CODE_SECURITY_RULES_AND_BACKEND_SEQUENCE
 LANE_C = ANTIGRAVITY_FRONTEND_IMPLEMENTATION
 ```
+
+---
+
+# 8.13 OWNER DECISION — DV-12 LIFETIME PLACED-ORDER SEMANTIC
+
+**DB-CR-040 — ADOPTED 2026-08-24.** A bounded QA review found that DV-12's current rebuild row excluded
+`CANCELLED` while every current command contract and the frozen backend maintained the field only at
+`cpo.submit`. The owner resolved the contradiction without rewriting the historical evidence that exposed
+it:
+
+```text
+OWNER_DECISION_DV12 = LIFETIME_PLACED_ORDERS
+
+ordersPlacedCount is a historical connection-activity counter.
+
+successful cpo.submit       +1
+later cpo.cancel             0
+accept/reject/ship/receive   0
+```
+
+A connected purchase order contributes exactly once when `cpo.submit` successfully places it. A later
+lifecycle transition, including `CANCELLED`, does not erase that historical fact and does not decrement
+the counter. This is intentionally different from private-partner DV-13, whose owner-approved meaning is
+non-cancelled private orders.
+
+## Mechanically verified submission evidence
+
+`submittedAt` is the persisted marker for successful connected submission:
+
+1. `cpo.draftSave` creates a `DRAFT` without `submittedAt`.
+2. `cpo.submit` creates the canonical record and both projections with the same server-generated
+   `submittedAt` in the transaction that increments both connection projections.
+3. Every later connected transition uses partial updates and retains `submittedAt`, including
+   `SUBMITTED → CANCELLED`.
+4. The shared purchase-order schema accepts `submittedAt` as a Firestore timestamp.
+
+Therefore DV-12 rebuild means: for one connection, count canonical connected purchase orders carrying a
+valid `submittedAt`. Current status is not a rebuild predicate; a submitted order still contributes after
+becoming `CANCELLED`. An unsubmitted `DRAFT` cannot contribute.
+
+## Propagation and scope
+
+The current normative DV-12 rows in `DB_07` and the affected current schema, command and frontend
+contracts are corrected by this same forward amendment. Historical implementation-evidence files remain
+unchanged. No backend, frontend, Rules, path, schema, query, index, command, invariant or derived-contract
+identifier is added, removed or renumbered.
+
+```text
+DV12_SEMANTIC                  = LIFETIME_PLACED_ORDERS
+DV12_SUBMISSION_MARKER         = submittedAt
+DV12_REBUILD                   = count valid submittedAt for the connection
+FROZEN_BACKEND_BEHAVIOR_CHANGE = NO
+FRONTEND_MACRO_B_CHANGE        = NO
+
+ACTIVE_QUERY_IDS             = 92
+ACTIVE_INDEX_IDS             = 67
+ACTIVE_COMMAND_IDS           = 38
+ACTIVE_INVARIANT_IDS         = 26
+ACTIVE_DERIVED_CONTRACT_IDS  = 14
+```

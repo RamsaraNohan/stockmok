@@ -1,23 +1,24 @@
 # INTEGRATION_STATUS
 
 Live status of the contracts between Antigravity, Codex and Claude Code.
-**Updated 2026-08-17 at `A3R-P2` (C1 implementation-discovery propagation; `DB_00` §8.12), which follows
-database amendment `A3R-P` (A3R propagation closure).**
+**Updated 2026-08-24 at `DB-CR-040` (`DB_00` §8.13), the owner-approved DV-12 lifetime
+placed-order reconciliation. The governed counts remain unchanged from `A3R-P2`.**
 
 ## 1. Phase status
 
 ```
 BUSINESS ARCHITECTURE     COMPLETE   Stockmok_Final_Control_Pack_v4 (01–17)
 DESIGN                    COMPLETE   STOCKMOK_DESIGN_FREEZE_v1.0, Gate 14 APPROVED 2026-08-15
-DATABASE ARCHITECTURE     COMPLETE   DB_00 … DB_11, amendments A1 · A2 · A3 · A3R · A3R-P · A3R-P2
+DATABASE ARCHITECTURE     COMPLETE   DB_00 … DB_11, through owner amendment DB-CR-040
 DATABASE_ARCHITECTURE_FROZEN  YES      A3R_P_PROPAGATION_CLOSURE = COMPLETE
-IMPLEMENTATION CONTRACTS  COMPLETE   docs/implementation/ (7 files, this set), synchronized at A3R-P2
+IMPLEMENTATION CONTRACTS  COMPLETE   docs/implementation/ (7 files), DV-12 synchronized at DB-CR-040
 CODEX FOUNDATION          COMPLETE    Codex C1 Firebase Foundation.  C1_FOUNDATION_COMPLETE = YES
                                       67 indexes generated (matrix 32, IDX-36 onHandMilli DESC),
                                       shared types/schemas/converters/paths, transition data,
                                       emulator + bootstrap tooling, foundation tests, Node-22 CI.
                                       Evidence: docs/implementation-evidence/C1_COMPLETION_REPORT.md
 A3R_P2_PROPAGATION        COMPLETE    C1-AUTH-001 … C1-AUTH-007 propagated (DB_00 §8.12)
+DV12_OWNER_RECONCILIATION COMPLETE    LIFETIME_PLACED_ORDERS; submittedAt rebuild marker (DB_00 §8.13)
 FIRESTORE RULES           NOT STARTED
 CLOUD FUNCTIONS           NOT STARTED   (CALLABLE_EXPORTS = 0; functions scaffold only)
 FRONTEND                  NOT STARTED
@@ -74,6 +75,7 @@ contract needs an amendment. It is never resolved silently.**
 | **A3R** | 2026-08-17 | **Adversarial review of A3 itself, 18 findings, verdict FAIL** | DB-CR-038, DB-CR-039, `C-38`, `INV-27`, `DV-14`. 17 accepted and patched; 1 rejected on the canonical bytes. 12 were propagation failures — the change record was written, the normative table was not. 4 were real engineering defects: the index matrix, the aggregation index, dual rounding, and an unenforceable archive guard. **SCREEN-049 reinstated** — A3 had struck an `A-MUST` requirement using a rank-7 authority. |
 | **A3R-P2** | 2026-08-17 | **C1 implementation-discovery propagation** (`DB_00` §8.12). Not an architecture pass: no decision reopened, no feature added or removed, no count changed, no code touched. | Seven rulings accepted during executable Codex C1 made current in the normative text. Six propagation corrections — `MovementType` (generic `ADJUSTMENT` is not a storage value), `ConnectionStatus` (`REJECTED`, not `DECLINED`), `MappingStatus` (`VERIFIED`/`DISABLED` only), private partners (bounded `partnerTypes` + `PartnerStatus`; UI archive → `DEACTIVATED`, restore → `ACTIVE`; `ARCHIVED` never persisted), `UserStatus = ACTIVE \| DISABLED`, and **`IDX-36 … onHandMilli DESC`** (the later `DB-CR-038` matrix rule controls; no index added, deleted or renumbered). One **owner-approved semantic exception**, `C1-AUTH-007`: `OPENING_BALANCE` permits `signedQuantityMilli >= 0`, every other type requires non-zero, `C-13` accepts `quantityMilli >= 0`, and the canonical Cooking Oil zero opening balance is a recorded fact. Counts re-derived and **unchanged**: 92 · 67 · 38 · 26 · 14. `STALE_CURRENT_ASSERTIONS = 0`. |
 | **A3R-P** | 2026-08-17 | **Propagation closure of A3R into the normative files** (`DB_00` §8.11). Not an architecture pass: no decision reopened, no schema semantics changed, no feature added or removed. | Nine defects `P-01 … P-09`. A3R fixed the counts it *inherited* and did not re-count after its *own* additions: invariants **25 → 26** (`INV-27` uncounted), derived-contract heading **DV-13 → DV-14**, queries **91 → 92** (`Q-085g` undefined → defined as **`Q-080`**, the `C-38` guard — `A3 · F-H-01` one pass later). `DB_03`'s normative rows corrected to **SCREEN-049 / CHART-003 = INCLUDED**; ledger search to `Q-015r`, PO search to `Q-084a`/`Q-084b`. `DB_11`'s A2-era inventory labelled historical, superseded by a new **§M**. Owner-item count reconciled to **4**. `STALE_CURRENT_ASSERTIONS = 0`. |
+| **DB-CR-040** | 2026-08-24 | Owner decision after bounded QA review found DV-12 rebuild/maintenance contradiction | `ordersPlacedCount = LIFETIME_PLACED_ORDERS`; `cpo.submit +1`, later transitions `+0`; rebuild counts canonical connected orders with retained `submittedAt`. Backend and governed ID totals unchanged. |
 
 ## 4. Open items
 
