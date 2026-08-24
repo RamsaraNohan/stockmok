@@ -93,9 +93,14 @@ function externalSteps(plan: QaPlan): ReadonlyMap<BalanceKey, readonly LedgerSte
         if (!dispatched) continue;
         const supplierWarehouse = line.mapping.supplierProduct.warehouseIds[0];
         if (supplierWarehouse === undefined) continue;
+        // `cpo.ship` (`connected-po.ts`) deducts `orderedSupplierMilli`
+        // directly — INV-17 already makes that the supplier's own base-unit
+        // quantity, so no buyer-side conversion factor belongs here. Using
+        // `orderedBuyerBaseMilli` would dispatch the wrong quantity domain
+        // entirely.
         push(network.supplier.orgId, line.mapping.supplierProduct.productId, supplierWarehouse, {
           movementType: 'CONNECTED_DISPATCH_OUT',
-          delta: -line.orderedBuyerBaseMilli,
+          delta: -line.orderedSupplierMilli,
           sourceType: 'CONNECTED_PO',
           sourceId: order.purchaseOrderId,
           ...(order.orderNumber !== undefined ? { sourceReference: order.orderNumber } : {}),

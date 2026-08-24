@@ -1,8 +1,15 @@
+import type { DocumentData } from 'firebase-admin/firestore';
 import { describe, expect, it } from 'vitest';
 
 import { verifyAuthority } from '../../scripts/qa/verify/authority.js';
 import { verifyNetwork } from '../../scripts/qa/verify/network.js';
-import { documentField, field, pathsUnder, smokeFixture } from './dataset-fixture.js';
+import {
+  documentField,
+  field,
+  mutatedSnapshot,
+  pathsUnder,
+  smokeFixture,
+} from './dataset-fixture.js';
 
 interface OrderRow {
   readonly path: string;
@@ -88,6 +95,161 @@ describe('QA connected network', () => {
         .map((order) => order.read('viewRole')),
     );
     expect(roles).toEqual(new Set(['BUYER', 'SUPPLIER']));
+  });
+});
+
+/** The buyer-side connected order document carrying the given status. */
+function connectedOrder(status: string): { readonly path: string; readonly data: DocumentData } {
+  const fixture = smokeFixture();
+  const path = connectedOrders().find((order) => order.read('status') === status)?.path;
+  if (path === undefined) throw new Error(`no connected order carries status ${status}`);
+  const data = fixture.snapshot.documents.get(path);
+  if (data === undefined) throw new Error(`no document at ${path}`);
+  return { path, data };
+}
+
+function orderIds(data: DocumentData): {
+  readonly purchaseOrderId: string;
+  readonly buyerOrgId: string;
+  readonly supplierOrgId: string;
+} {
+  const purchaseOrderId = String(data['purchaseOrderId']);
+  const canonical = smokeFixture().snapshot.documents.get(
+    `connectedPurchaseOrders/${purchaseOrderId}`,
+  );
+  if (canonical === undefined) throw new Error(`no canonical record for ${purchaseOrderId}`);
+  return {
+    purchaseOrderId,
+    buyerOrgId: String(canonical['buyerOrgId']),
+    supplierOrgId: String(canonical['supplierOrgId']),
+  };
+}
+
+describe('QA connected network — negative coverage (regressions for DV review findings)', () => {
+  it('QA-2: catches a supplier dispatch quantity written in the wrong domain', () => {
+    const fixture = smokeFixture();
+    const { data } = connectedOrder('SHIPPED');
+    const { purchaseOrderId, supplierOrgId } = orderIds(data);
+    const dispatchPath = pathsUnder(
+      fixture,
+      (parts) =>
+        parts[0] === 'organizations' && parts[1] === supplierOrgId && parts[2] === 'stockMovements',
+    ).find((path) => {
+      const movement = fixture.snapshot.documents.get(path);
+      return (
+        movement?.['movementType'] === 'CONNECTED_DISPATCH_OUT' &&
+        movement['sourceId'] === purchaseOrderId
+      );
+    });
+    expect(dispatchPath).toBeDefined();
+    if (dispatchPath === undefined) return;
+    const movement = fixture.snapshot.documents.get(dispatchPath);
+    const corrupted = (movement?.['signedQuantityMilli'] as number) * 5;
+    const failures = verifyNetwork(
+      mutatedSnapshot(fixture, dispatchPath, { signedQuantityMilli: corrupted }),
+    );
+    expect(failures.some((f) => f.includes('CONNECTED_DISPATCH_DOMAIN'))).toBe(true);
+  });
+
+  it('QA-3: catches a history row whose transition no cpo.* command can produce', () => {
+    const fixture = smokeFixture();
+    const { data } = connectedOrder('RECEIVED');
+    const { purchaseOrderId } = orderIds(data);
+    const firstHistoryPath = `connectedPurchaseOrders/${purchaseOrderId}/history/qa-cpoh-${purchaseOrderId}-01`;
+    expect(fixture.snapshot.documents.has(firstHistoryPath)).toBe(true);
+    const failures = verifyNetwork(
+      mutatedSnapshot(fixture, firstHistoryPath, { toStatus: 'RECEIVED' }),
+    );
+    expect(failures.some((f) => f.includes('ILLEGAL_HISTORY_TRANSITION'))).toBe(true);
+  });
+
+  it('QA-3/QA-5: catches a missing organization mirror of a canonical history row', () => {
+    const fixture = smokeFixture();
+    const { data } = connectedOrder('SUBMITTED');
+    const { purchaseOrderId, buyerOrgId } = orderIds(data);
+    const historyId = `qa-cpoh-${purchaseOrderId}-01`;
+    const mirrorPath = `organizations/${buyerOrgId}/purchaseOrders/${purchaseOrderId}/history/${historyId}`;
+    expect(fixture.snapshot.documents.has(mirrorPath)).toBe(true);
+    const failures = verifyNetwork(mutatedSnapshot(fixture, mirrorPath, undefined));
+    expect(
+      failures.some((f) => f.includes('CONNECTED_HISTORY_PARITY') && f.includes('missing')),
+    ).toBe(true);
+  });
+
+  it('QA-5: catches a history row that disagrees between organizations', () => {
+    const fixture = smokeFixture();
+    const { data } = connectedOrder('ACCEPTED');
+    const { purchaseOrderId, supplierOrgId } = orderIds(data);
+    const historyId = `qa-cpoh-${purchaseOrderId}-02`;
+    const mirrorPath = `organizations/${supplierOrgId}/purchaseOrders/${purchaseOrderId}/history/${historyId}`;
+    expect(fixture.snapshot.documents.has(mirrorPath)).toBe(true);
+    const failures = verifyNetwork(
+      mutatedSnapshot(fixture, mirrorPath, { actorName: 'Someone Else' }),
+    );
+    expect(failures.some((f) => f.includes('CONNECTED_HISTORY_PARITY'))).toBe(true);
+  });
+
+  it('QA-5: catches a corrupted supplier item quantity (the exact DV finding)', () => {
+    const fixture = smokeFixture();
+    const { data } = connectedOrder('RECEIVED');
+    const { purchaseOrderId, supplierOrgId } = orderIds(data);
+    const itemPath = `organizations/${supplierOrgId}/purchaseOrders/${purchaseOrderId}/items/line-01`;
+    expect(fixture.snapshot.documents.has(itemPath)).toBe(true);
+    const failures = verifyNetwork(
+      mutatedSnapshot(fixture, itemPath, { receivedBuyerBaseMilli: 5_000 }),
+    );
+    expect(failures.some((f) => f.includes('CONNECTED_ITEM_PARITY'))).toBe(true);
+  });
+
+  it('QA-5: catches a corrupted buyer item quantity', () => {
+    const fixture = smokeFixture();
+    const { data } = connectedOrder('RECEIVED');
+    const { purchaseOrderId, buyerOrgId } = orderIds(data);
+    const itemPath = `organizations/${buyerOrgId}/purchaseOrders/${purchaseOrderId}/items/line-01`;
+    expect(fixture.snapshot.documents.has(itemPath)).toBe(true);
+    const failures = verifyNetwork(
+      mutatedSnapshot(fixture, itemPath, { orderedBuyerBaseMilli: 1 }),
+    );
+    expect(failures.some((f) => f.includes('CONNECTED_ITEM_PARITY'))).toBe(true);
+  });
+
+  it('QA-5: catches a corrupted canonical item quantity', () => {
+    const fixture = smokeFixture();
+    const { data } = connectedOrder('RECEIVED');
+    const { purchaseOrderId } = orderIds(data);
+    const itemPath = `connectedPurchaseOrders/${purchaseOrderId}/items/line-01`;
+    expect(fixture.snapshot.documents.has(itemPath)).toBe(true);
+    const failures = verifyNetwork(mutatedSnapshot(fixture, itemPath, { orderedSupplierMilli: 1 }));
+    expect(failures.some((f) => f.includes('CONNECTED_ITEM_PARITY'))).toBe(true);
+  });
+
+  it('QA-5: catches a mismatched shared header field between projections', () => {
+    const fixture = smokeFixture();
+    const { path } = connectedOrder('SHIPPED');
+    const failures = verifyNetwork(mutatedSnapshot(fixture, path, { totalMinor: 1 }));
+    expect(failures.some((f) => f.includes('CONNECTED_HEADER_PARITY'))).toBe(true);
+  });
+
+  it('QA-4: catches receivingWarehouseId pinned before any receipt happened', () => {
+    const fixture = smokeFixture();
+    const { path } = connectedOrder('SUBMITTED');
+    const failures = verifyNetwork(
+      mutatedSnapshot(fixture, path, { receivingWarehouseId: 'main-store' }),
+    );
+    expect(
+      failures.some((f) => f.includes('receivingWarehouseId') && f.includes('SUBMITTED')),
+    ).toBe(true);
+  });
+
+  it('QA-4: catches receivingWarehouseId leaking onto the canonical record', () => {
+    const fixture = smokeFixture();
+    const { data } = connectedOrder('RECEIVED');
+    const { purchaseOrderId } = orderIds(data);
+    const canonicalPath = `connectedPurchaseOrders/${purchaseOrderId}`;
+    const failures = verifyNetwork(
+      mutatedSnapshot(fixture, canonicalPath, { receivingWarehouseId: 'main-store' }),
+    );
+    expect(failures.some((f) => f.includes('must not carry receivingWarehouseId'))).toBe(true);
   });
 });
 

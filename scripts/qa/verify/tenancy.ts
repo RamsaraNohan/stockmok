@@ -33,6 +33,13 @@ const CROSS_ORG_BY_CONTRACT: ReadonlySet<string> = new Set([
   'supplierCatalogItemId',
   'supplierOrgHandle',
   'counterpartyHandle',
+  // `writeConnectedHistory` (`connected-lib.ts`) writes one identical row —
+  // `actorOrgId` included — to the canonical record AND both organizations'
+  // history mirrors, so a transition the supplier performed legitimately
+  // carries the supplier's `actorOrgId` inside the buyer's own history
+  // subcollection, and vice versa. The private lane's history never crosses
+  // an org boundary, so `actorOrgId` there is always the owning org anyway.
+  'actorOrgId',
 ]);
 
 export function verifyTenancy(snapshot: QaSnapshot): readonly string[] {

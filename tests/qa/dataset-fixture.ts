@@ -48,3 +48,35 @@ export function pathsUnder(
 ): readonly string[] {
   return [...fixture.snapshot.documents.keys()].filter((path) => predicate(path.split('/')));
 }
+
+/**
+ * A snapshot with one document patched, replaced entirely, or removed —
+ * for verifier negative tests that prove a corruption is actually detected
+ * rather than merely relying on the generator never producing one.
+ */
+export function mutatedSnapshot(
+  fixture: Fixture,
+  path: string,
+  patch: Record<string, unknown> | undefined,
+): Fixture['snapshot'] {
+  const documents = new Map(fixture.snapshot.documents);
+  if (patch === undefined) {
+    if (!documents.delete(path)) throw new Error(`no document at ${path} to remove`);
+  } else {
+    const original = documents.get(path);
+    if (original === undefined) throw new Error(`no document at ${path} to mutate`);
+    documents.set(path, { ...original, ...patch });
+  }
+  return { documents };
+}
+
+/** A snapshot with one extra document injected at `path`. */
+export function withAddedDocument(
+  fixture: Fixture,
+  path: string,
+  data: DocumentData,
+): Fixture['snapshot'] {
+  const documents = new Map(fixture.snapshot.documents);
+  documents.set(path, data);
+  return { documents };
+}

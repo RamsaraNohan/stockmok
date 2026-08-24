@@ -10,6 +10,7 @@ import {
 } from '../../../packages/shared/src/schemas/network.js';
 import {
   ProductMappingSchema,
+  PurchaseOrderHistorySchema,
   PurchaseOrderItemSchema,
   PurchaseOrderSchema,
 } from '../../../packages/shared/src/schemas/procurement.js';
@@ -81,6 +82,109 @@ const STATUS_TIMESTAMPS: Readonly<Record<string, Record<string, ReturnType<typeo
     cancelledAt: epochPlus(14, 9),
   },
 };
+
+interface HistoryStep {
+  readonly from: PoStatus;
+  readonly to: PoStatus;
+  readonly side: 'BUYER' | 'SUPPLIER';
+  readonly operationId: boolean;
+  readonly createdAt: ReturnType<typeof epochPlus>;
+}
+
+const SUBMIT: HistoryStep = {
+  from: 'DRAFT',
+  to: 'SUBMITTED',
+  side: 'BUYER',
+  operationId: true,
+  createdAt: CPO_SUBMITTED,
+};
+const ACCEPT: HistoryStep = {
+  from: 'SUBMITTED',
+  to: 'ACCEPTED',
+  side: 'SUPPLIER',
+  operationId: true,
+  createdAt: epochPlus(14, 9),
+};
+const SHIP: HistoryStep = {
+  from: 'ACCEPTED',
+  to: 'SHIPPED',
+  side: 'SUPPLIER',
+  operationId: true,
+  createdAt: epochPlus(15, 9),
+};
+
+/**
+ * Every history row a terminal status implies, in the order the frozen
+ * `cpo.*` commands (`connected-po.ts`) actually produce it: `submit` (buyer),
+ * `respond` (supplier, ACCEPT or REJECT), `ship` (supplier), `receive`
+ * (buyer). `cancel` carries no `operationId` because DB-06 §1 marks it
+ * non-idempotent. There is no direct edge from DRAFT to anything but
+ * SUBMITTED, so a terminal status past SUBMITTED implies every intermediate
+ * row, not just its own.
+ */
+const HISTORY_STEPS: Readonly<Record<string, readonly HistoryStep[]>> = {
+  DRAFT: [],
+  SUBMITTED: [SUBMIT],
+  ACCEPTED: [SUBMIT, ACCEPT],
+  REJECTED: [
+    SUBMIT,
+    {
+      from: 'SUBMITTED',
+      to: 'REJECTED',
+      side: 'SUPPLIER',
+      operationId: true,
+      createdAt: epochPlus(14, 9),
+    },
+  ],
+  SHIPPED: [SUBMIT, ACCEPT, SHIP],
+  PARTIALLY_RECEIVED: [
+    SUBMIT,
+    ACCEPT,
+    SHIP,
+    {
+      from: 'SHIPPED',
+      to: 'PARTIALLY_RECEIVED',
+      side: 'BUYER',
+      operationId: true,
+      createdAt: epochPlus(16, 9),
+    },
+  ],
+  RECEIVED: [
+    SUBMIT,
+    ACCEPT,
+    SHIP,
+    {
+      from: 'SHIPPED',
+      to: 'RECEIVED',
+      side: 'BUYER',
+      operationId: true,
+      createdAt: epochPlus(16, 9),
+    },
+  ],
+  CANCELLED: [
+    SUBMIT,
+    {
+      from: 'SUBMITTED',
+      to: 'CANCELLED',
+      side: 'BUYER',
+      operationId: false,
+      createdAt: epochPlus(14, 9),
+    },
+  ],
+};
+
+function actorFor(
+  network: QaNetwork,
+  side: 'BUYER' | 'SUPPLIER',
+): {
+  readonly uid: string;
+  readonly name: string;
+  readonly orgId: string;
+  readonly orgName: string;
+} {
+  const org = side === 'BUYER' ? network.buyer : network.supplier;
+  return { uid: org.ownerUid, name: 'Dana Owner', orgId: org.orgId, orgName: org.name };
+}
 
 export interface QaMapping {
   readonly mappingId: string;
@@ -270,7 +374,10 @@ function writeMappings(builder: DatasetBuilder, network: QaNetwork): void {
         supplierPartnerSkuSnapshot: `PACK-${mapping.supplierProduct.internalSku}`,
         supplierDisplayNameSnapshot: `${mapping.supplierProduct.name} 5 ${mapping.supplierProduct.baseUnit} Pack`,
         buyerBaseUnit: mapping.buyerProduct.baseUnit,
-        supplierOrderUnit: 'PACK',
+        // Mirrors `mapping.create` (`mapping.ts`), which reads this straight
+        // off `catalogItem.orderUnit` — INV-17 already pins that to the
+        // supplier product's own baseUnit.
+        supplierOrderUnit: mapping.supplierProduct.baseUnit,
         supplierToBuyerBaseFactorMilli: FACTOR_MILLI,
         semanticConfirmedByUid: network.buyer.ownerUid,
         semanticConfirmedByName: 'Dana Owner',
@@ -298,7 +405,9 @@ function itemFields(line: QaConnectedLine): Record<string, unknown> {
     supplierCatalogItemId: line.mapping.supplierCatalogItemId,
     supplierProductNameSnapshot: line.mapping.supplierProduct.name,
     supplierSkuSnapshot: `PACK-${line.mapping.supplierProduct.internalSku}`,
-    supplierOrderUnitSnapshot: 'PACK',
+    // Mirrors `cpo.submit` (`connected-po.ts`), which freezes this line from
+    // `catalogItem.orderUnit` at submit time.
+    supplierOrderUnitSnapshot: line.mapping.supplierProduct.baseUnit,
     orderedSupplierMilli: line.orderedSupplierMilli,
     receivedSupplierMilli: line.receivedSupplierMilli,
     supplierToBuyerBaseFactorMilliSnapshot: FACTOR_MILLI,
@@ -328,13 +437,21 @@ function writeOrders(builder: DatasetBuilder, network: QaNetwork): void {
       ...(STATUS_TIMESTAMPS[order.status] ?? {}),
     };
 
+    // `receivingWarehouseId` is pinned only by `cpo.receive`
+    // (`connected-po.ts`), and only onto the buyer's own projection —
+    // `updateConnectedOrderEverywhere`'s `buyerOnly` parameter, never the
+    // canonical record or the supplier's projection (DB-05 §8: warehouse
+    // identity never crosses the connected boundary). It cannot exist before
+    // a receipt has actually happened.
+    const received = order.status === 'PARTIALLY_RECEIVED' || order.status === 'RECEIVED';
+
     const buyerSide = {
       ...base,
       viewRole: 'BUYER' as const,
       counterpartyName: network.supplier.name,
       counterpartyOrgId: network.supplier.orgId,
       counterpartyHandle: network.supplier.handle,
-      receivingWarehouseId: order.receivingWarehouseId,
+      ...(received ? { receivingWarehouseId: order.receivingWarehouseId } : {}),
       // A draft is not a projection of anything: no canonical record exists yet.
       isProjection: order.status !== 'DRAFT',
     };
@@ -386,7 +503,8 @@ function writeOrders(builder: DatasetBuilder, network: QaNetwork): void {
         counterpartyHandle: network.supplier.handle,
         buyerOrgId: network.buyer.orgId,
         supplierOrgId: network.supplier.orgId,
-        receivingWarehouseId: order.receivingWarehouseId,
+        // The canonical record carries only fields BOTH parties are entitled
+        // to see (DB-02 §7.3); `receivingWarehouseId` is buyer-only.
         isProjection: false,
       },
     );
@@ -398,23 +516,40 @@ function writeOrders(builder: DatasetBuilder, network: QaNetwork): void {
       );
     }
 
-    const historyId = `qa-cpoh-${order.purchaseOrderId}-01`;
-    builder.add(
-      serverPaths.connectedPurchaseOrderHistory(order.purchaseOrderId, historyId),
-      ConnectedHistorySchema,
-      {
+    // DB-02 §5.4 — one history row, written identically to the canonical
+    // record AND both projections in the same transaction.
+    const steps = HISTORY_STEPS[order.status] ?? [];
+    steps.forEach((step, index) => {
+      const historyId = `qa-cpoh-${order.purchaseOrderId}-${ordinal(index + 1)}`;
+      const actor = actorFor(network, step.side);
+      const row = {
         historyId,
-        fromStatus: 'DRAFT',
-        toStatus: order.status === 'SUBMITTED' ? 'SUBMITTED' : order.status,
-        actorUid: network.buyer.ownerUid,
-        actorName: 'Dana Owner',
-        actorOrgId: network.buyer.orgId,
-        actorOrgName: network.buyer.name,
-        ...(order.status === 'CANCELLED' ? {} : { operationId: `qa-op-${historyId}` }),
-        note: `QA connected transition to ${order.status}`,
-        createdAt: CPO_SUBMITTED,
-      },
-    );
+        fromStatus: step.from,
+        toStatus: step.to,
+        actorUid: actor.uid,
+        actorName: actor.name,
+        actorOrgId: actor.orgId,
+        actorOrgName: actor.orgName,
+        ...(step.operationId ? { operationId: `qa-op-${historyId}` } : {}),
+        note: `QA connected transition ${step.from} -> ${step.to}`,
+        createdAt: step.createdAt,
+      };
+      builder.add(
+        serverPaths.connectedPurchaseOrderHistory(order.purchaseOrderId, historyId),
+        ConnectedHistorySchema,
+        row,
+      );
+      builder.add(
+        paths.purchaseOrderHistory(network.buyer.orgId, order.purchaseOrderId, historyId),
+        PurchaseOrderHistorySchema,
+        row,
+      );
+      builder.add(
+        paths.purchaseOrderHistory(network.supplier.orgId, order.purchaseOrderId, historyId),
+        PurchaseOrderHistorySchema,
+        row,
+      );
+    });
   }
 }
 
