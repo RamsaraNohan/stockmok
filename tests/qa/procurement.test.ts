@@ -1,7 +1,13 @@
 import { describe, expect, it } from 'vitest';
 
 import { verifyProcurement } from '../../scripts/qa/verify/procurement.js';
-import { documentField, pathsUnder, smokeFixture } from './dataset-fixture.js';
+import {
+  documentField,
+  mutatedSnapshot,
+  pathsUnder,
+  smokeFixture,
+  withAddedDocument,
+} from './dataset-fixture.js';
 
 function privateOrders(): { path: string; status: unknown; viewRole: unknown }[] {
   const fixture = smokeFixture();
@@ -89,5 +95,71 @@ describe('QA private procurement', () => {
     for (const path of catalog) {
       expect(documentField(fixture, path, 'published')).toBe(true);
     }
+  });
+
+  it("gives every catalog item an orderUnit equal to its source product's baseUnit (INV-17)", () => {
+    const fixture = smokeFixture();
+    const catalog = pathsUnder(
+      fixture,
+      (parts) => parts[0] === 'organizations' && parts[2] === 'partnerCatalog',
+    );
+    expect(catalog.length).toBeGreaterThan(0);
+    for (const path of catalog) {
+      const org = path.split('/')[1];
+      const sourceProductId = documentField(fixture, path, 'sourceProductId');
+      const product = fixture.snapshot.documents.get(
+        `organizations/${String(org)}/products/${String(sourceProductId)}`,
+      );
+      expect(documentField(fixture, path, 'orderUnit')).toBe(product?.['baseUnit']);
+    }
+  });
+});
+
+describe('QA private procurement — negative coverage (regressions for DV review findings)', () => {
+  it('QA-1: catches a catalog orderUnit that disagrees with its source product baseUnit (INV-17)', () => {
+    const fixture = smokeFixture();
+    const catalogPath = pathsUnder(
+      fixture,
+      (parts) => parts[0] === 'organizations' && parts[2] === 'partnerCatalog',
+    )[0];
+    expect(catalogPath).toBeDefined();
+    if (catalogPath === undefined) return;
+    const currentUnit = documentField(fixture, catalogPath, 'orderUnit');
+    const wrongUnit = currentUnit === 'PACK' ? 'KG' : 'PACK';
+    const failures = verifyProcurement(
+      mutatedSnapshot(fixture, catalogPath, { orderUnit: wrongUnit }),
+    );
+    expect(failures.some((f) => f.includes('INV-17'))).toBe(true);
+  });
+
+  it('QA-7: a colliding sourceId/productId pair in another organization does not corrupt reconciliation', () => {
+    const fixture = smokeFixture();
+    const [receiptPath, receiptData] =
+      [...fixture.snapshot.documents.entries()].find(
+        ([path, data]) =>
+          path.split('/')[2] === 'stockMovements' && data['movementType'] === 'PURCHASE_RECEIPT',
+      ) ?? [];
+    expect(receiptPath).toBeDefined();
+    if (receiptPath === undefined || receiptData === undefined) return;
+
+    const org = receiptPath.split('/')[1];
+    const otherOrg = pathsUnder(
+      fixture,
+      (parts) => parts[0] === 'organizations' && parts.length === 2,
+    )
+      .map((path) => path.split('/')[1])
+      .find((candidate) => candidate !== org);
+    expect(otherOrg).toBeDefined();
+    if (otherOrg === undefined) return;
+
+    // Same sourceId + productId as a real receipt, but living under a
+    // *different* tenant — the pre-fix unscoped key would have summed this
+    // into the original organization's reconciliation and doubled it.
+    const snapshot = withAddedDocument(
+      fixture,
+      `organizations/${otherOrg}/stockMovements/qa-mv-tenant-collision-test`,
+      { ...receiptData, movementId: 'qa-mv-tenant-collision-test' },
+    );
+    expect(verifyProcurement(snapshot)).toEqual([]);
   });
 });

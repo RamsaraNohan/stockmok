@@ -43,14 +43,21 @@ export function verifyProcurement(snapshot: QaSnapshot): readonly string[] {
     else bucket.push({ path, data });
   }
 
-  // (org, poId, productId) -> summed PURCHASE_RECEIPT quantity
+  // (org, poId, productId) -> summed PURCHASE_RECEIPT quantity. `sourceId`
+  // (a purchase order id) and `productId` are both tenant-scoped identifiers
+  // that repeat across organizations by design (the QA fixtures deliberately
+  // reuse ids as isolation traps, and a connected order's shared
+  // `purchaseOrderId` is not org-prefixed at all) - so the org the movement
+  // actually lives in must be part of the key, or two different tenants'
+  // receipts collide into one total.
   const receipts = new Map<string, number>();
-  for (const [, data] of snapshot.documents) {
+  for (const [path, data] of snapshot.documents) {
     if (stringField(data, 'movementType') !== 'PURCHASE_RECEIPT') continue;
     const sourceId = stringField(data, 'sourceId');
     const productId = stringField(data, 'productId');
-    if (sourceId === undefined || productId === undefined) continue;
-    const key = `${sourceId}|${productId}`;
+    const org = path.split('/')[1];
+    if (sourceId === undefined || productId === undefined || org === undefined) continue;
+    const key = `${org}|${sourceId}|${productId}`;
     receipts.set(key, (receipts.get(key) ?? 0) + (numberField(data, 'signedQuantityMilli') ?? 0));
   }
 
@@ -133,7 +140,7 @@ export function verifyProcurement(snapshot: QaSnapshot): readonly string[] {
 
       const productId = stringField(line.data, 'buyerProductId');
       if (productId !== undefined && stringField(data, 'viewRole') !== 'SUPPLIER') {
-        const receipted = receipts.get(`${purchaseOrderId}|${productId}`) ?? 0;
+        const receipted = receipts.get(`${org}|${purchaseOrderId}|${productId}`) ?? 0;
         if (receipted !== received) {
           failures.push(
             `PRIVATE_PO_RECONCILIATION ${line.path} received ${String(received)} but PURCHASE_RECEIPT movements total ${String(receipted)}`,
@@ -198,6 +205,26 @@ export function verifyProcurement(snapshot: QaSnapshot): readonly string[] {
     if (actual !== expected) {
       failures.push(
         `PRIVATE_PO_RECONCILIATION ${path} ordersPlacedCount=${String(actual)} but ${String(expected)} non-cancelled orders were placed`,
+      );
+    }
+  }
+
+  // INV-17 (`partner-catalog.ts`, `partnerCatalog.publish`) — a catalog
+  // item's orderUnit must equal its source product's baseUnit. A catalog row
+  // that disagrees could never have been published by the real command.
+  for (const [path, data] of snapshot.documents) {
+    const parts = path.split('/');
+    if (parts[0] !== 'organizations' || parts[2] !== 'partnerCatalog' || parts.length !== 4)
+      continue;
+    const org = parts[1];
+    const sourceProductId = stringField(data, 'sourceProductId');
+    const orderUnit = stringField(data, 'orderUnit');
+    if (org === undefined || sourceProductId === undefined) continue;
+    const product = snapshot.documents.get(`organizations/${org}/products/${sourceProductId}`);
+    const baseUnit = product === undefined ? undefined : stringField(product, 'baseUnit');
+    if (orderUnit !== baseUnit) {
+      failures.push(
+        `PRIVATE_PO_RECONCILIATION ${path} orderUnit=${String(orderUnit)} disagrees with source product baseUnit=${String(baseUnit)} (INV-17)`,
       );
     }
   }

@@ -348,9 +348,11 @@ function writePartnerCatalog(builder: DatasetBuilder, org: QaOrg): void {
       internalSkuSnapshot: product.internalSku,
       partnerSku,
       partnerSkuNormalized: partnerSku.toUpperCase(),
-      displayName: `${product.name} 5 ${product.baseUnit} Pack`,
-      orderUnit: 'PACK',
-      packDescription: `5 ${product.baseUnit} per pack`,
+      displayName: `${product.name} (${product.baseUnit})`,
+      // INV-17 (partner-catalog.ts) — a catalog item's orderUnit must equal
+      // its source product's baseUnit; a catalog cannot invent a distinct
+      // ordering unit.
+      orderUnit: product.baseUnit,
       availabilityState: totalOnHandMilli(product) > 0 ? 'IN_STOCK' : 'OUT_OF_STOCK',
       wholesalePriceMinor: product.purchaseCostMinor * 5,
       currency: org.currency,
