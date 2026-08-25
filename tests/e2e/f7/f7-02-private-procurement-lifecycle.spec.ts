@@ -67,9 +67,11 @@ test('OWNER walks a Wide private PO through DRAFT -> ORDERED -> PARTIALLY_RECEIV
   await expect(page.getByRole('heading', { name: /^Receive:/ })).toBeVisible({ timeout: 25000 });
   const firstPassRows = page.locator('table tbody tr');
   await expect(firstPassRows).toHaveCount(5, { timeout: 15000 });
-  const row0CurrentStockBefore = parseFloat(
-    (await firstPassRows.nth(0).locator('td').nth(1).innerText()).trim(),
-  );
+  const row0CurrentStockCellBefore = firstPassRows.nth(0).locator('td').nth(1);
+  // Rows render before the asynchronous stock-balance query hydrates. Wait for
+  // the authoritative seeded value rather than reading the initial zero.
+  await expect(row0CurrentStockCellBefore).toHaveText('100', { timeout: 15000 });
+  const row0CurrentStockBefore = parseFloat((await row0CurrentStockCellBefore.innerText()).trim());
   const row0Ordered = parseFloat(
     (await firstPassRows.nth(0).locator('td').nth(2).innerText()).trim(),
   );
@@ -87,10 +89,18 @@ test('OWNER walks a Wide private PO through DRAFT -> ORDERED -> PARTIALLY_RECEIV
   const secondPassRows = page.locator('table tbody tr');
   await expect(secondPassRows).toHaveCount(5, { timeout: 25000 });
 
-  const row0CurrentStockAfterFirstReceipt = parseFloat(
-    (await secondPassRows.nth(0).locator('td').nth(1).innerText()).trim(),
+  const expectedStockAfterFirstReceipt = row0CurrentStockBefore + partialQty;
+  const row0CurrentStockCellAfterFirstReceipt = secondPassRows.nth(0).locator('td').nth(1);
+  // The receive callable has completed, but this route's balance query may
+  // still be hydrating. Auto-retry the UI assertion until it shows 100.5.
+  await expect(row0CurrentStockCellAfterFirstReceipt).toHaveText(
+    String(expectedStockAfterFirstReceipt),
+    { timeout: 15000 },
   );
-  expect(row0CurrentStockAfterFirstReceipt).toBeCloseTo(row0CurrentStockBefore + partialQty, 2);
+  const row0CurrentStockAfterFirstReceipt = parseFloat(
+    (await row0CurrentStockCellAfterFirstReceipt.innerText()).trim(),
+  );
+  expect(row0CurrentStockAfterFirstReceipt).toBeCloseTo(expectedStockAfterFirstReceipt, 2);
 
   const rowCount = await secondPassRows.count();
   for (let index = 0; index < rowCount; index += 1) {
