@@ -19,7 +19,9 @@ export const auth = getAuth(app);
 export const db = getFirestore(app);
 export const functions = getFunctions(app, 'asia-southeast1');
 
-const useEmulators = env.VITE_USE_EMULATORS === 'true';
+// Keep this as direct import.meta.env access: Vite replaces DEV at build time,
+// allowing the complete emulator-only branch and connector imports to be removed.
+const useEmulators = import.meta.env.DEV && import.meta.env.VITE_USE_EMULATORS === 'true';
 
 if (useEmulators && typeof window !== 'undefined') {
   const globalAny = window as unknown as { _firebaseEmulatorsConnected?: boolean };

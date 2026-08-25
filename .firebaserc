@@ -1,5 +1,12 @@
 {
   "projects": {
     "default": "stockmok"
+  },
+  "targets": {
+    "stockmok": {
+      "hosting": {
+        "production": ["stockmok"]
+      }
+    }
   }
 }
