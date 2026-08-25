@@ -78,3 +78,13 @@ export async function fetchUserMemberships(uid: string): Promise<readonly UserMe
   const result = await client.list<UserMembership>('Q-003');
   return result.items;
 }
+
+// Q-003, forced to the server: for callers where "zero memberships" must be
+// an authoritative fact (the post-login onboarding-vs-workspace decision),
+// not a possibly-premature empty read from cache.
+export async function fetchUserMembershipsFromServer(
+  uid: string,
+): Promise<readonly UserMembership[]> {
+  const client = createReadClient(db, { uid });
+  return client.listFromServer<UserMembership>('Q-003');
+}
