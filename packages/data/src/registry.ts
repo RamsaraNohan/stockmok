@@ -402,8 +402,10 @@ export const QUERY_COVERAGE_REGISTRY = [
           filter('movementType', 'in', param('movementTypes')),
         ],
       ];
-      const indexes = [
-        'IDX-07',
+      // Index 0 (Q-022, the no-filter case) is undefined: Firestore serves `createdAt DESC` alone
+      // through its automatic single-field index, not a declared composite — see IDX-07 in DB_04.
+      const indexes: readonly (string | undefined)[] = [
+        undefined,
         'IDX-05',
         'IDX-06',
         'IDX-20',
@@ -412,6 +414,7 @@ export const QUERY_COVERAGE_REGISTRY = [
         'IDX-23',
         'IDX-24',
       ];
+      const requiredIndex = indexes[index];
       return definition(queryId, {
         purpose: 'Stock ledger filter-cube query',
         method: 'movements.list',
@@ -428,7 +431,7 @@ export const QUERY_COVERAGE_REGISTRY = [
         defaultLimit: 25,
         maxLimit: 100,
         cursor: true,
-        indexes: [indexes[index] ?? 'IDX-07'],
+        ...(requiredIndex ? { indexes: [requiredIndex] } : {}),
       });
     },
   ),
@@ -876,7 +879,6 @@ export const QUERY_COVERAGE_REGISTRY = [
     order: [order('createdAt', 'desc')],
     defaultLimit: 5,
     maxLimit: 5,
-    indexes: ['IDX-07'],
   }),
   definition('Q-064', {
     purpose: 'Pending connection count',

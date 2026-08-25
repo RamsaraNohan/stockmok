@@ -75,16 +75,6 @@
       ]
     },
     {
-      "collectionGroup": "stockMovements",
-      "queryScope": "COLLECTION",
-      "fields": [
-        {
-          "fieldPath": "createdAt",
-          "order": "DESCENDING"
-        }
-      ]
-    },
-    {
       "collectionGroup": "stockBalances",
       "queryScope": "COLLECTION",
       "fields": [

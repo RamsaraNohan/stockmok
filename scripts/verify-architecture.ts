@@ -75,7 +75,7 @@ assertSet(
   'index ids',
   generateAllIndexes().map(({ id }) => id),
   Array.from({ length: 69 }, (_, index) => `IDX-${String(index + 1).padStart(2, '0')}`).filter(
-    (id) => !['IDX-03', 'IDX-19'].includes(id),
+    (id) => !['IDX-03', 'IDX-07', 'IDX-19'].includes(id),
   ),
 );
 assertSet('invariant ids', invariantIds, [
@@ -112,7 +112,7 @@ if (undefinedReferences.length > 0) {
 }
 
 console.log('ACTIVE_QUERY_IDS=92');
-console.log('ACTIVE_INDEX_IDS=67');
+console.log('ACTIVE_INDEX_IDS=66');
 console.log('ACTIVE_COMMAND_IDS=38');
 console.log('ACTIVE_INVARIANT_IDS=26');
 console.log('ACTIVE_DERIVED_CONTRACT_IDS=14');
