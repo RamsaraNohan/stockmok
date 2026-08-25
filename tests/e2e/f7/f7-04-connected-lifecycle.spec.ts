@@ -38,6 +38,14 @@ async function chooseWarehouseIfNeeded(page: Page): Promise<void> {
 test('Buyer submits, supplier accepts and ships, buyer partially then fully receives a connected order', async ({
   page,
 }) => {
+  // Unlike every other F7 spec (one login per test), this test re-authenticates
+  // three times across two orgs (buyer -> supplier -> buyer) to walk the
+  // connected lifecycle end to end. Each login can itself cost up to 20s under
+  // Firestore emulator cold-connection latency (see helpers.ts), so the
+  // default 30s total-test timeout can be exhausted by login alone before the
+  // later submit/accept/ship/receive actions ever run.
+  test.setTimeout(90000);
+
   page.on('dialog', (dialog) => {
     void dialog.accept();
   });
