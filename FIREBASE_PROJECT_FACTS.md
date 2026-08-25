@@ -15,6 +15,7 @@ BUDGET_ALERTS_CONFIGURED = NO
 # No billing upgrade/budget-alert configuration has been performed yet.
 # Before production Cloud Functions deployment, evaluate upgrade to Blaze
 # and configure billing alerts.
+# Budget alerts are notifications only. They do not cap or prevent spending.
 
 ## Firestore
 
@@ -35,32 +36,34 @@ FIRESTORE_LOCATION = asia-southeast1 (Singapore)
 EMAIL_PASSWORD_AUTH = ENABLED
 GOOGLE_AUTH = ENABLED
 
-AUTHORIZED_DOMAINS = NOT_VERIFIED
-# Firebase-generated domains are expected to exist from project setup,
-# but the exact authorized-domain list has not been recorded.
-# stockmok.com has not yet been confirmed as an authorized Auth domain.
+AUTHORIZED_DOMAINS = localhost, stockmok.firebaseapp.com, stockmok.web.app
+# Verified read-only through the authenticated Firebase CLI identity on 2026-08-25.
+# stockmok.com has not yet been connected or authorized.
 
 ## Cloud Functions
 
-FUNCTIONS_ALREADY_INITIALIZED = NO
-FUNCTIONS_REGION = UNDECIDED
-# Recommended: co-locate with Firestore.
-# If Firestore is confirmed as asia-southeast1, recommend asia-southeast1.
+FUNCTIONS_ALREADY_INITIALIZED = LOCAL IMPLEMENTATION COMPLETE / PRODUCTION NOT DEPLOYED
+FUNCTIONS_REGION = asia-southeast1
+CLOUD_FUNCTIONS_API = DISABLED
+# Production deployment remains an owner-controlled action after Blaze readiness.
 
-FUNCTIONS_GENERATION = 2nd gen (PLANNED / NOT INITIALIZED)
+FUNCTIONS_GENERATION = 2nd gen
 # 2nd gen / undecided
 
-NODE_RUNTIME = undecided
+NODE_RUNTIME = 22
 # 20 / 22 / undecided
-# Resolve against the current Firebase-supported runtime before implementation.
 
 ## Hosting
 
-HOSTING_INITIALIZED = PARTIAL
-# Firebase Hosting site has been created in the Firebase project.
-# Local Firebase CLI Hosting initialization has NOT yet been performed.
+HOSTING_INITIALIZED = LOCAL CONFIG READY / PRODUCTION NOT DEPLOYED
+# The existing default site is the owner-approved production target.
+# No Hosting release was created or changed during RC2 source repair.
 
-HOSTING_SITE_ID = stockmokweb
+HOSTING_SITE_ID = stockmok
+HOSTING_PRIMARY_URL = https://stockmok.web.app
+HOSTING_SECONDARY_SITE_ID = stockmokweb
+HOSTING_SECONDARY_URL = https://stockmokweb.web.app
+# The secondary site is retained unchanged and is not an RC2 deployment target.
 
 CUSTOM_DOMAIN_STATUS = stockmok.com purchased; DNS/custom-domain connection not yet configured
 # stockmok.com purchased / not purchased / DNS not connected / etc.
@@ -91,11 +94,11 @@ APP_CHECK_ENFORCEMENT = disabled
 
 ## Local development
 
-FIREBASE_CLI_VERSION = NOT_VERIFIED
-NODE_VERSION = NOT_VERIFIED
-NPM_VERSION = NOT_VERIFIED
+FIREBASE_CLI_VERSION = 15.27.0
+NODE_VERSION = 22.23.2
+NPM_VERSION = 10.9.8
 
-EMULATOR_SUITE_CONFIGURED = NO
+EMULATOR_SUITE_CONFIGURED = YES
 
 ## Production environments
 
@@ -112,8 +115,8 @@ ENVIRONMENT_PLAN = local Firebase Emulator Suite + one production Firebase proje
 
 - Firebase Web App is already registered.
 - Firebase Web App nickname: Stockmok Web.
-- Firebase Hosting site already exists as:
-  stockmokweb.web.app
+- Firebase Hosting default site exists as `stockmok.web.app` and is the selected production target.
+- The secondary `stockmokweb.web.app` site remains present and unchanged.
 - Email/Password authentication is enabled.
 - Google authentication is enabled.
 - Email-link/passwordless authentication is disabled.
