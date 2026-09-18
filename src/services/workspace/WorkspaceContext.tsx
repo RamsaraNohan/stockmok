@@ -7,9 +7,9 @@ import type {
 } from '@stockmok/shared';
 import { useQueryClient } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
-import { createContext, useCallback, useContext, useEffect, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
 
-import { fetchUserMemberships } from '@/data/adapters/authAdapter';
+import { fetchUserMembershipsFromServer } from '@/data/adapters/authAdapter';
 import {
   fetchOrganization,
   fetchOrganizationSettings,
@@ -25,6 +25,14 @@ export interface WorkspaceContextValue {
   readonly activeMemberDoc: Member | null;
   readonly activeRole: Role | null;
   readonly isLoading: boolean;
+  /**
+   * True when the most recent membership read failed outright (e.g. the
+   * network is genuinely unreachable) rather than authoritatively resolving
+   * to zero memberships. Consumers that decide onboarding-vs-workspace from
+   * `memberships` (GuestGuard) must check this first — a failed read is not
+   * evidence the account has no workspace.
+   */
+  readonly membershipsError: boolean;
   readonly isWorkspaceDataLoading: boolean;
   readonly setActiveHandle: (handle: string) => Promise<boolean>;
   readonly refreshMemberships: () => Promise<readonly UserMembership[]>;
@@ -43,15 +51,33 @@ export function WorkspaceProvider({ children }: { readonly children: ReactNode }
   const [activeSettings, setActiveSettings] = useState<OrganizationSettings | null>(null);
   const [activeMemberDoc, setActiveMemberDoc] = useState<Member | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [membershipsError, setMembershipsError] = useState(false);
   const [isWorkspaceDataLoading, setIsWorkspaceDataLoading] = useState(false);
+  // Guards against overlapping loadMemberships calls applying their result
+  // out of order — e.g. StrictMode's dev-mode double effect invocation
+  // starts two concurrent requests for the same uid, each opening its own
+  // Firestore channel; only the most recently *started* call's result may
+  // ever reach state, regardless of which happens to resolve first.
+  const membershipRequestId = useRef(0);
 
   const loadMemberships = useCallback(async (uid: string) => {
+    const requestId = ++membershipRequestId.current;
     try {
-      const list = await fetchUserMemberships(uid);
-      setMemberships(list);
+      // Forced-server read: GuestGuard treats an authoritative empty result
+      // as "route to onboarding," so a possibly-premature empty read from
+      // cache (before the Firestore connection finishes establishing) must
+      // not be allowed to masquerade as that fact.
+      const list = await fetchUserMembershipsFromServer(uid);
+      if (requestId === membershipRequestId.current) {
+        setMemberships(list);
+        setMembershipsError(false);
+      }
       return list;
     } catch {
-      setMemberships([]);
+      if (requestId === membershipRequestId.current) {
+        setMemberships([]);
+        setMembershipsError(true);
+      }
       return [];
     }
   }, []);
@@ -63,6 +89,7 @@ export function WorkspaceProvider({ children }: { readonly children: ReactNode }
       queueMicrotask(() => {
         if (isMounted) {
           setMemberships([]);
+          setMembershipsError(false);
           setActiveMembership(null);
           setActiveOrg(null);
           setActiveSettings(null);
@@ -209,6 +236,7 @@ export function WorkspaceProvider({ children }: { readonly children: ReactNode }
         activeMemberDoc,
         activeRole,
         isLoading,
+        membershipsError,
         isWorkspaceDataLoading,
         setActiveHandle,
         refreshMemberships,

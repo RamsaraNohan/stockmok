@@ -7,6 +7,7 @@ import {
   getCountFromServer,
   getDoc,
   getDocs,
+  getDocsFromServer,
   limit as limitConstraint,
   onSnapshot,
   orderBy,
@@ -224,6 +225,19 @@ export interface ReadClient {
     parameters?: QueryParameters,
     page?: PageRequest,
   ) => Promise<PageResult<T>>;
+  /**
+   * Like `list`, but forces a genuine round trip to the server instead of
+   * `list`'s default (server-or-cache) read. Use this only where an empty
+   * result must be an authoritative fact — `getDocs()` can resolve from an
+   * empty local cache before the connection has finished establishing,
+   * which is indistinguishable from a real zero-document result. No
+   * pagination: callers needing an authoritative answer want the whole
+   * (small) result set, not a page of it.
+   */
+  readonly listFromServer: <T = DocumentData>(
+    queryId: QueryId,
+    parameters?: QueryParameters,
+  ) => Promise<readonly T[]>;
   readonly aggregate: (queryId: QueryId, parameters?: QueryParameters) => Promise<AggregateResult>;
   readonly subscribe: <T = DocumentData>(
     queryId: QueryId,
@@ -347,6 +361,29 @@ export function createReadClient(db: Firestore, scope: BoundReadScope): ReadClie
     return { items, nextCursor };
   }
 
+  async function listFromServer<T = DocumentData>(
+    queryId: QueryId,
+    parameters: QueryParameters = {},
+  ): Promise<readonly T[]> {
+    const record = QUERY_COVERAGE_BY_ID[queryId];
+    assertExecutable(record);
+    if (record.kind !== 'list') {
+      throw new DataReadError('invalid-argument', `${queryId} is not a list read`);
+    }
+    const reference = collection(db, resolvePath(record.path, scope, parameters)).withConverter(
+      converterFor(record),
+    );
+    const constraints = constraintsFor(record, parameters);
+    // Security rules gate every list read on `request.query.limit <= N`
+    // (boundedList()); an unlimited query has `request.query.limit == null`,
+    // which is not a valid `null <= int` comparison and the rules engine
+    // denies it outright. list() already applies this — listFromServer must
+    // too, even though it never paginates past this one (small) result set.
+    constraints.push(limitConstraint(pageSize(record, undefined)));
+    const snapshot = await getDocsFromServer(query(reference, ...constraints));
+    return snapshot.docs.map((current) => current.data() as T);
+  }
+
   async function aggregate(
     queryId: QueryId,
     parameters: QueryParameters = {},
@@ -421,7 +458,16 @@ export function createReadClient(db: Firestore, scope: BoundReadScope): ReadClie
     return { matches: page.items.slice(0, 10), overflow: page.items.length === 11 };
   }
 
-  return { getUnreadCount, subscribeUnreadBadge, get, list, aggregate, subscribe, resolve };
+  return {
+    getUnreadCount,
+    subscribeUnreadBadge,
+    get,
+    list,
+    listFromServer,
+    aggregate,
+    subscribe,
+    resolve,
+  };
 }
 
 export function formatUnreadBadge(value: RealtimeUnreadBadgeResult): string {

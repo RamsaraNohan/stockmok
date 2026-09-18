@@ -28,7 +28,9 @@ export const NON_MATRIX_INDEXES = [
   index('IDX-04', 'productStockSummaries', [asc('stockStatus'), asc('onHandMilli')]),
   index('IDX-05', 'stockMovements', [asc('productId'), desc('createdAt')]),
   index('IDX-06', 'stockMovements', [asc('warehouseId'), desc('createdAt')]),
-  index('IDX-07', 'stockMovements', [desc('createdAt')]),
+  // IDX-07 deleted: single-field `stockMovements.createdAt DESC` — Firestore rejects a composite
+  // index over one field, since it already maintains that field's ASC/DESC index automatically.
+  // Q-022 and Q-063 remain served by that automatic single-field index. See DB_04 §"A3 index changes".
   index('IDX-08', 'stockBalances', [asc('warehouseId'), desc('onHandMilli')]),
   index('IDX-09', 'stockBalances', [asc('productId'), desc('onHandMilli')]),
   index('IDX-10', 'privatePartners', [array('partnerTypes'), asc('status'), asc('name')]),

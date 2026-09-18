@@ -113,8 +113,8 @@ for (const record of QUERY_COVERAGE_REGISTRY) {
   }
 }
 
-if (indexes.indexes.length !== 67)
-  throw new Error('firestore.indexes.json must remain at 67 indexes');
+if (indexes.indexes.length !== 66)
+  throw new Error('firestore.indexes.json must remain at 66 indexes');
 const canonicalIndex = (value: (typeof indexes.indexes)[number]): string =>
   JSON.stringify({
     collectionGroup: value.collectionGroup,
@@ -128,7 +128,7 @@ const generatedIndexSet = generateAllIndexes()
   )
   .sort();
 if (JSON.stringify(actualIndexSet) !== JSON.stringify(generatedIndexSet)) {
-  throw new Error('firestore.indexes.json differs from the generated 67-index authority');
+  throw new Error('firestore.indexes.json differs from the generated 66-index authority');
 }
 if (PRODUCT_LIST_MATRIX.length !== 32) throw new Error('Product-list matrix must contain 32 rows');
 if (
@@ -144,7 +144,7 @@ if (PRODUCT_LIST_MATRIX.find(({ indexId }) => indexId === 'IDX-36')?.sortDirecti
 
 const activeIndexIds = new Set(
   Array.from({ length: 69 }, (_, index) => `IDX-${String(index + 1).padStart(2, '0')}`).filter(
-    (id) => !['IDX-03', 'IDX-19'].includes(id),
+    (id) => !['IDX-03', 'IDX-07', 'IDX-19'].includes(id),
   ),
 );
 for (const record of QUERY_COVERAGE_REGISTRY) {
@@ -188,7 +188,7 @@ console.log('UNIMPLEMENTED_ACTIVE_QUERY_IDS=0');
 console.log('EXTRA_QUERY_IMPLEMENTATIONS=0');
 console.log('DUPLICATE_ACTIVE_QUERY_IDS=0');
 console.log('UNDEFINED_ACTIVE_QUERY_IDS=0');
-console.log('ACTIVE_INDEX_IDS=67');
+console.log('ACTIVE_INDEX_IDS=66');
 console.log('PRODUCT_LIST_MATRIX_INDEXES=32');
 console.log('REALTIME_QUERY_COUNT=4');
 console.log('REALTIME_QUERIES_IMPLEMENTED=4');

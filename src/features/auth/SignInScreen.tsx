@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router-dom';
 import { z } from 'zod';
 
-import { fetchMembershipsForUser, loginWithEmail } from '@/services/auth/authService';
+import { fetchMembershipsForUserFromServer, loginWithEmail } from '@/services/auth/authService';
 import { useWorkspace } from '@/services/workspace/useWorkspace';
 import { Button } from '@/ui/primitives/Button';
 import { Input } from '@/ui/primitives/Input';
@@ -34,9 +34,19 @@ export function SignInScreen() {
 
   const onSubmit = async (data: SignInFormData) => {
     setAuthError(null);
+    let user;
     try {
-      const user = await loginWithEmail(data.email, data.password);
-      const list = await fetchMembershipsForUser(user.uid);
+      user = await loginWithEmail(data.email, data.password);
+    } catch {
+      setAuthError('Invalid email or password. Please check your credentials and try again.');
+      return;
+    }
+
+    try {
+      // Forced-server read: a "zero memberships" result here must be an
+      // authoritative fact before it can send an existing member to
+      // onboarding, not a possibly-premature empty read from cache.
+      const list = await fetchMembershipsForUserFromServer(user.uid);
       void refreshMemberships();
       const first = list[0];
       if (list.length === 0 || !first) {
@@ -47,7 +57,10 @@ export function SignInScreen() {
         void navigate('/select-workspace');
       }
     } catch {
-      setAuthError('Invalid email or password. Please check your credentials and try again.');
+      // The account is authenticated; only the membership lookup failed.
+      // Never fall back to onboarding here — that would misclassify a real
+      // member as having no workspace.
+      setAuthError('We could not confirm your workspace access. Please try again.');
     }
   };
 

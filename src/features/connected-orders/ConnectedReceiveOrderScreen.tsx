@@ -23,6 +23,14 @@ interface QuantityInputProps {
   readonly value: number;
   readonly disabled: boolean;
   readonly onChange: (quantityMilli: number) => void;
+  /**
+   * This screen renders each line twice — once in the desktop table, once in
+   * the md:hidden mobile card list — so a bare `receive-{itemId}` id would be
+   * duplicated in the DOM (invalid HTML, and the sr-only label would
+   * associate with both inputs). The desktop id is left unprefixed since
+   * existing Playwright coverage (tests/e2e/macro-b) already targets it.
+   */
+  readonly layout: 'desktop' | 'mobile';
 }
 
 function formatMilli(value: number): string {
@@ -33,9 +41,9 @@ function supplierOutstanding(item: PurchaseOrderItem): number {
   return Math.max(0, (item.orderedSupplierMilli ?? 0) - (item.receivedSupplierMilli ?? 0));
 }
 
-function QuantityInput({ item, value, disabled, onChange }: QuantityInputProps) {
+function QuantityInput({ item, value, disabled, onChange, layout }: QuantityInputProps) {
   const outstanding = supplierOutstanding(item);
-  const inputId = `receive-${item.itemId}`;
+  const inputId = layout === 'mobile' ? `receive-mobile-${item.itemId}` : `receive-${item.itemId}`;
   return (
     <div className="space-y-1">
       <label className="sr-only" htmlFor={inputId}>
@@ -273,6 +281,7 @@ export function ConnectedReceiveOrderScreen({
                       <QuantityInput
                         disabled={isSubmitting}
                         item={item}
+                        layout="desktop"
                         onChange={(next) => {
                           setQuantities((current) => ({ ...current, [item.itemId]: next }));
                         }}
@@ -314,6 +323,7 @@ export function ConnectedReceiveOrderScreen({
                 <QuantityInput
                   disabled={isSubmitting}
                   item={item}
+                  layout="mobile"
                   onChange={(next) => {
                     setQuantities((current) => ({ ...current, [item.itemId]: next }));
                   }}

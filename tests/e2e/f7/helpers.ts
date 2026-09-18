@@ -8,21 +8,15 @@ import { expect, type Page } from '@playwright/test';
  */
 
 /**
- * KNOWN DEFECT (found while building F7, reported separately — not patched
- * here, see the F7 report): SignInScreen.onSubmit does one `getDocs()` read
- * of the caller's memberships immediately after login and, if it comes back
- * empty, routes to /onboarding with no distinction between "genuinely has no
- * memberships" and "the Firestore SDK had not finished establishing its
- * WebChannel yet and fell back to an empty cache." Under the Wide dataset's
- * heavier emulator load, the well-documented "Could not reach Cloud
- * Firestore backend... within 10 seconds" cold-connection window is wide
- * enough to hit this on a real, membership-holding account, misrouting it to
- * onboarding. A second sign-in attempt immediately after always succeeds,
- * because by then the connection is warm — so the retry below is a
- * test-harness accommodation for a real product race, not a flaky-test
- * workaround, and is deliberately not silent about it.
+ * The onboarding-redirect race that used to require a login retry here is
+ * fixed at the source (SignInScreen/BrandedLoginScreen now force a genuine
+ * server read of memberships before deciding where to route — see
+ * fetchUserMembershipsFromServer). A single sign-in attempt is expected to
+ * reach the dashboard; the generous timeout below is solely for the Wide
+ * dataset's Firestore emulator cold-connection latency, not a defect
+ * workaround.
  */
-async function attemptLogin(page: Page, email: string, handle: string): Promise<boolean> {
+export async function login(page: Page, email: string, handle: string): Promise<void> {
   if (page.url().includes('/app/')) {
     await page.getByRole('button', { name: 'User account menu' }).click();
     await page.getByText('Sign Out', { exact: true }).click();
@@ -33,26 +27,7 @@ async function attemptLogin(page: Page, email: string, handle: string): Promise<
   await page.locator('input[name="email"]').fill(email);
   await page.locator('input[name="password"]').fill('password123');
   await page.getByRole('button', { name: 'Sign In', exact: true }).click();
-  try {
-    await page.waitForURL(new RegExp(`/app/${handle}/dashboard`), { timeout: 20000 });
-    return true;
-  } catch {
-    return false;
-  }
-}
-
-export async function login(page: Page, email: string, handle: string): Promise<void> {
-  if (await attemptLogin(page, email, handle)) return;
-  console.log(
-    `F7_KNOWN_DEFECT: first sign-in for ${email} landed on ${page.url()} instead of the dashboard ` +
-      `(SignInScreen's post-login membership read raced a cold Firestore connection). Retrying once.`,
-  );
-  const succeeded = await attemptLogin(page, email, handle);
-  if (!succeeded) {
-    throw new Error(
-      `Login for ${email} did not reach /app/${handle}/dashboard after a retry — this is beyond the known transient onboarding-race defect.`,
-    );
-  }
+  await page.waitForURL(new RegExp(`/app/${handle}/dashboard`), { timeout: 20000 });
 }
 
 export async function expectDenied(page: Page, path: string): Promise<void> {

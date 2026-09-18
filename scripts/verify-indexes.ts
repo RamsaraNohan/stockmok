@@ -21,7 +21,7 @@ const ids = generated.map(({ id }) => id);
 const expectedIds = Array.from(
   { length: 69 },
   (_, offset) => `IDX-${String(offset + 1).padStart(2, '0')}`,
-).filter((id) => id !== 'IDX-03' && id !== 'IDX-19');
+).filter((id) => id !== 'IDX-03' && id !== 'IDX-19' && id !== 'IDX-07');
 
 function canonical(value: unknown): string {
   return JSON.stringify(value);
@@ -96,17 +96,30 @@ const generatedPayload = generated.map(({ collectionGroup, queryScope, fields })
   fields,
 }));
 
-if (new Set(ids).size !== 67)
-  throw new Error(`Expected 67 unique index ids, got ${String(new Set(ids).size)}`);
+if (new Set(ids).size !== 66)
+  throw new Error(`Expected 66 unique index ids, got ${String(new Set(ids).size)}`);
 if (matrix.length !== 32)
   throw new Error(`Expected 32 matrix indexes, got ${String(matrix.length)}`);
 if (canonical(ids) !== canonical(expectedIds)) throw new Error('Index id set does not match DB-04');
-if (parsed.indexes.length !== 67)
-  throw new Error(`Expected 67 JSON indexes, got ${String(parsed.indexes.length)}`);
+if (parsed.indexes.length !== 66)
+  throw new Error(`Expected 66 JSON indexes, got ${String(parsed.indexes.length)}`);
 if (canonical(parsed.indexes) !== canonical(generatedPayload)) {
   throw new Error('firestore.indexes.json is stale; run scripts/generate-indexes.ts');
 }
 if (parsed.fieldOverrides.length !== 0) throw new Error('Unexpected field overrides');
+
+for (const generatedIndex of generated) {
+  if (generatedIndex.fields.length < 2) {
+    throw new Error(
+      `${generatedIndex.id} is a single-field composite index (${generatedIndex.fields
+        .map((field) => field.fieldPath)
+        .join(
+          ', ',
+        )}); Firestore rejects composite declarations over one field because it already ` +
+        "maintains that field's ASC/DESC index automatically — remove it from index-spec.ts instead",
+    );
+  }
+}
 
 for (const generatedIndex of matrix) {
   const authority = authorityIndex(generatedIndex.id);
@@ -140,8 +153,8 @@ const onHandMatrix = matrix.filter(({ fields }) =>
   fields.some((field) => field.fieldPath === 'onHandMilli'),
 );
 
-console.log('INDEXES_EXPECTED=67');
-console.log('INDEXES_IMPLEMENTED=67');
+console.log('INDEXES_EXPECTED=66');
+console.log('INDEXES_IMPLEMENTED=66');
 console.log('PRODUCT_LIST_MATRIX=32');
 console.log('MISSING_INDEXES=0');
 console.log('EXTRA_INDEXES=0');

@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { z } from 'zod';
 
-import { fetchMembershipsForUser, loginWithEmail } from '@/services/auth/authService';
+import { fetchMembershipsForUserFromServer, loginWithEmail } from '@/services/auth/authService';
 import { fetchDirectoryByHandle } from '@/services/workspace/workspaceService';
 import { useWorkspace } from '@/services/workspace/useWorkspace';
 import { Button } from '@/ui/primitives/Button';
@@ -77,9 +77,19 @@ export function BrandedLoginScreen() {
 
   const onSubmit = async (data: BrandedLoginFormData) => {
     setAuthError(null);
+    let user;
     try {
-      const user = await loginWithEmail(data.email, data.password);
-      const list = await fetchMembershipsForUser(user.uid);
+      user = await loginWithEmail(data.email, data.password);
+    } catch {
+      setAuthError('Invalid credentials. Please verify your email and password.');
+      return;
+    }
+
+    try {
+      // Forced-server read: see fetchMembershipsForUserFromServer — a "not a
+      // member" conclusion here must be authoritative, not a possibly-
+      // premature empty read from cache.
+      const list = await fetchMembershipsForUserFromServer(user.uid);
       void refreshMemberships();
       const match = list.find((m) => m.handle.toLowerCase() === handle.toLowerCase());
       if (match) {
@@ -88,7 +98,7 @@ export function BrandedLoginScreen() {
         setAuthError(`Your account is not an active member of ${dir.name}.`);
       }
     } catch {
-      setAuthError('Invalid credentials. Please verify your email and password.');
+      setAuthError('We could not confirm your workspace access. Please try again.');
     }
   };
 
