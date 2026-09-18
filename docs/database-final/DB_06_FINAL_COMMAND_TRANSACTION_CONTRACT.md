@@ -457,9 +457,10 @@ outcome names *"…settings, **counter**, and first warehouse creation"*; `Q-068
 `ordersPlacedCount`; `po.cancel` decrements it, so it counts **non-cancelled** orders placed.
 **`openOrdersCount` does not exist** — the archive guard is `C-38 partner.setStatus`'s in-transaction
 `limit(1)` query, which cannot drift and cannot strand a supplier behind a counter that never reaches
-zero. `cpo.submit` increments the
-connection projection's `ordersPlacedCount` in the transaction that already writes both projections
-(`INV-19`).
+zero. **DB-CR-040:** `cpo.submit` increments the connection projection's `ordersPlacedCount` in the
+transaction that already writes both projections (`INV-19`); `cpo.cancel`, `cpo.respond`, `cpo.ship` and
+`cpo.receive` do not change it. DV-12 is the lifetime count of successfully submitted connected orders,
+rebuilt from the retained `submittedAt` marker rather than current status.
 
 **Snapshot writes** (A3 · DB-CR-031, DB-CR-036). `po.receive`, `cpo.receive` and `cpo.ship` write
 `sourceReferenceSnapshot` onto the movement from the order number already in the transaction.

@@ -275,7 +275,7 @@ was correct at A3 and became wrong the moment `A3R-05` added **`INV-27`**. `INV-
 
 | DV | Field | Source of truth | Owner / trigger | Atomicity | Rebuild |
 |---|---|---|---|---|---|
-| **DV-12** | `connections/{id}.ordersPlacedCount` (tenant projection) | `connectedPurchaseOrders` | `cpo.submit`, in the transaction that already writes both projections (`INV-19`) | same transaction | recount by `connectedPurchaseOrders where buyerOrgId == B and supplierOrgId == S` |
+| **DV-12** | `connections/{id}.ordersPlacedCount` (tenant projection) | successfully submitted `connectedPurchaseOrders` (`submittedAt` present) | `cpo.submit` **+1**; every later transition including `cpo.cancel` **+0** (`DB-CR-040`) | same transaction | for the connection, count canonical connected orders carrying a valid `submittedAt`; current status is irrelevant |
 | **DV-13** | `privatePartners/{id}.ordersPlacedCount` | `purchaseOrders` | `po.order` **+1**; `po.cancel` **−1** | same transaction | `count()` `purchaseOrders where privateSupplierId == P and status != 'CANCELLED'` |
 
 Both satisfy the §12 audit rule: host and source are written by the **same** transactional writer. Both
@@ -370,8 +370,14 @@ happened** — which a join to the live `warehouses` document would get *wrong*,
 
 | DV | Field | Source of truth | Writer | Rebuild |
 |---|---|---|---|---|
-| **DV-12** | `connections/{id}.ordersPlacedCount` (tenant projection) | `connectedPurchaseOrders` | `cpo.submit`, in the transaction that already writes both projections (`INV-19`) | `count()` `connectedPurchaseOrders where buyerOrgId == B and supplierOrgId == S and status != 'CANCELLED'` |
+| **DV-12** | `connections/{id}.ordersPlacedCount` (tenant projection) | successfully submitted `connectedPurchaseOrders` (`submittedAt` present) | `cpo.submit` **+1**; every later transition including `cpo.cancel` **+0** (`DB-CR-040`) | for the connection, count canonical connected orders carrying a valid `submittedAt`; current status is irrelevant |
 | **DV-13** | `privatePartners/{id}.ordersPlacedCount` | `purchaseOrders` | `po.order` **+1**; `po.cancel` **−1** | `count()` `purchaseOrders where privateSupplierId == P and status != 'CANCELLED'` |
+
+**DB-CR-040 — DV-12 is historical, DV-13 is not.** A connected `DRAFT` has no `submittedAt` and does not
+contribute. `cpo.submit` writes `submittedAt` to the canonical record and both projections in the same
+transaction as the counter increment; later partial lifecycle updates retain it, including cancellation.
+DV-12 rebuild therefore counts that immutable evidence of successful submission rather than interpreting
+the order's current status. This owner decision preserves the frozen backend maintenance rule.
 
 **A3R-11 — `openOrdersCount` is DELETED, and the archive guard is a command, not a field read.**
 The first A3 pass made *"a supplier with an order still open cannot be archived"* depend on a maintained

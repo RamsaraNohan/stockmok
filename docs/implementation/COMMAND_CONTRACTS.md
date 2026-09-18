@@ -88,7 +88,8 @@ in the coverage denominator (A3 · F-M-16). **17** commands are idempotent (A3 �
 | `po.order` | `+1` to `privatePartners.ordersPlacedCount`. Upserts `counters/purchaseOrder` when absent. |
 | `po.receive` | Writes `sourceReferenceSnapshot` and `warehouseNameSnapshot` onto the movement. |
 | `po.cancel` | `−1 ordersPlacedCount`, so the counter tracks **non-cancelled** orders placed. |
-| `cpo.submit` | `+1` to the connection projection's `ordersPlacedCount`, in the transaction that already writes both projections. |
+| `cpo.submit` | `+1` to the connection projection's `ordersPlacedCount`, in the transaction that already writes both projections. **DB-CR-040:** this is a lifetime successfully-submitted count, evidenced by retained `submittedAt`. |
+| `cpo.cancel` / `cpo.respond` / `cpo.ship` / `cpo.receive` | `+0` to connection `ordersPlacedCount`; later lifecycle state does not erase a placed order (`DV-12`, DB-CR-040). |
 | `cpo.ship` / `cpo.receive` | Write `sourceReferenceSnapshot` onto the movement. |
 | every stock command | Also writes that balance row's `stockValueMinor`, `stockStatus`, `shortfallMilli`, and the summary's `stockStatus`, `shortfallMilli` and `stockValueMinor` (the latter as the **sum** of the product's balances, `INV-27`). Zero extra reads — same documents, same transaction. |
 | `product.update` / `product.setStatus` | The existing `Q-079` fanout (`IDX-09`, `limit(100)`) now also recomputes the three derived balance fields **and** the summary's `stockStatus`/`shortfallMilli` when `minimumStockMilli` changes. `warehouse.create` refuses beyond **100 ACTIVE warehouses per organization**, so `limit(100)` can never truncate the fanout (A3R-18). |
