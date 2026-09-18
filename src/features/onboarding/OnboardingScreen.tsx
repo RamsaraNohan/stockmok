@@ -87,14 +87,25 @@ export function OnboardingScreen() {
     setSubmitError(null);
     try {
       await executeCreateOrgCommand(data);
-      const fresh = await refreshMemberships();
-      if (fresh.length > 0) {
-        await setActiveHandle(data.handle);
-        void navigate(`/app/${data.handle}/dashboard`);
+      let found = false;
+      for (let i = 0; i < 5; i++) {
+        const fresh = await refreshMemberships();
+        if (fresh.some((m) => m.handle === data.handle)) {
+          found = true;
+          void navigate(`/app/${data.handle}/dashboard`);
+          break;
+        }
+        await new Promise((resolve) => setTimeout(resolve, 1000));
       }
-    } catch {
+      if (!found) {
+        setSubmitError(
+          'Workspace created, but timeout waiting for membership propagation. Please refresh.',
+        );
+      }
+    } catch (e: any) {
+      console.error('orgCreate failed:', e);
       setSubmitError(
-        'C-01 org.create backend command execution pending promotion. Frontend onboarding structure validated successfully.',
+        e?.message || 'Unknown error occurred while creating the organization. Check console.',
       );
     }
   };

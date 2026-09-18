@@ -21,10 +21,11 @@ export function GuestGuard({ children }: { readonly children: ReactNode }) {
     if (memberships.length === 0) {
       return <Navigate replace to="/onboarding" />;
     }
-    if (memberships.length === 1 && first) {
+    if (first) {
       return <Navigate replace to={`/app/${first.handle}/dashboard`} />;
     }
-    return <Navigate replace to="/select-workspace" />;
+    // Fallback if memberships array is somehow invalid
+    return <Navigate replace to="/onboarding" />;
   }
 
   return <>{children}</>;

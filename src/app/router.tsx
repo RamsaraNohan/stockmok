@@ -64,11 +64,7 @@ function SectionPlaceholder({ title }: { readonly title: string }) {
 export const router = createBrowserRouter([
   {
     path: '/',
-    element: (
-      <GuestGuard>
-        <LandingScreen />
-      </GuestGuard>
-    ),
+    element: <LandingScreen />,
   },
   {
     path: '/signup',

@@ -95,7 +95,6 @@ export const QUERY_COVERAGE_REGISTRY = [
     path: 'users/{uid}/memberships',
     converter: 'userMembership',
     filters: [filter('status', '==', active)],
-    order: [order('joinedAt', 'asc')],
     defaultLimit: 25,
     maxLimit: 25,
   }),

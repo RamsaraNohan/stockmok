@@ -47,7 +47,8 @@ export function WorkspaceProvider({ children }: { readonly children: ReactNode }
       const list = await fetchUserMemberships(uid);
       setMemberships(list);
       return list;
-    } catch {
+    } catch (err) {
+      console.error('loadMemberships failed:', err);
       setMemberships([]);
       return [];
     }

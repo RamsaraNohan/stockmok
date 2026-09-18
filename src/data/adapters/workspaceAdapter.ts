@@ -60,7 +60,12 @@ export async function executeCreateOrgCommand(payload: {
     functions,
     'orgCreate',
   );
-  const response = await callable(payload);
+  const { warehouseName, warehouseType, ...strictPayload } = payload;
+  const response = await callable({
+    orgId: 'new',
+    operationId: crypto.randomUUID(),
+    payload: strictPayload,
+  });
   const result = response.data;
   return result.data as { readonly organizationId: string };
 }
@@ -73,7 +78,10 @@ export async function executeBootstrapProfileCommand(payload: {
     functions,
     'userBootstrapProfile',
   );
-  await callable(payload);
+  await callable({
+    orgId: 'self',
+    payload,
+  });
 }
 
 // C-06: team.acceptInvitation Command Adapter (authorization: INVITEE)
@@ -84,7 +92,10 @@ export async function executeAcceptInvitationCommand(payload: {
     functions,
     'teamAcceptInvitation',
   );
-  const response = await callable(payload);
+  const response = await callable({
+    orgId: 'invitee',
+    payload,
+  });
   const result = response.data;
   return result.data as { readonly organizationId: string };
 }

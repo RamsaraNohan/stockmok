@@ -1,5 +1,15 @@
 {
   "projects": {
     "default": "stockmok"
-  }
+  },
+  "targets": {
+    "stockmok": {
+      "hosting": {
+        "stockmokweb": [
+          "stockmokweb"
+        ]
+      }
+    }
+  },
+  "etags": {}
 }

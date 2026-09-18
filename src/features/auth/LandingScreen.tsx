@@ -1,4 +1,4 @@
-import { ArrowRight, CheckCircle2, ShieldCheck, Zap } from 'lucide-react';
+import { ArrowRight, CheckCircle2, Megaphone, ShieldCheck, Zap } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 import { Button } from '@/ui/primitives/Button';
@@ -27,6 +27,24 @@ export function LandingScreen() {
       </header>
 
       <main className="flex-1">
+        <div className="bg-[#a4101e] text-white shadow-sm">
+          <div className="mx-auto flex w-[min(calc(100%-2rem),90rem)] items-center justify-between gap-4 py-4 max-md:w-[min(calc(100%-1.5rem),90rem)] max-md:flex-col max-md:text-center">
+            <div className="flex items-center gap-4 max-md:flex-col">
+              <Megaphone className="size-7 shrink-0 opacity-90 max-md:hidden" />
+              <div className="text-sm leading-relaxed">
+                <strong className="font-bold tracking-wide">DOCUMENTATION UPDATE: Correct GitHub Source Link.</strong>
+                <br />
+                Our apologies, a link in a recent document was misdirected to this address. Access the correct open-source project repository.
+              </div>
+            </div>
+            <a href="https://github.com/RamsaraNohan/stockmok" target="_blank" rel="noreferrer" className="shrink-0">
+              <Button className="bg-black/20 hover:bg-black/30 border-white/10 text-white font-semibold transition-colors" size="sm">
+                View GitHub Repository <ArrowRight className="ml-2 size-4" />
+              </Button>
+            </a>
+          </div>
+        </div>
+
         <section className="mx-auto max-w-[90rem] px-8 py-20 max-md:px-4 max-md:py-12">
           <div className="mx-auto max-w-3xl text-center">
             <h1 className="text-text text-4xl font-extrabold tracking-tight max-md:text-3xl sm:text-5xl">

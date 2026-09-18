@@ -36,14 +36,13 @@ export function SignInScreen() {
     setAuthError(null);
     try {
       await loginWithEmail(data.email, data.password);
+      // Important: Load workspaces AFTER successful login to decide where to route
       const list = await refreshMemberships();
       const first = list[0];
       if (list.length === 0 || !first) {
         void navigate('/onboarding');
-      } else if (list.length === 1) {
-        void navigate(`/app/${first.handle}/dashboard`);
       } else {
-        void navigate('/select-workspace');
+        void navigate(`/app/${first.handle}/dashboard`);
       }
     } catch {
       setAuthError('Invalid email or password. Please check your credentials and try again.');
