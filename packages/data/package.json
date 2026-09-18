@@ -1,0 +1,43 @@
+{
+  "name": "@stockmok/data",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./server": {
+      "node": {
+        "types": "./dist/server.d.ts",
+        "default": "./dist/server.js"
+      }
+    }
+  },
+  "browser": {
+    "./dist/server.js": false
+  },
+  "scripts": {
+    "build": "npm run build --workspace @stockmok/shared && tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src scripts test vitest.config.ts vitest.emulator.config.ts",
+    "format:check": "prettier --check package.json tsconfig.json tsconfig.build.json vitest.config.ts vitest.emulator.config.ts \"src/**/*.ts\" \"scripts/**/*.ts\" \"test/**/*.ts\"",
+    "test": "vitest run --config vitest.config.ts",
+    "test:emulator:inner": "vitest run --config vitest.emulator.config.ts",
+    "test:emulator": "firebase emulators:exec --project stockmok --config ../../firebase.json --only firestore \"npm run test:emulator:inner\"",
+    "verify:contracts": "tsx scripts/verify-c2.ts",
+    "verify": "npm run format:check && npm run typecheck && npm run lint && npm run test && npm run verify:contracts && npm run build"
+  },
+  "dependencies": {
+    "@stockmok/shared": "0.1.0",
+    "firebase": "^12.17.1",
+    "firebase-admin": "^14.1.0"
+  },
+  "devDependencies": {
+    "@firebase/rules-unit-testing": "^5.0.1",
+    "typescript": "5.9.3"
+  }
+}
