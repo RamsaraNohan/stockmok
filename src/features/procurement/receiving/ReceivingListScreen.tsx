@@ -6,7 +6,14 @@ import { PageHeader } from '@/ui/shell/PageHeader';
 import { EmptyState } from '@/ui/primitives/EmptyState';
 import { ErrorState } from '@/ui/primitives/ErrorState';
 import { Skeleton } from '@/ui/primitives/Skeleton';
-import type { PoStatus } from '@stockmok/shared';
+import { isFirestoreTimestamp, type PoStatus, type PurchaseOrder } from '@stockmok/shared';
+
+function formatExpectedDate(value: PurchaseOrder['expectedDate']): string {
+  if (!isFirestoreTimestamp(value)) return '-';
+  const date = value.toDate();
+  if (Number.isNaN(date.getTime())) return '-';
+  return new Intl.DateTimeFormat(undefined, { dateStyle: 'medium' }).format(date);
+}
 
 export function ReceivingListScreen() {
   const navigate = useNavigate();
@@ -80,7 +87,7 @@ export function ReceivingListScreen() {
                     <td className="p-4 text-sm text-text-muted">{order.counterpartyName}</td>
                     <td className="p-4 text-sm text-text-muted">{order.status}</td>
                     <td className="p-4 text-sm text-text-muted">
-                      {order.expectedDate ? (order.expectedDate as unknown as string) : '-'}
+                      {formatExpectedDate(order.expectedDate)}
                     </td>
                   </tr>
                 ))}
